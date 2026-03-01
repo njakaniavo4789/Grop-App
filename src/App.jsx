@@ -620,10 +620,53 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage }) {
   );
 }
 
+// Convertit le code WMO Open-Meteo → icône + libellé + gradient
+function wmoInfo(code) {
+  if (code === 0)  return { icon: '☀️',  label: 'Ciel dégagé',    bg: 'from-amber-400 to-orange-500'  };
+  if (code <= 2)   return { icon: '🌤️',  label: 'Peu nuageux',    bg: 'from-yellow-300 to-sky-400'    };
+  if (code <= 3)   return { icon: '☁️',  label: 'Couvert',        bg: 'from-slate-400 to-slate-500'   };
+  if (code <= 48)  return { icon: '🌫️',  label: 'Brouillard',     bg: 'from-gray-300 to-gray-400'     };
+  if (code <= 55)  return { icon: '🌦️',  label: 'Bruine',         bg: 'from-blue-300 to-cyan-400'     };
+  if (code <= 65)  return { icon: '🌧️',  label: 'Pluie',          bg: 'from-blue-500 to-indigo-600'   };
+  if (code <= 75)  return { icon: '❄️',  label: 'Neige',          bg: 'from-blue-100 to-sky-200'      };
+  if (code <= 82)  return { icon: '🌧️',  label: 'Averses',        bg: 'from-blue-400 to-indigo-500'   };
+  if (code <= 86)  return { icon: '🌨️',  label: 'Averses neige',  bg: 'from-sky-200 to-blue-300'      };
+  return             { icon: '⛈️',  label: 'Orage',          bg: 'from-gray-600 to-gray-800'     };
+}
+
 function DashboardPage() {
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const [userList, setUserList] = useState([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [selectedCity, setSelectedCity] = useState(null);   // { name, lat, lon, regionName, color }
+  const [weather, setWeather] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const mapRef = React.useRef(null);
   const mapInstanceRef = React.useRef(null);
+
+  // Chargement des utilisateurs — visible uniquement si le compte est admin (sinon 403 silencieux)
+  useEffect(() => {
+    authAPI.getUsers(getAccessToken())
+      .then(res => setUserList(res.data))
+      .catch(() => {});
+  }, []);
+
+  // Météo temps réel via Open-Meteo (sans clé API) — déclenché au clic sur une région
+  useEffect(() => {
+    if (!selectedCity) return;
+    setWeatherLoading(true);
+    setWeather(null);
+    fetch(
+      `https://api.open-meteo.com/v1/forecast` +
+      `?latitude=${selectedCity.lat}&longitude=${selectedCity.lon}` +
+      `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,weather_code` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
+      `&wind_speed_unit=kmh&timezone=Indian%2FAntananarivo&forecast_days=5`
+    )
+      .then(r => r.json())
+      .then(data => { setWeather(data); setWeatherLoading(false); })
+      .catch(() => setWeatherLoading(false));
+  }, [selectedCity]);
 
   React.useEffect(() => {
     const loadLeaflet = async () => {
@@ -672,6 +715,33 @@ function DashboardPage() {
           'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
           { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 10 }
         ).addTo(map);
+
+        // Ville principale de chaque région (pour l'API météo)
+        const regionCities = {
+          'Diana':             { name: 'Antsiranana',       lat: -12.2787, lon: 49.2917 },
+          'SAVA':              { name: 'Sambava',            lat: -14.2667, lon: 50.1667 },
+          'Analanjirofo':      { name: 'Fenoarivo Atsinanana', lat: -17.3833, lon: 49.4167 },
+          'Sofia':             { name: 'Antsohihy',          lat: -14.8833, lon: 47.9833 },
+          'Boeny':             { name: 'Mahajanga',           lat: -15.7167, lon: 46.3167 },
+          'Betsiboka':         { name: 'Maevatanana',         lat: -16.9333, lon: 46.8333 },
+          'Melaky':            { name: 'Maintirano',           lat: -18.0500, lon: 44.0167 },
+          'Bongolava':         { name: 'Tsiroanomandidy',     lat: -18.7667, lon: 46.0500 },
+          'Itasy':             { name: 'Miarinarivo',          lat: -19.0000, lon: 46.7333 },
+          'Analamanga':        { name: 'Antananarivo',         lat: -18.9137, lon: 47.5361 },
+          'Alaotra-Mangoro':   { name: 'Ambatondrazaka',       lat: -17.8333, lon: 48.4167 },
+          'Atsinanana':        { name: 'Toamasina',            lat: -18.1443, lon: 49.4122 },
+          'Vakinankaratra':    { name: 'Antsirabe',            lat: -19.8667, lon: 47.0333 },
+          "Amoron'i Mania":    { name: 'Ambositra',            lat: -20.5333, lon: 47.2500 },
+          'Menabe':            { name: 'Morondava',            lat: -20.2833, lon: 44.2833 },
+          'Haute Matsiatra':   { name: 'Fianarantsoa',         lat: -21.4533, lon: 47.0858 },
+          'Vatovavy':          { name: 'Manakara',             lat: -22.1500, lon: 48.0167 },
+          'Fitovinany':        { name: 'Farafangana',           lat: -22.8167, lon: 47.8333 },
+          'Ihorombe':          { name: 'Ihosy',                lat: -22.4000, lon: 46.1167 },
+          'Atsimo-Atsinanana': { name: 'Vangaindrano',         lat: -23.3500, lon: 47.6000 },
+          'Atsimo-Andrefana':  { name: 'Toliara',              lat: -23.3500, lon: 43.6667 },
+          'Androy':            { name: 'Ambovombe',             lat: -25.1667, lon: 46.0833 },
+          'Anosy':             { name: 'Tôlanaro',             lat: -25.0333, lon: 46.9833 },
+        };
 
         // 22 régions de Madagascar avec couleurs distinctes
         const regions = [
@@ -752,6 +822,14 @@ function DashboardPage() {
 
           polygon.on('mouseover', function () { this.setStyle({ fillOpacity: 0.5, weight: 2.5 }); });
           polygon.on('mouseout',  function () { this.setStyle({ fillOpacity: 0.22, weight: 1.2 }); });
+
+          // Clic → mise à jour météo en temps réel
+          const city = regionCities[region.name];
+          if (city) {
+            polygon.on('click', () =>
+              setSelectedCity({ ...city, regionName: region.name, color: region.color })
+            );
+          }
         });
 
         // Villes principales
@@ -851,15 +929,6 @@ function DashboardPage() {
     { id: 12, name: "Androy",            production: 60, crop: "Manioc, Maïs",           color: "#f59e0b", area: "19 317 km²",  farmers: "35 000"  },
   ];
 
-  const weatherData = [
-    { day: "Lun", temp: 24, rain: 20 },
-    { day: "Mar", temp: 26, rain: 40 },
-    { day: "Mer", temp: 23, rain: 80 },
-    { day: "Jeu", temp: 25, rain: 60 },
-    { day: "Ven", temp: 27, rain: 30 },
-    { day: "Sam", temp: 28, rain: 10 },
-    { day: "Dim", temp: 26, rain: 50 }
-  ];
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -906,40 +975,103 @@ function DashboardPage() {
             ></div>
           </div>
 
-          <div className="lg:col-span-1 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Météo - 7 Jours</h3>
-            <div className="space-y-3">
-              {weatherData.map((day, index) => (
-                <div key={index} className="flex items-center justify-between p-2.5 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
-                      <CloudRain size={15} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800 text-sm">{day.day}</p>
-                      <p className="text-xs text-gray-500">{day.temp}°C</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-500" style={{ width: `${day.rain}%` }}></div>
-                    </div>
-                    <span className="text-xs font-medium text-gray-600 w-7">{day.rain}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white">⚠️</span>
+          {/* Panel météo temps réel */}
+          <div className="lg:col-span-1 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col" style={{ minHeight: '720px' }}>
+            {!selectedCity ? (
+              /* Invite de sélection */
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-5">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl flex items-center justify-center text-4xl shadow-inner">
+                  🗺️
                 </div>
                 <div>
-                  <p className="font-semibold text-amber-800 text-sm">Alerte Météo</p>
-                  <p className="text-xs text-amber-700 mt-1">Fortes pluies prévues mercredi. Protégez vos cultures sensibles.</p>
+                  <h3 className="font-semibold text-gray-700 mb-2">Météo en temps réel</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Cliquez sur une région de la carte pour afficher sa météo en direct
+                  </p>
+                </div>
+                <div className="w-full border-t border-gray-100 pt-4">
+                  <p className="text-xs text-gray-300">Source : Open-Meteo • Sans clé API</p>
                 </div>
               </div>
-            </div>
+            ) : weatherLoading ? (
+              /* Chargement */
+              <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="text-sm text-gray-400">Récupération météo…</p>
+                <p className="text-xs text-gray-300">{selectedCity.name}</p>
+              </div>
+            ) : weather && weather.current ? (
+              /* Données météo */
+              <div className="flex flex-col h-full overflow-y-auto">
+                {/* En-tête dégradé */}
+                <div className={`px-5 py-5 bg-gradient-to-br ${wmoInfo(weather.current.weather_code).bg} text-white flex-shrink-0`}>
+                  <p className="text-xs opacity-75 mb-0.5 uppercase tracking-wider">{selectedCity.regionName}</p>
+                  <h3 className="text-xl font-bold mb-3">{selectedCity.name}</h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-5xl leading-none">{wmoInfo(weather.current.weather_code).icon}</span>
+                    <div>
+                      <p className="text-4xl font-bold leading-none">{Math.round(weather.current.temperature_2m)}°C</p>
+                      <p className="text-sm opacity-90 mt-1">{wmoInfo(weather.current.weather_code).label}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4 métriques courantes */}
+                <div className="grid grid-cols-2 gap-2 p-4 border-b border-gray-100 flex-shrink-0">
+                  {[
+                    { icon: '🌡️', label: 'Ressenti',  value: `${Math.round(weather.current.apparent_temperature)}°C` },
+                    { icon: '💧', label: 'Humidité',  value: `${weather.current.relative_humidity_2m}%`            },
+                    { icon: '💨', label: 'Vent',       value: `${Math.round(weather.current.wind_speed_10m)} km/h`  },
+                    { icon: '🌧️', label: 'Précip.',   value: `${weather.current.precipitation} mm`                 },
+                  ].map((d, i) => (
+                    <div key={i} className="bg-gray-50 rounded-xl p-2.5 text-center">
+                      <div className="text-xl mb-0.5">{d.icon}</div>
+                      <div className="text-sm font-bold text-gray-800">{d.value}</div>
+                      <div className="text-xs text-gray-400">{d.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Prévisions 5 jours */}
+                <div className="p-4 flex-1">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Prévisions 5 jours</p>
+                  <div className="space-y-1">
+                    {weather.daily.time.map((date, i) => {
+                      const info = wmoInfo(weather.daily.weather_code[i]);
+                      const dayName = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short' });
+                      return (
+                        <div key={i} className="flex items-center justify-between py-2 px-3 rounded-xl hover:bg-gray-50 transition-colors">
+                          <span className="text-sm font-medium text-gray-600 w-10 capitalize">{dayName}</span>
+                          <span className="text-xl mx-1">{info.icon}</span>
+                          <span className="text-xs text-blue-500 w-10 text-center">
+                            💧{weather.daily.precipitation_probability_max[i]}%
+                          </span>
+                          <div className="text-right">
+                            <span className="text-sm font-bold text-gray-800">
+                              {Math.round(weather.daily.temperature_2m_max[i])}°
+                            </span>
+                            <span className="text-xs text-gray-400 ml-1">
+                              {Math.round(weather.daily.temperature_2m_min[i])}°
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Pied de page */}
+                <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
+                  <p className="text-xs text-gray-300 text-center">
+                    Open-Meteo · Mis à jour à l'instant
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center p-6 text-sm text-red-400">
+                Impossible de charger la météo.
+              </div>
+            )}
           </div>
         </div>
 
@@ -1012,6 +1144,88 @@ function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Liste des utilisateurs (admin uniquement) ── */}
+        {userList.length > 0 && (() => {
+          const fmt = iso => iso
+            ? new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '—';
+          const filtered = userList.filter(u =>
+            u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+            u.email.toLowerCase().includes(userSearch.toLowerCase())
+          );
+          return (
+            <div className="mt-6 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+              {/* En-tête */}
+              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                    <Users size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Utilisateurs inscrits</h3>
+                    <p className="text-xs text-gray-400">
+                      {userList.length} compte{userList.length > 1 ? 's' : ''} — {userList.filter(u => u.is_staff).length} admin{userList.filter(u => u.is_staff).length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher nom ou email…"
+                    value={userSearch}
+                    onChange={e => setUserSearch(e.target.value)}
+                    className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white w-56"
+                  />
+                </div>
+              </div>
+
+              {/* Tableau */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="text-left px-6 py-3">Utilisateur</th>
+                      <th className="text-left px-6 py-3">Email</th>
+                      <th className="text-left px-6 py-3">Rôle</th>
+                      <th className="text-left px-6 py-3">Statut</th>
+                      <th className="text-left px-6 py-3">Inscrit le</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filtered.length === 0
+                      ? <tr><td colSpan={5} className="text-center py-10 text-gray-400 text-sm">Aucun résultat.</td></tr>
+                      : filtered.map(u => (
+                        <tr key={u.id} className="hover:bg-violet-50/40 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <UserAvatar name={u.name} />
+                              <span className="font-semibold text-gray-800">{u.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{u.email}</td>
+                          <td className="px-6 py-4">
+                            {u.is_staff
+                              ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700"><Shield size={11} /> Admin</span>
+                              : <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"><User size={11} /> Utilisateur</span>}
+                          </td>
+                          <td className="px-6 py-4">
+                            {u.is_active
+                              ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Actif</span>
+                              : <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" /> Inactif</span>}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">{fmt(u.created_at)}</td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
+
       </div>
     </div>
   );
