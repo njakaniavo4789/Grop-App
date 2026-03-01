@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
-import { Send, Home, MessageSquare, Settings, User, TrendingUp, Sprout, Leaf, CloudRain } from 'lucide-react';
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck } from 'lucide-react';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import Login from "./composant/login";
 import Register from "./composant/register";
 import cartographie from "./composant/cartographie";
+import { getAccessToken, clearTokens, authAPI } from "./api/auth";
+
+function PrivateRoute({ children }) {
+  return getAccessToken() ? children : <Navigate to="/login" replace />;
+}
 
 // Main layout with navbar + chat/dashboard
 function MainLayout() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState('chat');
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [userInfo, setUserInfo] = useState({ name: 'Agriculteur', email: '', isAdmin: false });
+
+  useEffect(() => {
+    authAPI.getProfile(getAccessToken())
+      .then(res => setUserInfo({
+        name: res.data.name,
+        email: res.data.email,
+        isAdmin: res.data.is_staff,
+      }))
+      .catch(() => {});
+  }, []);
+
+  const handleLogout = () => {
+    clearTokens();
+    navigate('/login');
+  };
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
@@ -54,9 +76,17 @@ function MainLayout() {
             <NavItem
               icon={<Settings size={20} />}
               label="Paramètres"
-              active={false}
-              onClick={() => {}}
+              active={currentPage === 'settings'}
+              onClick={() => setCurrentPage('settings')}
             />
+            {userInfo.isAdmin && (
+              <NavItem
+                icon={<Users size={20} />}
+                label="Utilisateurs"
+                active={currentPage === 'users'}
+                onClick={() => setCurrentPage('users')}
+              />
+            )}
           </div>
         </div>
 
@@ -65,10 +95,21 @@ function MainLayout() {
             <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
               <User size={20} className="text-white" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-800">Agriculteur</p>
-              <p className="text-xs text-gray-500">Plan Premium</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-800 truncate">{userInfo.name}</p>
+              <p className="text-xs text-gray-500">{userInfo.isAdmin ? '⭐ Admin' : 'Connecté'}</p>
             </div>
+            <button
+              onClick={handleLogout}
+              title="Déconnexion"
+              className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
           </div>
         </div>
       </nav>
@@ -77,7 +118,11 @@ function MainLayout() {
       <main className="flex-1 flex flex-col overflow-hidden">
         {currentPage === 'chat'
           ? <ChatPage messages={messages} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={handleSendMessage} />
-          : <DashboardPage />
+          : currentPage === 'dashboard'
+            ? <DashboardPage />
+            : currentPage === 'settings'
+              ? <SettingsPage />
+              : <UsersPage />
         }
       </main>
     </div>
@@ -92,9 +137,218 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/cartographie" element={<cartographie />} />
-        <Route path="/" element={<MainLayout />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <MainLayout />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
+  );
+}
+
+// Défini en dehors de SettingsPage pour éviter la perte de focus à chaque frappe
+function PwdField({ label, value, onChange, show, setShow }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          required
+          className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-800 transition-all"
+        />
+        <button type="button" onClick={() => setShow(!show)}
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+          {show ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SettingsAlert({ msg }) {
+  if (!msg) return null;
+  return (
+    <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm ${
+      msg.type === 'success'
+        ? 'bg-green-50 border border-green-200 text-green-700'
+        : 'bg-red-50 border border-red-200 text-red-700'
+    }`}>
+      {msg.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+      {msg.text}
+    </div>
+  );
+}
+
+function SettingsPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [currentPwd, setCurrentPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [showCurrentPwd, setShowCurrentPwd] = useState(false);
+  const [showNewPwd, setShowNewPwd] = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [nameMsg, setNameMsg] = useState(null); // { type: 'success'|'error', text }
+  const [pwdMsg, setPwdMsg] = useState(null);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    authAPI.getProfile(token)
+      .then(res => { setName(res.data.name); setEmail(res.data.email); })
+      .catch(() => {});
+  }, []);
+
+  const handleNameSubmit = async (e) => {
+    e.preventDefault();
+    setNameMsg(null);
+    setNameLoading(true);
+    try {
+      await authAPI.updateProfile({ name }, getAccessToken());
+      setNameMsg({ type: 'success', text: 'Nom mis à jour avec succès.' });
+    } catch (err) {
+      setNameMsg({ type: 'error', text: err.response?.data?.error || 'Erreur lors de la mise à jour.' });
+    } finally {
+      setNameLoading(false);
+    }
+  };
+
+  const handlePwdSubmit = async (e) => {
+    e.preventDefault();
+    setPwdMsg(null);
+    if (newPwd !== confirmPwd) {
+      setPwdMsg({ type: 'error', text: 'Les nouveaux mots de passe ne correspondent pas.' });
+      return;
+    }
+    setPwdLoading(true);
+    try {
+      await authAPI.updateProfile({ current_password: currentPwd, new_password: newPwd }, getAccessToken());
+      setPwdMsg({ type: 'success', text: 'Mot de passe mis à jour avec succès.' });
+      setCurrentPwd(''); setNewPwd(''); setConfirmPwd('');
+    } catch (err) {
+      setPwdMsg({ type: 'error', text: err.response?.data?.error || 'Erreur lors de la mise à jour.' });
+    } finally {
+      setPwdLoading(false);
+    }
+  };
+
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-6 border-b border-gray-200">
+        <h2 className="text-3xl font-semibold text-gray-800">Paramètres</h2>
+        <p className="text-gray-500 mt-1">Gérez les informations de votre compte</p>
+      </div>
+
+      <div className="p-8 max-w-2xl space-y-8">
+
+        {/* Section : Informations du profil */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+              <User size={18} className="text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">Informations du profil</h3>
+              <p className="text-xs text-gray-500">Modifiez votre nom d'affichage</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleNameSubmit} className="px-6 py-5 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
+              <input
+                type="email"
+                value={email}
+                disabled
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-400 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-400 mt-1">L'adresse email ne peut pas être modifiée.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nom complet</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                placeholder="Votre nom"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-800 transition-all"
+              />
+            </div>
+
+            <SettingsAlert msg={nameMsg} />
+
+            <button
+              type="submit"
+              disabled={nameLoading}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+            >
+              <Save size={16} />
+              {nameLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+            </button>
+          </form>
+        </div>
+
+        {/* Section : Sécurité */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+              <Lock size={18} className="text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">Changer le mot de passe</h3>
+              <p className="text-xs text-gray-500">Minimum 8 caractères</p>
+            </div>
+          </div>
+
+          <form onSubmit={handlePwdSubmit} className="px-6 py-5 space-y-4">
+            <PwdField
+              label="Mot de passe actuel"
+              value={currentPwd}
+              onChange={setCurrentPwd}
+              show={showCurrentPwd}
+              setShow={setShowCurrentPwd}
+            />
+            <PwdField
+              label="Nouveau mot de passe"
+              value={newPwd}
+              onChange={setNewPwd}
+              show={showNewPwd}
+              setShow={setShowNewPwd}
+            />
+            <PwdField
+              label="Confirmer le nouveau mot de passe"
+              value={confirmPwd}
+              onChange={setConfirmPwd}
+              show={showConfirmPwd}
+              setShow={setShowConfirmPwd}
+            />
+
+            <SettingsAlert msg={pwdMsg} />
+
+            <button
+              type="submit"
+              disabled={pwdLoading}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+            >
+              <Lock size={16} />
+              {pwdLoading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -111,6 +365,164 @@ function NavItem({ icon, label, active, onClick }) {
       {icon}
       <span className="font-medium">{label}</span>
     </button>
+  );
+}
+
+function UserAvatar({ name, isAdmin }) {
+  const initials = name
+    .split(' ')
+    .map(n => n[0] || '')
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  const palette = [
+    'from-blue-500 to-indigo-600',
+    'from-emerald-500 to-teal-600',
+    'from-violet-500 to-purple-600',
+    'from-rose-500 to-pink-600',
+    'from-amber-500 to-orange-600',
+    'from-cyan-500 to-sky-600',
+  ];
+  const color = palette[(name.charCodeAt(0) || 0) % palette.length];
+  return (
+    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${color} flex items-center justify-center flex-shrink-0`}>
+      <span className="text-white text-sm font-bold">{initials || '?'}</span>
+    </div>
+  );
+}
+
+function UsersPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    authAPI.getUsers(getAccessToken())
+      .then(res => { setUsers(res.data); setLoading(false); })
+      .catch(() => { setError('Impossible de charger les utilisateurs.'); setLoading(false); });
+  }, []);
+
+  const filtered = users.filter(u =>
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const total     = users.length;
+  const admins    = users.filter(u => u.is_staff).length;
+  const actifs    = users.filter(u => u.is_active).length;
+
+  const formatDate = iso => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-6 border-b border-gray-200">
+        <h2 className="text-3xl font-semibold text-gray-800">Gestion des Utilisateurs</h2>
+        <p className="text-gray-500 mt-1">{total} utilisateur{total !== 1 ? 's' : ''} inscrit{total !== 1 ? 's' : ''}</p>
+      </div>
+
+      <div className="p-8 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-5">
+          {[
+            { label: 'Total utilisateurs', value: total,  icon: <Users size={22} className="text-blue-600" />,  color: 'from-blue-400 to-indigo-500'   },
+            { label: 'Administrateurs',    value: admins, icon: <Shield size={22} className="text-violet-600" />, color: 'from-violet-400 to-purple-500' },
+            { label: 'Comptes actifs',     value: actifs, icon: <UserCheck size={22} className="text-emerald-600" />, color: 'from-emerald-400 to-teal-500' },
+          ].map((s, i) => (
+            <div key={i} className="bg-white/70 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 flex items-center gap-4 hover:shadow-lg transition-all">
+              <div className={`w-14 h-14 bg-gradient-to-br ${s.color} rounded-xl flex items-center justify-center shadow-md`}>
+                {s.icon}
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">{s.label}</p>
+                <p className="text-3xl font-bold text-gray-800">{s.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Table card */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          {/* Search bar */}
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div className="relative flex-1 max-w-xs">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou email..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+              />
+            </div>
+            <span className="text-sm text-gray-400 ml-auto">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</span>
+          </div>
+
+          {/* Table */}
+          {loading ? (
+            <div className="py-16 text-center text-gray-400">Chargement...</div>
+          ) : error ? (
+            <div className="py-16 text-center text-red-500">{error}</div>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center text-gray-400">Aucun utilisateur trouvé.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-100">
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rôle</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Inscrit le</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filtered.map(user => (
+                    <tr key={user.id} className="hover:bg-green-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <UserAvatar name={user.name} isAdmin={user.is_staff} />
+                          <span className="font-medium text-gray-800">{user.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                      <td className="px-6 py-4">
+                        {user.is_staff ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700">
+                            <Shield size={11} /> Admin
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                            <User size={11} /> Utilisateur
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {user.is_active ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Actif
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                            <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Inactif
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{formatDate(user.created_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -240,110 +652,170 @@ function DashboardPage() {
 
     const initializeMap = () => {
       try {
+        // Limites de Madagascar
+        const madagascarBounds = window.L.latLngBounds(
+          [-26.0, 42.8],
+          [-11.5, 51.0]
+        );
+
         const map = window.L.map(mapRef.current, {
           zoomControl: true,
-          scrollWheelZoom: true
-        }).setView([-18.8792, 47.5079], 6);
+          scrollWheelZoom: true,
+          maxBounds: madagascarBounds,
+          maxBoundsViscosity: 1.0,
+          minZoom: 5,
+          maxZoom: 10,
+        }).fitBounds(madagascarBounds);
 
-        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap',
-          maxZoom: 19
-        }).addTo(map);
+        // Tuile CartoDB Positron — carte réelle et épurée
+        window.L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+          { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 10 }
+        ).addTo(map);
 
+        // 22 régions de Madagascar avec couleurs distinctes
         const regions = [
-          {
-            name: 'Diana',
-            coordinates: [[[-11.95, 49.28], [-12.15, 50.48], [-13.41, 50.48], [-13.88, 49.77], [-13.50, 49.05], [-12.50, 48.85], [-11.95, 49.28]]],
-            color: '#059669',
-            data: { production: 88, crop: 'Cacao, Vanille', farmers: '45,230', area: '19,266 km²' }
-          },
-          {
-            name: 'SAVA',
-            coordinates: [[[-13.88, 49.77], [-14.00, 50.48], [-15.32, 50.48], [-15.72, 50.00], [-15.50, 49.50], [-14.50, 49.20], [-13.88, 49.77]]],
-            color: '#047857',
-            data: { production: 96, crop: 'Vanille, Girofle', farmers: '67,890', area: '25,518 km²' }
-          },
-          {
-            name: 'Analamanga',
-            coordinates: [[[-18.50, 46.80], [-18.60, 47.90], [-19.20, 47.90], [-19.30, 47.20], [-19.00, 46.70], [-18.50, 46.80]]],
-            color: '#10b981',
-            data: { production: 91, crop: 'Riz, Légumes', farmers: '123,450', area: '16,911 km²' }
-          },
-          {
-            name: 'Vakinankaratra',
-            coordinates: [[[-19.20, 46.50], [-19.30, 47.50], [-20.20, 47.30], [-20.30, 46.70], [-19.70, 46.30], [-19.20, 46.50]]],
-            color: '#14b8a6',
-            data: { production: 89, crop: 'Riz, Pomme de terre', farmers: '98,760', area: '16,599 km²' }
-          },
-          {
-            name: 'Haute Matsiatra',
-            coordinates: [[[-20.30, 46.50], [-20.50, 47.50], [-21.80, 47.30], [-22.00, 46.50], [-21.30, 46.20], [-20.30, 46.50]]],
-            color: '#22c55e',
-            data: { production: 85, crop: 'Riz, Maïs, Manioc', farmers: '87,650', area: '21,080 km²' }
-          },
-          {
-            name: 'Atsimo-Andrefana',
-            coordinates: [[[-22.00, 43.50], [-22.50, 45.50], [-25.00, 45.50], [-25.60, 44.00], [-24.50, 43.20], [-22.00, 43.50]]],
-            color: '#84cc16',
-            data: { production: 72, crop: 'Maïs, Haricot', farmers: '54,320', area: '66,236 km²' }
-          }
+          { name: 'Diana',              color: '#3b82f6', data: { production: 88, crop: 'Cacao, Vanille',          farmers: '45 230',  area: '19 266 km²' },
+            coords: [[-11.95, 48.85], [-12.00, 50.48], [-13.50, 50.48], [-13.88, 49.77], [-13.50, 49.05], [-12.50, 48.85]] },
+          { name: 'SAVA',               color: '#ef4444', data: { production: 96, crop: 'Vanille, Girofle',        farmers: '67 890',  area: '25 518 km²' },
+            coords: [[-13.50, 49.05], [-13.88, 49.77], [-15.32, 50.48], [-15.72, 50.00], [-15.50, 49.50], [-14.50, 49.20]] },
+          { name: 'Analanjirofo',        color: '#f43f5e', data: { production: 82, crop: 'Girofle, Litchi',         farmers: '55 000',  area: '21 930 km²' },
+            coords: [[-15.32, 49.20], [-15.72, 50.00], [-17.00, 49.80], [-17.50, 49.30], [-16.50, 48.50]] },
+          { name: 'Sofia',               color: '#f97316', data: { production: 78, crop: 'Riz, Coton',              farmers: '48 000',  area: '50 875 km²' },
+            coords: [[-13.50, 47.00], [-13.50, 48.85], [-14.50, 49.20], [-15.50, 48.50], [-15.80, 47.50], [-15.00, 46.50]] },
+          { name: 'Boeny',               color: '#8b5cf6', data: { production: 75, crop: 'Riz, Canne à sucre',      farmers: '38 000',  area: '31 046 km²' },
+            coords: [[-15.00, 44.80], [-15.00, 47.00], [-16.50, 47.00], [-17.20, 46.00], [-16.50, 44.50]] },
+          { name: 'Betsiboka',           color: '#06b6d4', data: { production: 70, crop: 'Riz, Maïs',               farmers: '28 000',  area: '29 945 km²' },
+            coords: [[-15.00, 46.50], [-15.00, 48.50], [-16.50, 47.00]] },
+          { name: 'Melaky',              color: '#ec4899', data: { production: 65, crop: 'Maïs, Manioc',            farmers: '22 000',  area: '38 852 km²' },
+            coords: [[-16.50, 43.50], [-16.50, 45.00], [-18.00, 45.50], [-18.50, 44.20], [-17.50, 43.20]] },
+          { name: 'Bongolava',           color: '#84cc16', data: { production: 73, crop: 'Riz, Arachide',           farmers: '32 000',  area: '16 688 km²' },
+            coords: [[-16.50, 46.00], [-17.00, 47.50], [-18.50, 47.50], [-18.50, 46.00], [-17.50, 45.50]] },
+          { name: 'Itasy',               color: '#b45309', data: { production: 82, crop: 'Riz, Légumes',            farmers: '30 000',  area: '6 658 km²'  },
+            coords: [[-18.80, 45.80], [-18.80, 46.70], [-19.20, 46.70], [-19.20, 45.80]] },
+          { name: 'Analamanga',          color: '#10b981', data: { production: 91, crop: 'Riz, Légumes',            farmers: '123 450', area: '16 911 km²' },
+            coords: [[-18.20, 46.70], [-18.20, 48.00], [-19.50, 48.00], [-19.50, 46.70], [-18.80, 46.20]] },
+          { name: 'Alaotra-Mangoro',     color: '#eab308', data: { production: 87, crop: 'Riz, Café',               farmers: '60 000',  area: '31 948 km²' },
+            coords: [[-16.80, 47.80], [-17.00, 49.30], [-19.00, 49.00], [-19.20, 47.90], [-17.00, 47.50]] },
+          { name: 'Atsinanana',          color: '#6366f1', data: { production: 80, crop: 'Girofle, Café',           farmers: '68 000',  area: '21 934 km²' },
+            coords: [[-17.00, 48.80], [-17.50, 49.80], [-19.00, 49.00], [-19.00, 48.50], [-18.00, 48.00]] },
+          { name: 'Vakinankaratra',      color: '#14b8a6', data: { production: 89, crop: 'Riz, Pomme de terre',     farmers: '98 760',  area: '16 599 km²' },
+            coords: [[-19.20, 46.50], [-19.30, 47.80], [-20.80, 47.80], [-21.00, 47.00], [-20.50, 46.00]] },
+          { name: "Amoron'i Mania",      color: '#2563eb', data: { production: 78, crop: 'Café, Riz',               farmers: '40 000',  area: '16 548 km²' },
+            coords: [[-20.50, 46.50], [-20.50, 47.80], [-21.50, 47.30], [-21.50, 46.50], [-21.00, 46.00]] },
+          { name: 'Menabe',              color: '#d97706', data: { production: 76, crop: 'Riz, Coton',              farmers: '40 000',  area: '46 121 km²' },
+            coords: [[-18.50, 43.80], [-18.50, 45.50], [-21.00, 45.20], [-21.00, 43.80]] },
+          { name: 'Haute Matsiatra',     color: '#7c3aed', data: { production: 85, crop: 'Riz, Maïs, Manioc',      farmers: '87 650',  area: '21 080 km²' },
+            coords: [[-20.30, 46.50], [-20.50, 47.80], [-21.80, 47.30], [-22.00, 46.50], [-21.30, 46.20]] },
+          { name: 'Vatovavy',            color: '#0d9488', data: { production: 77, crop: 'Girofle, Café',           farmers: '45 000',  area: '19 605 km²' },
+            coords: [[-20.50, 47.80], [-21.50, 49.00], [-22.50, 48.00], [-22.50, 47.00], [-21.50, 47.30]] },
+          { name: 'Fitovinany',          color: '#dc2626', data: { production: 72, crop: 'Riz, Girofle',            farmers: '35 000',  area: '18 198 km²' },
+            coords: [[-22.50, 47.00], [-23.00, 48.00], [-24.00, 47.50], [-24.00, 47.00], [-23.50, 46.50]] },
+          { name: 'Ihorombe',            color: '#059669', data: { production: 65, crop: 'Maïs, Élevage',           farmers: '20 000',  area: '26 418 km²' },
+            coords: [[-21.80, 44.80], [-21.80, 46.50], [-23.50, 46.50], [-23.50, 44.50], [-22.50, 44.00]] },
+          { name: 'Atsimo-Atsinanana',   color: '#0891b2', data: { production: 70, crop: 'Riz, Girofle',            farmers: '35 000',  area: '18 198 km²' },
+            coords: [[-22.50, 47.00], [-23.50, 47.50], [-24.00, 47.00], [-23.50, 46.50]] },
+          { name: 'Atsimo-Andrefana',    color: '#65a30d', data: { production: 72, crop: 'Maïs, Haricot',           farmers: '54 320',  area: '66 236 km²' },
+            coords: [[-22.00, 43.50], [-22.50, 45.50], [-24.00, 45.50], [-24.50, 43.50], [-23.50, 43.00]] },
+          { name: 'Androy',              color: '#f59e0b', data: { production: 60, crop: 'Manioc, Maïs',            farmers: '35 000',  area: '19 317 km²' },
+            coords: [[-24.00, 45.00], [-24.50, 46.50], [-25.60, 46.50], [-25.60, 44.50], [-25.00, 43.50]] },
+          { name: 'Anosy',               color: '#a21caf', data: { production: 68, crop: 'Sisal, Maïs',             farmers: '30 000',  area: '25 731 km²' },
+            coords: [[-23.50, 46.50], [-24.00, 47.50], [-25.00, 47.50], [-25.50, 46.50], [-24.50, 45.80]] },
         ];
 
         regions.forEach((region) => {
-          const polygon = window.L.polygon(region.coordinates, {
-            color: region.color,
-            fillColor: region.color,
-            fillOpacity: 0.5,
-            weight: 2
-          }).addTo(map);
+          const polygon = window.L.polygon(
+            region.coords.map(([lat, lng]) => [lat, lng]),
+            { color: region.color, fillColor: region.color, fillOpacity: 0.22, weight: 1.2 }
+          ).addTo(map);
 
           polygon.bindPopup(`
-            <div style="font-family: system-ui; padding: 8px; min-width: 200px;">
-              <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #1f2937;">${region.name}</h3>
-              <p style="margin: 4px 0; font-size: 13px;"><strong>🌾 Cultures:</strong> ${region.data.crop}</p>
-              <p style="margin: 4px 0; font-size: 13px;"><strong>📍 Superficie:</strong> ${region.data.area}</p>
-              <p style="margin: 4px 0; font-size: 13px;"><strong>👨‍🌾 Agriculteurs:</strong> ${region.data.farmers}</p>
-              <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                  <span style="font-size: 12px; color: #6b7280;">Production:</span>
-                  <span style="font-size: 14px; font-weight: bold; color: #059669;">${region.data.production}%</span>
+            <div style="font-family:system-ui;padding:10px;min-width:210px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div style="width:12px;height:12px;border-radius:50%;background:${region.color};flex-shrink:0;"></div>
+                <h3 style="margin:0;font-size:15px;font-weight:700;color:#1f2937;">${region.name}</h3>
+              </div>
+              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>🌾</strong> ${region.data.crop}</p>
+              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>📍</strong> ${region.data.area}</p>
+              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>👨‍🌾</strong> ${region.data.farmers} agriculteurs</p>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span style="font-size:11px;color:#6b7280;">Production</span>
+                  <span style="font-size:13px;font-weight:700;color:${region.color};">${region.data.production}%</span>
                 </div>
-                <div style="background: #e5e7eb; border-radius: 9999px; height: 8px; overflow: hidden;">
-                  <div style="background: linear-gradient(to right, #10b981, #059669); height: 100%; width: ${region.data.production}%; border-radius: 9999px;"></div>
+                <div style="background:#e5e7eb;border-radius:9999px;height:6px;overflow:hidden;">
+                  <div style="background:${region.color};height:100%;width:${region.data.production}%;border-radius:9999px;"></div>
                 </div>
               </div>
             </div>
           `);
 
-          polygon.on('mouseover', function () { this.setStyle({ fillOpacity: 0.7, weight: 3 }); });
-          polygon.on('mouseout', function () { this.setStyle({ fillOpacity: 0.5, weight: 2 }); });
+          polygon.on('mouseover', function () { this.setStyle({ fillOpacity: 0.5, weight: 2.5 }); });
+          polygon.on('mouseout',  function () { this.setStyle({ fillOpacity: 0.22, weight: 1.2 }); });
         });
 
+        // Villes principales
         const cities = [
           { name: 'Antananarivo', coords: [-18.8792, 47.5079], capital: true },
-          { name: 'Toamasina', coords: [-18.1443, 49.4122] },
-          { name: 'Antsirabe', coords: [-19.8667, 47.0333] },
+          { name: 'Toamasina',    coords: [-18.1443, 49.4122] },
+          { name: 'Antsirabe',    coords: [-19.8667, 47.0333] },
           { name: 'Fianarantsoa', coords: [-21.4533, 47.0858] },
-          { name: 'Toliara', coords: [-23.3500, 43.6667] },
-          { name: 'Antsiranana', coords: [-12.2787, 49.2917] }
+          { name: 'Toliara',      coords: [-23.3500, 43.6667] },
+          { name: 'Antsiranana',  coords: [-12.2787, 49.2917] },
+          { name: 'Mahajanga',    coords: [-15.7167, 46.3167] },
         ];
-
         cities.forEach(city => {
           const marker = window.L.circleMarker(city.coords, {
-            radius: city.capital ? 8 : 5,
-            fillColor: '#ef4444',
-            color: '#ffffff',
+            radius: city.capital ? 7 : 4,
+            fillColor: '#1e293b',
+            color: '#fff',
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.9
+            fillOpacity: 1,
           }).addTo(map);
-          marker.bindPopup(`<strong>${city.name}</strong>${city.capital ? '<br/>(Capitale)' : ''}`);
+          marker.bindPopup(`<strong>${city.name}</strong>${city.capital ? '<br/><em>Capitale</em>' : ''}`);
         });
+
+        // Légende intégrée à la carte (overlay Leaflet)
+        const legendCtrl = window.L.control({ position: 'bottomleft' });
+        legendCtrl.onAdd = () => {
+          const div = window.L.DomUtil.create('div');
+          div.style.cssText = [
+            'background:rgba(255,255,255,0.93)',
+            'padding:8px 10px',
+            'border-radius:10px',
+            'box-shadow:0 2px 10px rgba(0,0,0,0.18)',
+            'font-family:system-ui',
+            'max-height:210px',
+            'overflow-y:auto',
+            'min-width:160px',
+            'line-height:1',
+          ].join(';');
+          div.innerHTML = `
+            <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #e5e7eb;">Régions</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;">
+              ${regions.map(r => `
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <div style="width:9px;height:9px;flex-shrink:0;border-radius:2px;background:${r.color};opacity:0.85;"></div>
+                  <span style="font-size:9.5px;color:#4b5563;white-space:nowrap;">${r.name}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:5px;padding-top:4px;border-top:1px solid #e5e7eb;">
+              <div style="width:9px;height:9px;border-radius:50%;background:#1e293b;border:1.5px solid white;box-shadow:0 0 0 1px #64748b;flex-shrink:0;"></div>
+              <span style="font-size:9.5px;color:#4b5563;">Villes principales</span>
+            </div>
+          `;
+          window.L.DomEvent.disableClickPropagation(div);
+          window.L.DomEvent.disableScrollPropagation(div);
+          return div;
+        };
+        legendCtrl.addTo(map);
 
         mapInstanceRef.current = map;
         setTimeout(() => { map.invalidateSize(); }, 100);
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error('Erreur initialisation carte:', error);
       }
     };
 
@@ -365,12 +837,18 @@ function DashboardPage() {
   ];
 
   const regions = [
-    { id: 1, name: "Diana", production: 88, crop: "Cacao, Vanille", color: "#059669", area: "19,266 km²", farmers: "45,230" },
-    { id: 2, name: "SAVA", production: 96, crop: "Vanille, Girofle", color: "#047857", area: "25,518 km²", farmers: "67,890" },
-    { id: 3, name: "Analamanga", production: 91, crop: "Riz, Légumes", color: "#10b981", area: "16,911 km²", farmers: "123,450" },
-    { id: 4, name: "Vakinankaratra", production: 89, crop: "Riz, Pomme de terre", color: "#14b8a6", area: "16,599 km²", farmers: "98,760" },
-    { id: 5, name: "Haute Matsiatra", production: 85, crop: "Riz, Maïs, Manioc", color: "#22c55e", area: "21,080 km²", farmers: "87,650" },
-    { id: 6, name: "Atsimo-Andrefana", production: 72, crop: "Maïs, Haricot", color: "#84cc16", area: "66,236 km²", farmers: "54,320" }
+    { id: 1,  name: "Diana",             production: 88, crop: "Cacao, Vanille",        color: "#3b82f6", area: "19 266 km²",  farmers: "45 230"  },
+    { id: 2,  name: "SAVA",              production: 96, crop: "Vanille, Girofle",       color: "#ef4444", area: "25 518 km²",  farmers: "67 890"  },
+    { id: 3,  name: "Analamanga",        production: 91, crop: "Riz, Légumes",           color: "#10b981", area: "16 911 km²",  farmers: "123 450" },
+    { id: 4,  name: "Vakinankaratra",    production: 89, crop: "Riz, Pomme de terre",   color: "#14b8a6", area: "16 599 km²",  farmers: "98 760"  },
+    { id: 5,  name: "Haute Matsiatra",   production: 85, crop: "Riz, Maïs, Manioc",    color: "#7c3aed", area: "21 080 km²",  farmers: "87 650"  },
+    { id: 6,  name: "Alaotra-Mangoro",   production: 87, crop: "Riz, Café",             color: "#eab308", area: "31 948 km²",  farmers: "60 000"  },
+    { id: 7,  name: "Boeny",             production: 75, crop: "Riz, Canne à sucre",    color: "#8b5cf6", area: "31 046 km²",  farmers: "38 000"  },
+    { id: 8,  name: "Sofia",             production: 78, crop: "Riz, Coton",            color: "#f97316", area: "50 875 km²",  farmers: "48 000"  },
+    { id: 9,  name: "Analanjirofo",      production: 82, crop: "Girofle, Litchi",        color: "#f43f5e", area: "21 930 km²",  farmers: "55 000"  },
+    { id: 10, name: "Atsinanana",        production: 80, crop: "Girofle, Café",          color: "#6366f1", area: "21 934 km²",  farmers: "68 000"  },
+    { id: 11, name: "Atsimo-Andrefana",  production: 72, crop: "Maïs, Haricot",         color: "#65a30d", area: "66 236 km²",  farmers: "54 320"  },
+    { id: 12, name: "Androy",            production: 60, crop: "Manioc, Maïs",           color: "#f59e0b", area: "19 317 km²",  farmers: "35 000"  },
   ];
 
   const weatherData = [
@@ -416,50 +894,37 @@ function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-          <div className="lg:col-span-3 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
+          <div className="lg:col-span-4 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">Carte Réelle de Madagascar</h3>
-              <div className="text-xs text-gray-500">Cliquez sur une région pour plus d'infos</div>
+              <h3 className="text-xl font-semibold text-gray-800">Carte de Madagascar</h3>
+              <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Cliquez sur une région pour les détails</div>
             </div>
             <div
               ref={mapRef}
-              className="w-full h-[600px] rounded-xl overflow-hidden shadow-lg border-2 border-gray-300"
-              style={{ zIndex: 1 }}
+              className="w-full rounded-xl overflow-hidden shadow-lg border border-gray-300"
+              style={{ zIndex: 1, height: '720px' }}
             ></div>
-            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <h4 className="font-semibold text-gray-700 mb-3 text-sm">Légende</h4>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-sm"></div>
-                  <span className="text-xs text-gray-600">Villes principales</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-emerald-600 shadow-sm opacity-50"></div>
-                  <span className="text-xs text-gray-600">Régions agricoles</span>
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Météo Agricole - 7 Jours</h3>
+          <div className="lg:col-span-1 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Météo - 7 Jours</h3>
             <div className="space-y-3">
               {weatherData.map((day, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-md">
-                      <CloudRain size={20} className="text-white" />
+                <div key={index} className="flex items-center justify-between p-2.5 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                      <CloudRain size={15} className="text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800">{day.day}</p>
+                      <p className="font-medium text-gray-800 text-sm">{day.day}</p>
                       <p className="text-xs text-gray-500">{day.temp}°C</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-500" style={{ width: `${day.rain}%` }}></div>
                     </div>
-                    <span className="text-xs font-medium text-gray-600 w-8">{day.rain}%</span>
+                    <span className="text-xs font-medium text-gray-600 w-7">{day.rain}%</span>
                   </div>
                 </div>
               ))}
