@@ -1,0 +1,334 @@
+# ============================================================
+# RESOURCES MODULE - agri-resources.ttl
+# Agricultural resources used in Madagascar farming
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+@prefix agri:  <http://example.org/agri/> .
+
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# RESOURCE SUBCLASSES
+# ============================================================
+
+# ---------- Land (Terre) ----------
+agri:Land a owl:Class ;
+    rdfs:label "Agricultural Land"@en ;
+    rdfs:label "Terre Agricole"@fr ;
+    rdfs:label "Tany Fambolena"@mg ;
+    skos:definition "Land used for agricultural production"@en ;
+    skos:definition "Terre utilisée pour la production agricole"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_3496 ;
+    .
+
+# ---------- Soil Type ----------
+agri:SoilType a owl:Class ;
+    rdfs:label "Soil Type"@en ;
+    rdfs:label "Type de Sol"@fr ;
+    rdfs:label "Karazana Tany"@mg ;
+    skos:definition "Classification of soil characteristics"@en ;
+    skos:definition "Classification des caractéristiques du sol"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_7243 ;
+    .
+
+# ---------- Water (Eau) ----------
+agri:Water a owl:Class ;
+    rdfs:label "Water Resource"@en ;
+    rdfs:label "Ressource en Eau"@fr ;
+    rdfs:label "Rano"@mg ;
+    skos:definition "Water sources for agriculture"@en ;
+    skos:definition "Sources d'eau pour l'agriculture"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_8181 ;
+    .
+
+# ---------- Climate (Climat) ----------
+agri:Climate a owl:Class ;
+    rdfs:label "Climate"@en ;
+    rdfs:label "Climat"@fr ;
+    rdfs:label "Toetr'andro"@mg ;
+    skos:definition "Climate conditions affecting agriculture"@en ;
+    skos:definition "Conditions climatiques affectant l'agriculture"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_1668 ;
+    .
+
+# ---------- Tools (Outils) ----------
+agri:Tool a owl:Class ;
+    rdfs:label "Agricultural Tool"@en ;
+    rdfs:label "Outil Agricole"@fr ;
+    rdfs:label "Fitaovana Fambolena"@mg ;
+    skos:definition "Equipment and tools used in farming"@en ;
+    skos:definition "Équipement et outils utilisés en agriculture"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_345 ;
+    .
+
+# ---------- Labor ----------
+agri:Labor a owl:Class ;
+    rdfs:label "Agricultural Labor"@en ;
+    rdfs:label "Main-d'œuvre Agricole"@fr ;
+    rdfs:label "Asa Fambolena"@mg ;
+    skos:definition "Human workforce in agriculture"@en ;
+    skos:definition "Force de travail humaine en agriculture"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    .
+
+# ---------- Seed Resource ----------
+agri:Seed a owl:Class ;
+    rdfs:label "Seed"@en ;
+    rdfs:label "Semence"@fr ;
+    rdfs:label "Voamafana"@mg ;
+    skos:definition "Planting material for crop propagation"@en ;
+    skos:definition "Matériel de plantation pour la propagation des cultures"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_6948 ;
+    .
+
+# ---------- Fertilizer Resource ----------
+agri:Fertilizer a owl:Class ;
+    rdfs:label "Fertilizer"@en ;
+    rdfs:label "Engrais"@fr ;
+    rdfs:label "Fertiliser"@mg ;
+    skos:definition "Substances used to enrich soil nutrients"@en ;
+    skos:definition "Substances utilisées pour enrichir les nutriments du sol"@fr ;
+    rdfs:subClassOf agri:Resource ;
+    owl:equivalentClass agrovoc:c_2855 ;
+    .
+
+# ============================================================
+# SOIL TYPE CLASSIFICATIONS
+# ============================================================
+
+agri:Ferralsol a owl:Class ;
+    rdfs:label "Ferralsol"@en ;
+    rdfs:label "Ferralsol"@fr ;
+    skos:definition "Highly weathered tropical soils"@en ;
+    skos:definition "Sols tropicaux fortement altérés"@fr ;
+    rdfs:subClassOf agri:SoilType ;
+    owl:equivalentClass agrovoc:c_2755 ;
+    .
+
+agri:Andosol a owl:Class ;
+    rdfs:label "Andosol"@en ;
+    rdfs:label "Andosol"@fr ;
+    skos:definition "Volcanic ash soils"@en ;
+    skos:definition "Sols volcaniques"@fr ;
+    rdfs:subClassOf agri:SoilType ;
+    owl:equivalentClass agrovoc:c_487 ;
+    .
+
+agri:PaddySoil a owl:Class ;
+    rdfs:label "Paddy Soil"@en ;
+    rdfs:label "Sol de Rizière"@fr ;
+    rdfs:label "Tany Vary"@mg ;
+    skos:definition "Flooded rice cultivation soil"@en ;
+    skos:definition "Sol de culture de riz inondé"@fr ;
+    rdfs:subClassOf agri:SoilType ;
+    .
+
+agri:SandySoil a owl:Class ;
+    rdfs:label "Sandy Soil"@en ;
+    rdfs:label "Sol Sablonneux"@fr ;
+    skos:definition "Soil with high sand content"@en ;
+    skos:definition "Sol à haute teneur en sable"@fr ;
+    rdfs:subClassOf agri:SoilType ;
+    .
+
+agri:ClaySoil a owl:Class ;
+    rdfs:label "Clay Soil"@en ;
+    rdfs:label "Sol Argileux"@fr ;
+    skos:definition "Soil with high clay content"@en ;
+    skos:definition "Sol à haute teneur en argile"@fr ;
+    rdfs:subClassOf agri:SoilType ;
+    .
+
+# ============================================================
+# WATER SOURCE TYPES
+# ============================================================
+
+agri:River a owl:Class ;
+    rdfs:label "River"@en ;
+    rdfs:label "Rivière"@fr ;
+    rdfs:label "Ony"@mg ;
+    skos:definition "Flowing water body used for irrigation"@en ;
+    skos:definition "Cours d'eau utilisé pour l'irrigation"@fr ;
+    rdfs:subClassOf agri:Water ;
+    owl:equivalentClass agrovoc:c_6710 ;
+    .
+
+agri:Well a owl:Class ;
+    rdfs:label "Well"@en ;
+    rdfs:label "Puits"@fr ;
+    rdfs:label "Lava-Bato"@mg ;
+    skos:definition "Excavated water source"@en ;
+    skos:definition "Source d'eau excavée"@fr ;
+    rdfs:subClassOf agri:Water ;
+    .
+
+agri:Rainfall a owl:Class ;
+    rdfs:label "Rainfall"@en ;
+    rdfs:label "Pluviométrie"@fr ;
+    rdfs:label "Ranonorana"@mg ;
+    skos:definition "Natural precipitation"@en ;
+    skos:definition "Précipitation naturelle"@fr ;
+    rdfs:subClassOf agri:Water ;
+    .
+
+agri:Reservoir a owl:Class ;
+    rdfs:label "Water Reservoir"@en ;
+    rdfs:label "Réservoir d'Eau"@fr ;
+    rdfs:label "Farihy"@mg ;
+    skos:definition "Stored water for irrigation"@en ;
+    skos:definition "Eau stockée pour l'irrigation"@fr ;
+    rdfs:subClassOf agri:Water ;
+    .
+
+# ============================================================
+# CLIMATE TYPES
+# ============================================================
+
+agri:TropicalClimate a owl:Class ;
+    rdfs:label "Tropical Climate"@en ;
+    rdfs:label "Climat Tropical"@fr ;
+    rdfs:label "Toetr'andro Antona"@mg ;
+    skos:definition "Warm, humid climate near equator"@en ;
+    skos:definition "Climat chaud et humide près de l'équateur"@fr ;
+    rdfs:subClassOf agri:Climate ;
+    owl:equivalentClass agrovoc:c_7844 ;
+    .
+
+agri:SubtropicalClimate a owl:Class ;
+    rdfs:label "Subtropical Climate"@en ;
+    rdfs:label "Climat Subtropical"@fr ;
+    skos:definition "Climate between tropical and temperate zones"@en ;
+    skos:definition "Climat entre les zones tropicales et tempérées"@fr ;
+    rdfs:subClassOf agri:Climate ;
+    .
+
+agri:HighlandClimate a owl:Class ;
+    rdfs:label "Highland Climate"@en ;
+    rdfs:label "Climat de Haute Altitude"@fr ;
+    rdfs:label "Toetr'andro Ambony"@mg ;
+    skos:definition "Cooler climate at higher elevations"@en ;
+    skos:definition "Climat plus frais aux altitudes élevées"@fr ;
+    rdfs:subClassOf agri:Climate ;
+    .
+
+# ============================================================
+# TOOL TYPES
+# ============================================================
+
+agri:HandTool a owl:Class ;
+    rdfs:label "Hand Tool"@en ;
+    rdfs:label "Outil à Main"@fr ;
+    skos:definition "Manual farming implements"@en ;
+    skos:definition "Ustensiles agricoles manuels"@fr ;
+    rdfs:subClassOf agri:Tool ;
+    .
+
+agri:MechanicalTool a owl:Class ;
+    rdfs:label "Mechanical Tool"@en ;
+    rdfs:label "Outil Mécanique"@fr ;
+    skos:definition "Powered farming equipment"@en ;
+    skos:definition "Équipement agricole motorisé"@fr ;
+    rdfs:subClassOf agri:Tool ;
+    .
+
+# Specific tools
+agri:Hoe a owl:Class ;
+    rdfs:label "Hoe"@en ;
+    rdfs:label "Houe"@fr ;
+    rdfs:label "H誉"@mg ;
+    skos:definition "Digging and cultivating tool"@en ;
+    skos:definition "Outil de creusement et de culture"@fr ;
+    rdfs:subClassOf agri:HandTool ;
+    .
+
+agri:Plow a owl:Class ;
+    rdfs:label "Plow"@en ;
+    rdfs:label "Charrue"@fr ;
+    rdfs:label "Fifonoana"@mg ;
+    skos:definition "Tool for breaking soil"@en ;
+    skos:definition "Outil pour briser le sol"@fr ;
+    rdfs:subClassOf agri:Tool ;
+    .
+
+# ============================================================
+# RESOURCE OBJECT PROPERTIES
+# ============================================================
+
+# Located on land
+agri:locatedOn a owl:ObjectProperty ;
+    rdfs:label "located on"@en ;
+    rdfs:label "situé sur"@fr ;
+    rdfs:domain agri:Resource ;
+    rdfs:range agri:Land ;
+    .
+
+# Has soil type
+agri:hasSoilType a owl:ObjectProperty ;
+    rdfs:label "has soil type"@en ;
+    rdfs:label "a un type de sol"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range agri:SoilType ;
+    .
+
+# Has water source
+agri:hasWaterSource a owl:ObjectProperty ;
+    rdfs:label "has water source"@en ;
+    rdfs:label "a une source d'eau"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range agri:Water ;
+    .
+
+# Has climate
+agri:hasClimate a owl:ObjectProperty ;
+    rdfs:label "has climate"@en ;
+    rdfs:label "a un climat"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range agri:Climate ;
+    .
+
+# Resource quantity
+agri:hasArea a owl:DatatypeProperty ;
+    rdfs:label "has area"@en ;
+    rdfs:label "a une superficie"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range xsd:decimal ;
+    .
+
+# Elevation
+agri:hasElevation a owl:DatatypeProperty ;
+    rdfs:label "has elevation"@en ;
+    rdfs:label "a une altitude"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range xsd:decimal ;
+    .
+
+# pH level
+agri:hasPHLevel a owl:DatatypeProperty ;
+    rdfs:label "has pH level"@en ;
+    rdfs:label "a un niveau de pH"@fr ;
+    rdfs:domain agri:SoilType ;
+    rdfs:range xsd:decimal ;
+    .
+
+# Water capacity
+agri:hasWaterCapacity a owl:DatatypeProperty ;
+    rdfs:label "has water capacity"@en ;
+    rdfs:label "a une capacité en eau"@fr ;
+    rdfs:domain agri:SoilType ;
+    rdfs:range xsd:decimal ;
+    .
+

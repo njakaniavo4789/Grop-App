@@ -1,0 +1,242 @@
+# ============================================================
+# CROPS MODULE - agri-crops.ttl
+# Classification of cultivated crops in Madagascar
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
+
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# CROP SUBCLASSES
+# ============================================================
+
+# ---------- Cereals (Céréales) ----------
+agri:Cereal a owl:Class ;
+    rdfs:label "Cereal"@en ;
+    rdfs:label "Céréale"@fr ;
+    rdfs:label "Varimbazaha"@mg ;
+    skos:definition "Grain crops cultivated for their edible seeds"@en ;
+    skos:definition "Cultures de céréales cultivées pour leurs graines comestibles"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_9214 ;
+    .
+
+# ---------- Legumes (Légumineuses) ----------
+agri:Legume a owl:Class ;
+    rdfs:label "Legume"@en ;
+    rdfs:label "Légumineuse"@fr ;
+    rdfs:label "Tsaramaso"@mg ;
+    skos:definition "Plants in the Fabaceae family that produce seeds in pods"@en ;
+    skos:definition "Plantes de la famille des Fabaceae qui produisent des graines dans des gousses"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_4254 ;
+    .
+
+# ---------- Fruits (Fruits) ----------
+agri:Fruit a owl:Class ;
+    rdfs:label "Fruit"@en ;
+    rdfs:label "Fruit"@fr ;
+    rdfs:label "Anana"@mg ;
+    skos:definition "Cultivated fruit-bearing plants"@en ;
+    skos:definition "Plantes cultivées portant des fruits"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_3031 ;
+    .
+
+# ---------- Vegetables (Légumes) ----------
+agri:Vegetable a owl:Class ;
+    rdfs:label "Vegetable"@en ;
+    rdfs:label "Légume"@fr ;
+    rdfs:label "Lahimatoa"@mg ;
+    skos:definition "Edible plants or parts of plants consumed as food"@en ;
+    skos:definition "Plantes comestibles ou parties de plantes consommées comme nourriture"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_8376 ;
+    .
+
+# ---------- Roots and Tubers ----------
+agri:RootCrop a owl:Class ;
+    rdfs:label "Root Crop"@en ;
+    rdfs:label "Culture Racine"@fr ;
+    rdfs:label "Finger"@mg ;
+    skos:definition "Crops grown for their edible underground parts"@en ;
+    skos:definition "Cultures cultivées pour leurs parties souterraines comestibles"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_6518 ;
+    .
+
+# ---------- Cash Crops ----------
+agri:CashCrop a owl:Class ;
+    rdfs:label "Cash Crop"@en ;
+    rdfs:label "Culture Commerciale"@fr ;
+    rdfs:label "Fambolena Mpanohitra"@mg ;
+    skos:definition "Crops grown for sale rather than personal consumption"@en ;
+    skos:definition "Cultures cultivées pour la vente plutôt que pour la consommation personnelle"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    owl:equivalentClass agrovoc:c_1479 ;
+    .
+
+# ============================================================
+# SPECIFIC CROP TYPES FOR MADAGASCAR
+# ============================================================
+
+# Rice varieties
+agri:Rice a owl:Class ;
+    rdfs:label "Rice"@en ;
+    rdfs:label "Riz"@fr ;
+    rdfs:label "Variety"@mg ;
+    skos:definition "Oryza sativa - primary staple crop in Madagascar"@en ;
+    skos:definition "Oryza sativa - culture de base à Madagascar"@fr ;
+    rdfs:subClassOf agri:Cereal ;
+    owl:equivalentClass agrovoc:c_6666 ;
+    .
+
+# Maize varieties
+agri:Maize a owl:Class ;
+    rdfs:label "Maize"@en ;
+    rdfs:label "Maïs"@fr ;
+    rdfs:label "Tsakafody"@mg ;
+    skos:definition "Zea mays - important cereal crop"@en ;
+    skos:definition "Zea mays - culture céréalière importante"@fr ;
+    rdfs:subClassOf agri:Cereal ;
+    owl:equivalentClass agrovoc:c_331409 ;
+    .
+
+# Cassava
+agri:Cassava a owl:Class ;
+    rdfs:label "Cassava"@en ;
+    rdfs:label "Manioc"@fr ;
+    rdfs:label "Mahatsanga"@mg ;
+    skos:definition "Manihot esculenta - root crop staple"@en ;
+    skos:definition "Manihot esculenta - culture de base racine"@fr ;
+    rdfs:subClassOf agri:RootCrop ;
+    owl:equivalentClass agrovoc:c_1594 ;
+    .
+
+# Sweet Potato
+agri:SweetPotato a owl:Class ;
+    rdfs:label "Sweet Potato"@en ;
+    rdfs:label "Patate Douce"@fr ;
+    rdfs:label "Ovy"@mg ;
+    skos:definition "Ipomoea batatas - important root crop"@en ;
+    skos:definition "Ipomoea batatas - culture racine importante"@fr ;
+    rdfs:subClassOf agri:RootCrop ;
+    owl:equivalentClass agrovoc:c_7477 ;
+    .
+
+# Cloves - Important cash crop for Madagascar
+agri:Clove a owl:Class ;
+    rdfs:label "Clove"@en ;
+    rdfs:label "Girofle"@fr ;
+    rdfs:label "Jirofo"@mg ;
+    skos:definition "Syzygium aromaticum - important cash crop"@en ;
+    skos:definition "Syzygium aromaticum - culture commerciale importante"@fr ;
+    rdfs:subClassOf agri:CashCrop ;
+    rdfs:subClassOf agri:Fruit ;
+    owl:equivalentClass agrovoc:c_1761 ;
+    .
+
+# Vanilla - High-value export crop
+agri:Vanilla a owl:Class ;
+    rdfs:label "Vanilla"@en ;
+    rdfs:label "Vanille"@fr ;
+    rdfs:label "Voanio"@mg ;
+    skos:definition "Vanilla planifolia - high-value orchid crop"@en ;
+    skos:definition "Vanilla planifolia - culture d'orchidée de haute valeur"@fr ;
+    rdfs:subClassOf agri:CashCrop ;
+    owl:equivalentClass agrovoc:c_8144 ;
+    .
+
+# Coffee
+agri:Coffee a owl:Class ;
+    rdfs:label "Coffee"@en ;
+    rdfs:label "Café"@fr ;
+    rdfs:label "Kafé"@mg ;
+    skos:definition "Coffea species - important export crop"@en ;
+    skos:definition "Espèces de Coffea - culture d'exportation importante"@fr ;
+    rdfs:subClassOf agri:CashCrop ;
+    owl:equivalentClass agrovoc:c_1771 ;
+    .
+
+# Beans
+agri:Bean a owl:Class ;
+    rdfs:label "Bean"@en ;
+    rdfs:label "Haricot"@fr ;
+    rdfs:label "Tsaramaso"@mg ;
+    skos:definition "Phaseolus vulgaris - common legume"@en ;
+    skos:definition "Phaseolus vulgaris - légumineuse commune"@fr ;
+    rdfs:subClassOf agri:Legume ;
+    owl:equivalentClass agrovoc:c_887 ;
+    .
+
+# Groundnut/Peanut
+agri:Groundnut a owl:Class ;
+    rdfs:label "Groundnut"@en ;
+    rdfs:label "Arachide"@fr ;
+    rdfs:label "Tsibundy"@mg ;
+    skos:definition "Arachis hypogaea - important oilseed crop"@en ;
+    skos:definition "Arachis hypogaea - culture oléagineuse importante"@fr ;
+    rdfs:subClassOf agri:Legume ;
+    owl:equivalentClass agrovoc:c_5228 ;
+    .
+
+# ============================================================
+# CROP OBJECT PROPERTIES
+# ============================================================
+
+# Has crop variety
+agri:hasVariety a owl:ObjectProperty ;
+    rdfs:label "has variety"@en ;
+    rdfs:label "a une variété"@fr ;
+    rdfs:domain agri:Crop ;
+    rdfs:range agri:CropVariety ;
+    rdfs:subPropertyOf gen:hasOffspring ;
+    .
+
+# Is variety of
+agri:isVarietyOf a owl:ObjectProperty ;
+    rdfs:label "is variety of"@en ;
+    rdfs:label "est une variété de"@fr ;
+    rdfs:domain agri:Crop ;
+    rdfs:range agri:Crop ;
+    owl:inverseOf agri:hasVariety ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+# Has growing season
+agri:hasGrowingSeason a owl:DatatypeProperty ;
+    rdfs:label "has growing season"@en ;
+    rdfs:label "a une saison de croissance"@fr ;
+    rdfs:domain agri:Crop ;
+    rdfs:range xsd:string ;
+    .
+
+# Has yield potential
+agri:hasYieldPotential a owl:DatatypeProperty ;
+    rdfs:label "has yield potential"@en ;
+    rdfs:label "a un potentiel de rendement"@fr ;
+    rdfs:domain agri:Crop ;
+    rdfs:range xsd:decimal ;
+    .
+
+# ============================================================
+# CROP VARIETY CLASS
+# ============================================================
+
+agri:CropVariety a owl:Class ;
+    rdfs:label "Crop Variety"@en ;
+    rdfs:label "Variété de Culture"@fr ;
+    rdfs:label "Karazana Famboly"@mg ;
+    skos:definition "Specific cultivar or variety of a crop species"@en ;
+    skos:definition "Cultivar ou variété spécifique d'une espèce végétale"@fr ;
+    rdfs:subClassOf agri:Crop ;
+    .
+
