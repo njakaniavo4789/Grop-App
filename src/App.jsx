@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck } from 'lucide-react';
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
@@ -42,13 +43,13 @@ function MainLayout() {
     setInputValue('');
 
     // Indicateur "en train de répondre..."
-    setMessages(prev => [...prev, { text: '...', sender: 'ai', loading: true }]);
+    setMessages(prev => [...prev, { text: '', sender: 'ai', loading: true }]);
 
     try {
       const token = getAccessToken();
       const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
-      const response = await fetch(`${API_BASE}/api/chat/direct/`, {
+      const response = await fetch(`${API_BASE}/api/chat/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,10 +60,22 @@ function MainLayout() {
 
       const data = await response.json();
 
-      // Remplacer l'indicateur de chargement par la vraie réponse
-      setMessages(prev =>
-        prev.map(m => m.loading ? { text: data.reply || data.error || 'Erreur inconnue', sender: 'ai' } : m)
-      );
+      if (response.ok) {
+        const tps = data.meta?.output_tokens && data.meta?.llm_latency_ms
+          ? Math.round(data.meta.output_tokens / (data.meta.llm_latency_ms / 1000))
+          : 0;
+        setMessages(prev => prev.map(m =>
+          m.loading ? {
+            text: data.reply || 'Réponse vide reçue.',
+            sender: 'ai',
+            thinking: data.thinking || '',
+            meta: { ...data.meta, tps },
+          } : m
+        ));
+      } else {
+        const replyText = `Erreur ${response.status} : ${data.error || data.detail || JSON.stringify(data)}`;
+        setMessages(prev => prev.map(m => m.loading ? { text: replyText, sender: 'ai' } : m));
+      }
     } catch (err) {
       setMessages(prev =>
         prev.map(m => m.loading ? { text: 'Erreur de connexion. Vérifiez que le serveur est démarré.', sender: 'ai' } : m)
@@ -549,6 +562,25 @@ function UsersPage() {
   );
 }
 
+function ThinkingIndicator() {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2 text-gray-400 italic text-sm">
+        <span className="flex gap-1">
+          {[0, 1, 2].map(i => (
+            <span
+              key={i}
+              className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
+        </span>
+        CropGPT réfléchit...
+      </div>
+    </div>
+  );
+}
+
 function ChatPage({ messages, inputValue, setInputValue, handleSendMessage }) {
   const suggestedPrompts = [
     { icon: "🌱", title: "Meilleures cultures pour Madagascar", subtitle: "Conseils de plantation" },
@@ -601,14 +633,33 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage }) {
                 key={index}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-lg px-6 py-3 rounded-2xl ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
-                      : 'bg-white/70 backdrop-blur-sm text-gray-800 border border-gray-200'
-                  }`}
-                >
-                  {message.text}
+                <div className={`max-w-lg ${message.sender === 'user' ? '' : 'flex flex-col gap-1'}`}>
+                  <div
+                    className={`px-6 py-3 rounded-2xl ${
+                      message.sender === 'user'
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                        : 'bg-white/70 backdrop-blur-sm text-gray-800 border border-gray-200'
+                    }`}
+                  >
+                    {message.loading ? <ThinkingIndicator /> : message.text}
+                  </div>
+                  {message.meta && (
+                    <div className="text-xs text-gray-400 px-2 flex gap-3">
+                      <span>↑ {message.meta.input_tokens} tok</span>
+                      <span>↓ {message.meta.output_tokens} tok</span>
+                      {message.meta.tps > 0 && <span>{message.meta.tps} tok/s</span>}
+                    </div>
+                  )}
+                  {message.thinking && (
+                    <details className="px-2">
+                      <summary className="text-xs text-purple-500 cursor-pointer hover:text-purple-700">
+                        Raisonnement CropGPT
+                      </summary>
+                      <div className="text-xs text-purple-400 mt-1 max-h-32 overflow-y-auto bg-purple-950/10 rounded-lg p-2 whitespace-pre-wrap">
+                        {message.thinking}
+                      </div>
+                    </details>
+                  )}
                 </div>
               </div>
             ))}
@@ -658,6 +709,7 @@ function wmoInfo(code) {
 }
 
 function DashboardPage() {
+  // eslint-disable-next-line no-unused-vars
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [userList, setUserList] = useState([]);
   const [userSearch, setUserSearch] = useState('');
@@ -820,6 +872,7 @@ function DashboardPage() {
         const norm = s => (s || '')
           .toLowerCase()
           .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          // eslint-disable-next-line no-useless-escape
           .replace(/['\u2019\u2018\-]/g, '')
           .replace(/\s+/g, ' ').trim();
 
