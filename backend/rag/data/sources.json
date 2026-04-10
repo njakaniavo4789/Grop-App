@@ -1,0 +1,66 @@
+[
+  {
+    "id": "fao_rice_madagascar",
+    "title": "FAO — Rice production in Madagascar",
+    "url": "https://www.fao.org/giews/countrybrief/country/MDG",
+    "type": "institutional",
+    "language": "en",
+    "topics": ["yield_prediction", "varieties", "climate"]
+  },
+  {
+    "id": "fofifa_sri",
+    "title": "FOFIFA — Système de Riziculture Intensive à Madagascar",
+    "url": "https://fofifa.mg",
+    "type": "research",
+    "language": "fr",
+    "topics": ["varieties", "yield_prediction", "water_management"]
+  },
+  {
+    "id": "maep_statistiques",
+    "title": "MAEP — Statistiques agricoles Madagascar",
+    "url": "https://www.agriculture.gov.mg",
+    "type": "institutional",
+    "language": "fr",
+    "topics": ["yield_prediction", "market", "climate"]
+  },
+  {
+    "id": "cirad_sol_madagascar",
+    "title": "CIRAD — Fertilité des sols à Madagascar",
+    "url": "https://www.cirad.fr",
+    "type": "research",
+    "language": "fr",
+    "topics": ["soil_health", "varieties"]
+  },
+  {
+    "id": "cornell_sri",
+    "title": "Cornell University — SRI International Network",
+    "url": "https://sri.ciifad.cornell.edu",
+    "type": "research",
+    "language": "en",
+    "topics": ["yield_prediction", "water_management", "varieties"]
+  },
+  {
+    "id": "wikipedia_riziculture_madagascar",
+    "title": "Wikipedia — Riziculture à Madagascar",
+    "url": "https://fr.wikipedia.org/wiki/Agriculture_%C3%A0_Madagascar",
+    "type": "encyclopedia",
+    "language": "fr",
+    "topics": ["yield_prediction", "varieties", "climate", "market"]
+  },
+  {
+    "id": "irri_rice_knowledge",
+    "title": "IRRI — Rice Knowledge Bank",
+    "url": "https://www.irri.org/rice-knowledge-bank",
+    "type": "research",
+    "language": "en",
+    "topics": ["varieties", "pest_disease", "soil_health", "water_management"]
+  },
+  {
+    "id": "fao_soil_madagascar_pdf",
+    "title": "FAO — Soil Map of Madagascar (PDF)",
+    "url": "https://www.fao.org/3/br144e/br144e.pdf",
+    "type": "pdf",
+    "language": "en",
+    "topics": ["soil_health"]
+  }
+]

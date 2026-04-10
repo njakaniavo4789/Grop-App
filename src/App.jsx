@@ -693,7 +693,7 @@ function DashboardPage() {
       }
     };
 
-    const initializeMap = () => {
+    const initializeMap = async () => {
       try {
         // Limites de Madagascar
         const madagascarBounds = window.L.latLngBounds(
@@ -793,44 +793,90 @@ function DashboardPage() {
             coords: [[-23.50, 46.50], [-24.00, 47.50], [-25.00, 47.50], [-25.50, 46.50], [-24.50, 45.80]] },
         ];
 
-        regions.forEach((region) => {
-          const polygon = window.L.polygon(
-            region.coords.map(([lat, lng]) => [lat, lng]),
-            { color: region.color, fillColor: region.color, fillOpacity: 0.22, weight: 1.2 }
-          ).addTo(map);
+        // ── Frontières officielles via geoBoundaries (GitHub raw, CORS activé) ──
+        const norm = s => (s || '')
+          .toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/['\u2019\u2018\-]/g, '')
+          .replace(/\s+/g, ' ').trim();
 
-          polygon.bindPopup(`
-            <div style="font-family:system-ui;padding:10px;min-width:210px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <div style="width:12px;height:12px;border-radius:50%;background:${region.color};flex-shrink:0;"></div>
-                <h3 style="margin:0;font-size:15px;font-weight:700;color:#1f2937;">${region.name}</h3>
-              </div>
-              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>🌾</strong> ${region.data.crop}</p>
-              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>📍</strong> ${region.data.area}</p>
-              <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>👨‍🌾</strong> ${region.data.farmers} agriculteurs</p>
-              <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                  <span style="font-size:11px;color:#6b7280;">Production</span>
-                  <span style="font-size:13px;font-weight:700;color:${region.color};">${region.data.production}%</span>
+        // Index rapide : nom normalisé → données région
+        const regionByNorm = {};
+        regions.forEach(r => { regionByNorm[norm(r.name)] = r; });
+
+        const renderLayer = (geoJson) => {
+          const onEach = (feature, layer) => {
+            const key   = norm(feature.properties.shapeName || '');
+            const region = regionByNorm[key] || {
+              name: feature.properties.shapeName || '—',
+              color: '#94a3b8',
+              data: { crop: '—', area: '—', farmers: '—', production: 0 },
+            };
+            const color = region.color;
+
+            layer.bindPopup(`
+              <div style="font-family:system-ui;padding:10px;min-width:210px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                  <div style="width:12px;height:12px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+                  <h3 style="margin:0;font-size:15px;font-weight:700;color:#1f2937;">${region.name}</h3>
                 </div>
-                <div style="background:#e5e7eb;border-radius:9999px;height:6px;overflow:hidden;">
-                  <div style="background:${region.color};height:100%;width:${region.data.production}%;border-radius:9999px;"></div>
+                <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>🌾</strong> ${region.data.crop}</p>
+                <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>📍</strong> ${region.data.area}</p>
+                <p style="margin:3px 0;font-size:12px;color:#374151;"><strong>👨‍🌾</strong> ${region.data.farmers} agriculteurs</p>
+                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                    <span style="font-size:11px;color:#6b7280;">Production</span>
+                    <span style="font-size:13px;font-weight:700;color:${color};">${region.data.production}%</span>
+                  </div>
+                  <div style="background:#e5e7eb;border-radius:9999px;height:6px;overflow:hidden;">
+                    <div style="background:${color};height:100%;width:${region.data.production}%;border-radius:9999px;"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          `);
+            `);
+            layer.on('mouseover', function () { this.setStyle({ fillOpacity: 0.5, weight: 2.5 }); });
+            layer.on('mouseout',  function () { this.setStyle({ fillOpacity: 0.22, weight: 1.2 }); });
+            const city = regionCities[region.name];
+            if (city) {
+              layer.on('click', () =>
+                setSelectedCity({ ...city, regionName: region.name, color })
+              );
+            }
+          };
 
-          polygon.on('mouseover', function () { this.setStyle({ fillOpacity: 0.5, weight: 2.5 }); });
-          polygon.on('mouseout',  function () { this.setStyle({ fillOpacity: 0.22, weight: 1.2 }); });
-
-          // Clic → mise à jour météo en temps réel
-          const city = regionCities[region.name];
-          if (city) {
-            polygon.on('click', () =>
-              setSelectedCity({ ...city, regionName: region.name, color: region.color })
-            );
+          if (geoJson) {
+            // ✅ Vraies frontières officielles
+            window.L.geoJSON(geoJson, {
+              style: feature => {
+                const r = regionByNorm[norm(feature.properties.shapeName || '')] || {};
+                const c = r.color || '#94a3b8';
+                return { color: c, fillColor: c, fillOpacity: 0.22, weight: 1.2 };
+              },
+              onEachFeature: onEach,
+            }).addTo(map);
+          } else {
+            // ⚠️ Secours : polygones approchés si le fetch échoue
+            regions.forEach(region => {
+              const layer = window.L.polygon(
+                region.coords.map(([lat, lng]) => [lat, lng]),
+                { color: region.color, fillColor: region.color, fillOpacity: 0.22, weight: 1.2 }
+              ).addTo(map);
+              onEach({ properties: { shapeName: region.name } }, layer);
+            });
           }
-        });
+        };
+
+        // Tentative de chargement des frontières réelles
+        try {
+          const resp = await fetch(
+            'https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/MDG/ADM1/geoBoundaries-MDG-ADM1.geojson'
+          );
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          renderLayer(await resp.json());
+        } catch (e) {
+          console.warn('geoBoundaries fetch échoué, polygones de secours.', e.message);
+          renderLayer(null);
+        }
 
         // Villes principales
         const cities = [
