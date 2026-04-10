@@ -16,9 +16,9 @@
     "topics": ["varieties", "yield_prediction", "water_management"]
   },
   {
-    "id": "maep_statistiques",
+    "id": "Agriculture in Madagascar Wikipedia",
     "title": "MAEP — Statistiques agricoles Madagascar",
-    "url": "https://www.agriculture.gov.mg",
+    "url": "https://en.wikipedia.org/wiki/Agriculture_in_Madagascar",
     "type": "institutional",
     "language": "fr",
     "topics": ["yield_prediction", "market", "climate"]

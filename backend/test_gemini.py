@@ -3,20 +3,23 @@ Script de test rapide pour vérifier que Gemini API fonctionne.
 Lancer depuis backend/ :
     python test_gemini.py
 """
+
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 
 # Charger la clé depuis .env si présent
 from pathlib import Path
-env_file = Path(__file__).parent / '.env'
+
+env_file = Path(__file__).parent / ".env"
 if env_file.exists():
     for line in env_file.read_text().splitlines():
-        if '=' in line and not line.startswith('#'):
-            key, _, value = line.partition('=')
+        if "=" in line and not line.startswith("#"):
+            key, _, value = line.partition("=")
             os.environ.setdefault(key.strip(), value.strip())
 
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-GEMINI_MODEL   = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 if not GEMINI_API_KEY:
     print("ERREUR : GEMINI_API_KEY non défini dans .env")
@@ -33,27 +36,28 @@ try:
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(
         model_name=GEMINI_MODEL,
-        system_instruction=(
-            "Tu es CropGPT, un assistant agricole malgache. "
-            "Réponds toujours en français."
-        ),
+        system_instruction="Tu es CropGPT, un assistant agricole malgache. Réponds toujours en français.",
     )
 
     response = model.generate_content(
         "En une phrase, quel est le rendement moyen du riz irrigué à Madagascar ?"
     )
 
-    print("✓ Gemini répond correctement !\n")
-    print(f"Réponse : {response.text}")
-    print("\n→ L'intégration est fonctionnelle. Tu peux démarrer le serveur.")
+    print("OK - Gemini repond correctement !\n")
+    print(f"Reponse : {response.text}")
+    print("\nL'integration est fonctionnelle. Tu peux demarrer le serveur.")
 
 except ImportError:
     print("ERREUR : google-generativeai non installé")
     print("→ Lancer : pip install google-generativeai")
 
+except ImportError:
+    print("ERREUR : google-genai non installé")
+    print("→ Lancer : pip install google-genai")
+
 except Exception as e:
     print(f"ERREUR : {e}")
-    if '403' in str(e):
+    if "403" in str(e):
         print("→ Clé API invalide ou non activée sur aistudio.google.com")
-    elif '429' in str(e):
+    elif "429" in str(e):
         print("→ Rate limit atteint — attendre 1 minute")
