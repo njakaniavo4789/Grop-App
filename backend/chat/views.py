@@ -45,6 +45,8 @@ def chat(request):
     # 2. Ontologie
     onto_result = ontology.validate_and_enrich(normalized)
 
+    thinking = ''
+
     if not onto_result['is_valid']:
         # Guardrail : question hors domaine
         bot_reply = onto_result['rejection_reason']
@@ -56,7 +58,12 @@ def chat(request):
 
         # 4. LLM
         full_context = {**onto_result, **rag_result}
-        bot_reply = llm.generate(full_context, history=history)
+        llm_result  = llm.generate(full_context, history=history)
+        bot_reply   = llm_result["reply"]
+        thinking    = llm_result.get("thinking", "")
+        input_tok   = llm_result.get("input_tokens", 0)
+        output_tok  = llm_result.get("output_tokens", 0)
+        llm_latency = llm_result.get("latency_ms", 0)
 
         # Si disclaimer RAG → l'ajouter en tête de la réponse
         disclaimer = rag_result.get('disclaimer')
@@ -72,6 +79,9 @@ def chat(request):
             'docs_retrieved': len(rag_result.get('retrieved_docs', [])),
             'language': normalized['language'],
             'latency_ms': round((time.time() - t0) * 1000),
+            'input_tokens': input_tok,
+            'output_tokens': output_tok,
+            'llm_latency_ms': llm_latency,
         }
 
     # Sauvegarder les messages
@@ -92,6 +102,7 @@ def chat(request):
     return Response({
         'conversation_id': conversation.pk,
         'reply': bot_reply,
+        'thinking': thinking,
         'sources': rag_result.get('retrieved_docs', []),
         'meta': pipeline_meta,
     })

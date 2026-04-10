@@ -1,11 +1,17 @@
 """
 Étape 4 du pipeline : appel au LLM avec le contexte RAG.
 
-Supporte : Anthropic (Claude), OpenAI, Ollama (local)
-Input  : dict complet du pipeline { enriched_text, rag_context, history, … }
-Output : str — réponse de l'assistant
+Tous les providers retournent maintenant un dict :
+{
+  "reply"       : str   — réponse finale
+  "thinking"    : str   — raisonnement interne (Gemini 2.5 thinking mode)
+  "input_tokens": int
+  "output_tokens": int
+  "latency_ms"  : int
+}
 """
 import logging
+import time
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -21,146 +27,276 @@ en particulier la riziculture. Tu aides les agriculteurs et chercheurs à :
 RÈGLES ABSOLUES :
 1. LANGUE : Réponds TOUJOURS en français, même si les documents de contexte sont en anglais.
    Si l'utilisateur écrit en malgache, réponds en malgache.
-   Ne jamais répondre en anglais sauf si explicitement demandé.
 
 2. SOURCES : Quand tu utilises des données des documents fournis, indique la source
    entre parenthèses. Ex : (Source : FAO Madagascar 2022)
-   Si la donnée vient de ta connaissance générale, écris (connaissance générale).
 
-3. HONNÊTETÉ : Si tu n'as pas d'information certaine sur Madagascar spécifiquement,
-   dis-le clairement. Ne jamais inventer de chiffres ou statistiques.
-   Préférer "je ne dispose pas de données précises sur ce point" à une approximation.
+3. HONNÊTETÉ : Ne jamais inventer de chiffres ou statistiques.
+   Préférer "je ne dispose pas de données précises" à une approximation.
 
-4. TRADUCTION : Les documents de contexte peuvent être en anglais, français ou malgache.
-   Tu lis et comprends toutes ces langues. Traduis et synthétise toujours en français
-   dans ta réponse finale.
+4. TRADUCTION : Les documents peuvent être en anglais/français/malgache.
+   Traduis et synthétise toujours en français dans ta réponse finale.
 
-5. UNITÉS : Utiliser les unités malgaches : Ariary (Ar) pour les prix,
-   hectares (ha) pour les surfaces, kg/ha ou t/ha pour les rendements.
+5. UNITÉS : Ariary (Ar) pour les prix, hectares (ha), kg/ha ou t/ha pour les rendements.
 """
 
 
-def build_prompt(user_message: str, rag_context: str, history: list,
-                 confidence_level: str = 'high') -> list:
-    """
-    Construit la liste de messages pour le LLM.
-    Adapte les instructions selon la confiance des données RAG.
-    """
-    messages = []
+# ─── Gemini ───────────────────────────────────────────────────────────────────
 
-    # Historique de la conversation (max 20 derniers messages)
-    for msg in history[-20:]:
-        messages.append({'role': msg['role'], 'content': msg['content']})
+def call_gemini(messages: list, system: str) -> dict:
+    import google.generativeai as genai
 
-    # Instructions au LLM selon le niveau de confiance
-    confidence_instructions = {
-        'high': (
-            "Tu disposes de données fiables et pertinentes ci-dessous. "
-            "Base ta réponse principalement sur ces données et cite tes sources."
-        ),
-        'medium': (
-            "Les données disponibles sont partiellement pertinentes. "
-            "Utilise-les mais signale explicitement les limites de ta réponse."
-        ),
-        'low': (
-            "Les données disponibles sont générales. Réponds avec ces informations "
-            "mais précise que des données spécifiques à leur situation manquent "
-            "et recommande de consulter un expert local (MAEP/FOFIFA)."
-        ),
-        'none': (
-            "IMPORTANT : Tu n'as pas de données spécifiques pour cette question. "
-            "Réponds uniquement avec ce que tu sais de façon certaine sur l'agriculture "
-            "malgache. Si tu n'es pas certain, dis-le clairement. "
-            "Ne pas inventer de chiffres ou de statistiques. "
-            "Recommande toujours de consulter un expert local."
-        ),
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    model_name = settings.GEMINI_MODEL  # gemini-2.5-flash
+
+    # Thinking mode — disponible sur gemini-2.5-flash
+    # budget=-1 = thinking illimité, budget=0 = thinking désactivé
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1.0,  # requis pour thinking mode
     }
 
-    instruction = confidence_instructions.get(confidence_level, confidence_instructions['none'])
+    # Activer thinking uniquement si le modèle le supporte
+    thinking_config = None
+    if "2.5" in model_name or "2.0" in model_name:
+        try:
+            thinking_config = {"thinking_budget": 5000}  # tokens max pour la réflexion
+        except Exception:
+            pass
 
-    # Construire le contenu utilisateur
-    user_content = user_message
+    model = genai.GenerativeModel(
+        model_name=model_name,
+        system_instruction=system,
+        generation_config=generation_config,
+    )
 
-    if rag_context:
-        user_content = (
-            f"{user_message}\n\n"
-            f"---\n"
-            f"[Instructions : {instruction}]\n\n"
-            f"[Données documentaires]\n{rag_context}\n"
-            f"---"
-        )
-    else:
-        user_content = (
-            f"{user_message}\n\n"
-            f"[Instruction : {instruction}]"
-        )
+    # Historique au format Gemini
+    gemini_history = []
+    for msg in messages[:-1]:
+        gemini_role = "model" if msg["role"] == "assistant" else "user"
+        gemini_history.append({"role": gemini_role, "parts": [msg["content"]]})
 
-    messages.append({'role': 'user', 'content': user_content})
-    return messages
+    chat = model.start_chat(history=gemini_history)
+    last_message = messages[-1]["content"]
+
+    t0 = time.time()
+    try:
+        # Passer thinking_config si disponible
+        if thinking_config:
+            response = chat.send_message(
+                last_message,
+                generation_config={"thinking_config": thinking_config, **generation_config},
+            )
+        else:
+            response = chat.send_message(last_message)
+
+        latency = round((time.time() - t0) * 1000)
+
+        # Extraire thinking + reply depuis les parts
+        thinking_text = ""
+        reply_text = ""
+
+        try:
+            candidate = response.candidates[0]
+            for part in candidate.content.parts:
+                # Les parts "thought" contiennent le raisonnement interne
+                if hasattr(part, "thought") and part.thought:
+                    thinking_text += part.text or ""
+                else:
+                    reply_text += part.text or ""
+        except Exception:
+            # Fallback si la structure est différente
+            reply_text = response.text
+            thinking_text = ""
+
+        if not reply_text:
+            reply_text = response.text
+
+        # Tokens
+        input_tokens = 0
+        output_tokens = 0
+        try:
+            usage = response.usage_metadata
+            input_tokens = getattr(usage, "prompt_token_count", 0) or 0
+            output_tokens = getattr(usage, "candidates_token_count", 0) or 0
+        except Exception:
+            pass
+
+        return {
+            "reply": reply_text,
+            "thinking": thinking_text,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "latency_ms": latency,
+        }
+
+    except Exception as e:
+        error_str = str(e)
+        latency = round((time.time() - t0) * 1000)
+
+        if "429" in error_str or "quota" in error_str.lower():
+            logger.warning("Gemini rate limit — attente 60s...")
+            time.sleep(60)
+            response = chat.send_message(last_message)
+            return {
+                "reply": response.text,
+                "thinking": "",
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "latency_ms": latency,
+            }
+
+        if "blocked" in error_str.lower() or "safety" in error_str.lower():
+            return {
+                "reply": (
+                    "Je ne peux pas répondre à cette question telle qu'elle est formulée. "
+                    "Pourriez-vous la reformuler en précisant votre contexte agricole ?"
+                ),
+                "thinking": "",
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "latency_ms": latency,
+            }
+
+        if "503" in error_str or "UNAVAILABLE" in error_str:
+            logger.warning("Gemini 503 — fallback gemini-1.5-flash...")
+            fallback = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system)
+            fb_chat = fallback.start_chat(history=gemini_history)
+            fb_response = fb_chat.send_message(last_message)
+            return {
+                "reply": fb_response.text,
+                "thinking": "",
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "latency_ms": latency,
+            }
+
+        raise
 
 
-def call_anthropic(messages: list, system: str) -> str:
+# ─── Anthropic ────────────────────────────────────────────────────────────────
+
+def call_anthropic(messages: list, system: str) -> dict:
     import anthropic
+    t0 = time.time()
     client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
     response = client.messages.create(
-        model='claude-opus-4-6',
+        model="claude-opus-4-6",
         max_tokens=2048,
         system=system,
         messages=messages,
     )
-    return response.content[0].text
+    return {
+        "reply": response.content[0].text,
+        "thinking": "",
+        "input_tokens": response.usage.input_tokens,
+        "output_tokens": response.usage.output_tokens,
+        "latency_ms": round((time.time() - t0) * 1000),
+    }
 
 
-def call_openai(messages: list, system: str) -> str:
+# ─── OpenAI ───────────────────────────────────────────────────────────────────
+
+def call_openai(messages: list, system: str) -> dict:
     from openai import OpenAI
+    t0 = time.time()
     client = OpenAI(api_key=settings.OPENAI_API_KEY)
-    full_messages = [{'role': 'system', 'content': system}] + messages
-    response = client.chat.completions.create(
-        model='gpt-4o',
-        messages=full_messages,
-        max_tokens=2048,
-    )
-    return response.choices[0].message.content
+    full_messages = [{"role": "system", "content": system}] + messages
+    response = client.chat.completions.create(model="gpt-4o", messages=full_messages, max_tokens=2048)
+    return {
+        "reply": response.choices[0].message.content,
+        "thinking": "",
+        "input_tokens": response.usage.prompt_tokens,
+        "output_tokens": response.usage.completion_tokens,
+        "latency_ms": round((time.time() - t0) * 1000),
+    }
 
 
-def call_ollama(messages: list, system: str) -> str:
+# ─── Ollama ───────────────────────────────────────────────────────────────────
+
+def call_ollama(messages: list, system: str) -> dict:
     import httpx
-    full_messages = [{'role': 'system', 'content': system}] + messages
+    t0 = time.time()
+    full_messages = [{"role": "system", "content": system}] + messages
     response = httpx.post(
         f"{settings.OLLAMA_BASE_URL}/api/chat",
-        json={'model': 'mistral', 'messages': full_messages, 'stream': False},
+        json={"model": "mistral", "messages": full_messages, "stream": False},
         timeout=120,
     )
     response.raise_for_status()
-    return response.json()['message']['content']
+    data = response.json()
+    return {
+        "reply": data["message"]["content"],
+        "thinking": "",
+        "input_tokens": data.get("prompt_eval_count", 0),
+        "output_tokens": data.get("eval_count", 0),
+        "latency_ms": round((time.time() - t0) * 1000),
+    }
 
 
-def generate(pipeline_data: dict, history: list = None) -> str:
-    """Point d'entrée principal. Choisit le provider selon la config."""
+# ─── Prompt builder ───────────────────────────────────────────────────────────
+
+def build_prompt(user_message: str, rag_context: str, history: list,
+                 confidence_level: str = "high") -> list:
+    messages = []
+    for msg in history[-20:]:
+        messages.append({"role": msg["role"], "content": msg["content"]})
+
+    confidence_instructions = {
+        "high": "Tu disposes de données fiables ci-dessous. Base ta réponse sur ces données et cite tes sources.",
+        "medium": "Les données disponibles sont partielles. Utilise-les mais signale les limites.",
+        "low": "Données générales disponibles. Recommande de consulter un expert local (MAEP/FOFIFA).",
+        "none": "IMPORTANT : Pas de données spécifiques. Ne pas inventer de chiffres. Consulter MAEP/FOFIFA.",
+    }
+    instruction = confidence_instructions.get(confidence_level, confidence_instructions["none"])
+
+    if rag_context:
+        user_content = (
+            f"{user_message}\n\n---\n"
+            f"[Instructions : {instruction}]\n\n"
+            f"[Données documentaires — répondre en français]\n{rag_context}\n---"
+        )
+    else:
+        user_content = f"{user_message}\n\n[Instruction : {instruction}]"
+
+    messages.append({"role": "user", "content": user_content})
+    return messages
+
+
+# ─── Point d'entrée principal ─────────────────────────────────────────────────
+
+def generate(pipeline_data: dict, history: list = None) -> dict:
+    """Retourne un dict { reply, thinking, input_tokens, output_tokens, latency_ms }."""
     if history is None:
         history = []
 
     messages = build_prompt(
-        user_message=pipeline_data['enriched_text'],
-        rag_context=pipeline_data.get('rag_context', ''),
+        user_message=pipeline_data["enriched_text"],
+        rag_context=pipeline_data.get("rag_context", ""),
         history=history,
-        confidence_level=pipeline_data.get('confidence_level', 'none'),
+        confidence_level=pipeline_data.get("confidence_level", "none"),
     )
 
     provider = settings.LLM_PROVIDER
+    logger.info("LLM provider : %s", provider)
 
     try:
-        if provider == 'anthropic':
+        if provider == "gemini":
+            return call_gemini(messages, SYSTEM_PROMPT)
+        elif provider == "anthropic":
             return call_anthropic(messages, SYSTEM_PROMPT)
-        elif provider == 'openai':
+        elif provider == "openai":
             return call_openai(messages, SYSTEM_PROMPT)
-        elif provider == 'ollama':
+        elif provider == "ollama":
             return call_ollama(messages, SYSTEM_PROMPT)
         else:
-            raise ValueError(f"Provider LLM inconnu : {provider}")
+            raise ValueError(f"Provider inconnu : {provider}")
     except Exception as e:
-        logger.error("Erreur LLM (%s): %s", provider, e)
-        return (
-            "Désolé, je rencontre un problème technique. "
-            "Veuillez réessayer dans quelques instants."
-        )
+        logger.error("Erreur LLM (%s) : %s", provider, e)
+        return {
+            "reply": "Désolé, problème technique. Réessayez dans quelques instants.",
+            "thinking": "",
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "latency_ms": 0,
+        }
