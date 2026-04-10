@@ -44,52 +44,40 @@ RÈGLES ABSOLUES :
 # ─── Gemini ───────────────────────────────────────────────────────────────────
 
 def call_gemini(messages: list, system: str) -> dict:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
 
-    genai.configure(api_key=settings.GEMINI_API_KEY)
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
     model_name = settings.GEMINI_MODEL  # gemini-2.5-flash
 
-    # Thinking mode — disponible sur gemini-2.5-flash
-    # budget=-1 = thinking illimité, budget=0 = thinking désactivé
-    generation_config = {
-        "max_output_tokens": 2048,
-        "temperature": 1.0,  # requis pour thinking mode
-    }
-
-    # Activer thinking uniquement si le modèle le supporte
-    thinking_config = None
-    if "2.5" in model_name or "2.0" in model_name:
-        try:
-            thinking_config = {"thinking_budget": 5000}  # tokens max pour la réflexion
-        except Exception:
-            pass
-
-    model = genai.GenerativeModel(
-        model_name=model_name,
-        system_instruction=system,
-        generation_config=generation_config,
-    )
-
-    # Historique au format Gemini
-    gemini_history = []
+    # Construire le contenu au format google.genai
+    # Historique : tous les messages sauf le dernier
+    contents = []
     for msg in messages[:-1]:
-        gemini_role = "model" if msg["role"] == "assistant" else "user"
-        gemini_history.append({"role": gemini_role, "parts": [msg["content"]]})
+        role = "model" if msg["role"] == "assistant" else "user"
+        contents.append(types.Content(role=role, parts=[types.Part(text=msg["content"])]))
 
-    chat = model.start_chat(history=gemini_history)
+    # Dernier message (question actuelle)
     last_message = messages[-1]["content"]
+    contents.append(types.Content(role="user", parts=[types.Part(text=last_message)]))
+
+    # Config de génération avec thinking mode pour gemini-2.5
+    thinking_budget = 5000 if ("2.5" in model_name or "2.0" in model_name) else 0
+
+    config = types.GenerateContentConfig(
+        system_instruction=system,
+        max_output_tokens=2048,
+        temperature=1.0,
+        thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget),
+    )
 
     t0 = time.time()
     try:
-        # Passer thinking_config si disponible
-        if thinking_config:
-            response = chat.send_message(
-                last_message,
-                generation_config={"thinking_config": thinking_config, **generation_config},
-            )
-        else:
-            response = chat.send_message(last_message)
-
+        response = client.models.generate_content(
+            model=model_name,
+            contents=contents,
+            config=config,
+        )
         latency = round((time.time() - t0) * 1000)
 
         # Extraire thinking + reply depuis les parts
@@ -97,30 +85,20 @@ def call_gemini(messages: list, system: str) -> dict:
         reply_text = ""
 
         try:
-            candidate = response.candidates[0]
-            for part in candidate.content.parts:
-                # Les parts "thought" contiennent le raisonnement interne
-                if hasattr(part, "thought") and part.thought:
+            for part in response.candidates[0].content.parts:
+                if getattr(part, "thought", False):
                     thinking_text += part.text or ""
                 else:
                     reply_text += part.text or ""
         except Exception:
-            # Fallback si la structure est différente
-            reply_text = response.text
-            thinking_text = ""
+            reply_text = response.text or ""
 
         if not reply_text:
-            reply_text = response.text
+            reply_text = response.text or ""
 
         # Tokens
-        input_tokens = 0
-        output_tokens = 0
-        try:
-            usage = response.usage_metadata
-            input_tokens = getattr(usage, "prompt_token_count", 0) or 0
-            output_tokens = getattr(usage, "candidates_token_count", 0) or 0
-        except Exception:
-            pass
+        input_tokens  = getattr(response.usage_metadata, "prompt_token_count", 0) or 0
+        output_tokens = getattr(response.usage_metadata, "candidates_token_count", 0) or 0
 
         return {
             "reply": reply_text,
@@ -133,13 +111,17 @@ def call_gemini(messages: list, system: str) -> dict:
     except Exception as e:
         error_str = str(e)
         latency = round((time.time() - t0) * 1000)
+        logger.error("Erreur Gemini : %s", error_str)
 
-        if "429" in error_str or "quota" in error_str.lower():
+        if "429" in error_str or "quota" in error_str.lower() or "RESOURCE_EXHAUSTED" in error_str:
             logger.warning("Gemini rate limit — attente 60s...")
             time.sleep(60)
-            response = chat.send_message(last_message)
+            response = client.models.generate_content(
+                model=model_name, contents=contents,
+                config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=2048),
+            )
             return {
-                "reply": response.text,
+                "reply": response.text or "",
                 "thinking": "",
                 "input_tokens": 0,
                 "output_tokens": 0,
@@ -159,12 +141,14 @@ def call_gemini(messages: list, system: str) -> dict:
             }
 
         if "503" in error_str or "UNAVAILABLE" in error_str:
-            logger.warning("Gemini 503 — fallback gemini-1.5-flash...")
-            fallback = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system)
-            fb_chat = fallback.start_chat(history=gemini_history)
-            fb_response = fb_chat.send_message(last_message)
+            logger.warning("Gemini 503 — fallback gemini-2.0-flash...")
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=2048),
+            )
             return {
-                "reply": fb_response.text,
+                "reply": response.text or "",
                 "thinking": "",
                 "input_tokens": 0,
                 "output_tokens": 0,

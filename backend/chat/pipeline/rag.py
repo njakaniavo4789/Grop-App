@@ -71,7 +71,8 @@ def retrieve(ontology_result: dict, top_k: int = None) -> dict:
 
     # Vector store non disponible (dev sans index)
     if index is None:
-        return _fallback_static(ontology_result.get('context_tags', []))
+        return _fallback_static(ontology_result.get('context_tags', []),
+                                ontology_result.get('ontology_facts', ''))
 
     try:
         from sentence_transformers import SentenceTransformer
@@ -80,7 +81,12 @@ def retrieve(ontology_result: dict, top_k: int = None) -> dict:
         model = SentenceTransformer(
             'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
         )
-        query_vec = model.encode([ontology_result['enriched_text']])
+
+        # ── Expansion de requête via l'ontologie ──────────────────────────────
+        base_query = ontology_result['enriched_text']
+        expanded_query = _expand_query(base_query, ontology_result.get('matched_keywords', []))
+
+        query_vec = model.encode([expanded_query])
         query_vec = np.array(query_vec, dtype='float32')
 
         # Récupérer plus de candidats pour filtrer ensuite
@@ -102,28 +108,56 @@ def retrieve(ontology_result: dict, top_k: int = None) -> dict:
         # Garder seulement top_k
         docs = docs[:top_k]
 
-        return _build_result(docs, ontology_result.get('context_tags', []))
+        return _build_result(docs, ontology_result.get('context_tags', []),
+                             ontology_result.get('ontology_facts', ''))
 
     except Exception as e:
         logger.error("Erreur RAG retrieval : %s", e)
-        return _fallback_static(ontology_result.get('context_tags', []))
+        return _fallback_static(ontology_result.get('context_tags', []),
+                                ontology_result.get('ontology_facts', ''))
 
 
-def _build_result(docs: list, context_tags: list) -> dict:
+def _expand_query(base_query: str, matched_keywords: list) -> str:
+    """
+    Enrichit la requête FAISS avec les concepts liés trouvés dans l'ontologie.
+    Ex : "Makalioka" → ajoute "Riz, Variété de Culture, Hybride, FOFIFA"
+    Améliore le rappel sémantique sans changer la question originale.
+    """
+    if not matched_keywords:
+        return base_query
+    try:
+        from rag.ontology_graph import get_related_concepts
+        extra_terms = []
+        seen = set()
+        for kw in matched_keywords[:5]:  # limiter pour la perf
+            related = get_related_concepts(kw)
+            for term in related[:3]:
+                if term not in seen and term.lower() not in base_query.lower():
+                    extra_terms.append(term)
+                    seen.add(term)
+        if extra_terms:
+            expanded = base_query + ' ' + ' '.join(extra_terms)
+            logger.debug("Requête FAISS élargie : +%d termes", len(extra_terms))
+            return expanded
+    except Exception as e:
+        logger.debug("Expansion ontologie échouée : %s", e)
+    return base_query
+
+
+def _build_result(docs: list, context_tags: list, ontology_facts: str = '') -> dict:
     """
     Évalue la qualité des résultats et construit la réponse appropriée.
     C'est ici que se gère le cas "rien trouvé" ou "données insuffisantes".
     """
     if not docs:
-        return _no_data_result(context_tags)
+        return _no_data_result(context_tags, ontology_facts)
 
     best_score = docs[0]['score']
 
     # ── CAS 1 : Données de haute qualité ──────────────────────────────
     if best_score >= SCORE_HIGH:
-        # Filtrer pour ne garder que les docs au-dessus du seuil moyen
         good_docs = [d for d in docs if d['score'] >= SCORE_MEDIUM]
-        rag_context = _format_context(good_docs)
+        rag_context = _format_context(good_docs, ontology_facts)
         return {
             'retrieved_docs': good_docs,
             'rag_context': rag_context,
@@ -134,7 +168,7 @@ def _build_result(docs: list, context_tags: list) -> dict:
 
     # ── CAS 2 : Données partiellement pertinentes ──────────────────────
     if best_score >= SCORE_MEDIUM:
-        rag_context = _format_context(docs)
+        rag_context = _format_context(docs, ontology_facts)
         return {
             'retrieved_docs': docs,
             'rag_context': rag_context,
@@ -148,16 +182,16 @@ def _build_result(docs: list, context_tags: list) -> dict:
         }
 
     # ── CAS 3 : Score faible — rien de pertinent ──────────────────────
-    return _no_data_result(context_tags)
+    return _no_data_result(context_tags, ontology_facts)
 
 
-def _no_data_result(context_tags: list) -> dict:
+def _no_data_result(context_tags: list, ontology_facts: str = '') -> dict:
     """
     Gère le cas où le RAG ne trouve rien d'utile.
     Tente le fallback sur la knowledge base statique.
     """
     logger.info("Score RAG trop faible — fallback knowledge base statique")
-    fallback = _fallback_static(context_tags)
+    fallback = _fallback_static(context_tags, ontology_facts)
 
     if fallback['has_data']:
         # On a des données générales dans le fallback
@@ -193,9 +227,14 @@ def _empty_result() -> dict:
     }
 
 
-def _format_context(docs: list) -> str:
-    """Formate les documents récupérés en texte pour le LLM."""
+def _format_context(docs: list, ontology_facts: str = '') -> str:
+    """Formate les documents récupérés + les faits ontologiques pour le LLM."""
     parts = []
+
+    # Faits ontologiques en premier (pedigree, catégorie) si disponibles
+    if ontology_facts:
+        parts.append(ontology_facts)
+
     for doc in docs:
         source_label = doc.get('title', 'Source inconnue')
         score_pct = int(doc.get('score', 0) * 100)
@@ -206,7 +245,7 @@ def _format_context(docs: list) -> str:
     return '\n\n---\n\n'.join(parts)
 
 
-def _fallback_static(context_tags: list) -> dict:
+def _fallback_static(context_tags: list, ontology_facts: str = '') -> dict:
     """
     Contexte statique de secours basé sur les tags ontologiques.
     Utilisé quand FAISS n'est pas disponible ou le score est trop faible.
@@ -257,10 +296,15 @@ def _fallback_static(context_tags: list) -> dict:
         ),
     }
 
-    context_parts = [fallbacks[tag] for tag in context_tags if tag in fallbacks]
+    context_parts = []
+
+    # Faits ontologiques en tête si disponibles
+    if ontology_facts:
+        context_parts.append(ontology_facts)
+
+    context_parts += [fallbacks[tag] for tag in context_tags if tag in fallbacks]
 
     if not context_parts:
-        # Aucun tag ne correspond → contexte très général
         context_parts = [
             "Madagascar est le pays africain avec la plus grande consommation de riz par habitant "
             "(~130 kg/an). La riziculture emploie plus de 70% de la population rurale. "
@@ -279,8 +323,8 @@ def _fallback_static(context_tags: list) -> dict:
     return {
         'retrieved_docs': [],
         'rag_context': '\n\n'.join(context_parts),
-        'confidence_level': 'medium',
+        'confidence_level': 'medium' if not ontology_facts else 'high',
         'has_data': True,
         'disclaimer': None,
-        'source': 'static_fallback',
+        'source': 'ontology_fallback' if ontology_facts else 'static_fallback',
     }

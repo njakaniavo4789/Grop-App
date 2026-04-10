@@ -10,6 +10,7 @@
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 
 @prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
 
 @prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
 

@@ -2,99 +2,194 @@
 Étape 2 du pipeline : validation ontologique et enrichissement du contexte.
 
 - Vérifie que la question est dans le domaine agricole (guardrail)
-- Enrichit le prompt avec des concepts clés liés à la riziculture malgache
-- Retourne le contexte structuré pour le RAG
+  → keywords issus du graphe rdflib (185 FR / 90 MG / 186 EN) au lieu d'un dict hardcodé
+- Détecte les context_tags via les classes OWL des entités trouvées
+- Enrichit le prompt avec les faits ontologiques (pedigree, catégorie, concepts liés)
 
 Input  : dict normalisé { text, language, … }
-Output : dict { is_valid, domain, context_tags, enriched_text, rejection_reason }
+Output : dict { is_valid, domain, context_tags, enriched_text, rejection_reason,
+                matched_keywords, ontology_facts }
 """
 
-# Termes du domaine agricole (mots-clés déclencheurs — extensible)
-AGRICULTURAL_KEYWORDS = {
-    'fr': [
-        'riz', 'rizière', 'culture', 'récolte', 'sol', 'semis', 'engrais', 'irrigation',
-        'rendement', 'agriculture', 'plante', 'maladie', 'insecte', 'ravageur', 'variété',
-        'paddy', 'riziculture', 'parcelle', 'saison', 'pluie', 'sécheresse', 'fertilisant',
-        'herbicide', 'pesticide', 'compost', 'labour', 'terrain', 'eau', 'digue', 'grenier',
-        'fofifa', 'tanety', 'bas-fond', 'tavy', 'manioc', 'maïs', 'vanille', 'girofle',
-    ],
-    'mg': [
-        'vary', 'tanimbary', 'fambolena', 'jinja', 'tany', 'orana', 'ahitra', 'aretina',
-        'zezika', 'famokarana', 'rano', 'tanety', 'lemaka', 'fasika',
-    ],
-    'en': [
-        'rice', 'paddy', 'crop', 'harvest', 'soil', 'seed', 'fertilizer', 'irrigation',
-        'yield', 'agriculture', 'plant', 'disease', 'pest', 'variety', 'farming',
-        'cultivation', 'drought', 'rainfall', 'compost', 'field',
-    ],
+import logging
+logger = logging.getLogger(__name__)
+
+# Tags de fallback si l'ontologie n'est pas disponible
+_FALLBACK_KEYWORDS = {
+    'fr': ['riz', 'rizière', 'culture', 'récolte', 'sol', 'semis', 'engrais', 'irrigation',
+           'rendement', 'agriculture', 'plante', 'maladie', 'ravageur', 'variété', 'paddy',
+           'fofifa', 'manioc', 'maïs', 'vanille', 'girofle', 'compost', 'eau', 'saison'],
+    'mg': ['vary', 'tanimbary', 'fambolena', 'jinja', 'tany', 'orana', 'aretina', 'zezika'],
+    'en': ['rice', 'paddy', 'crop', 'harvest', 'soil', 'seed', 'fertilizer', 'irrigation',
+           'yield', 'agriculture', 'plant', 'disease', 'pest', 'variety', 'farming'],
 }
 
-# Tags ontologiques pour enrichir le RAG
-TOPIC_TAGS = {
-    'water_management': ['irrigation', 'rano', 'digue', 'eau', 'inondation', 'sécheresse'],
-    'soil_health': ['sol', 'tany', 'engrais', 'zezika', 'compost', 'ph', 'azote'],
-    'pest_disease': ['maladie', 'ravageur', 'insecte', 'aretina', 'fungus', 'blight'],
-    'varieties': ['variété', 'fofifa', 'semence', 'hybride', 'traditionnel'],
-    'yield_prediction': ['rendement', 'production', 'famokarana', 'kg', 'tonne'],
-    'climate': ['pluie', 'orana', 'température', 'saison', 'cyclone', 'sécheresse'],
-    'market': ['prix', 'vente', 'marché', 'exportation', 'commercialisation'],
+# Mappage keyword → tag (fallback si ontologie indisponible)
+_TOPIC_KEYWORDS = {
+    'water_management': ['irrigation', 'rano', 'digue', 'eau', 'inondation', 'sécheresse', 'water'],
+    'soil_health':      ['sol', 'tany', 'engrais', 'zezika', 'compost', 'ph', 'azote', 'soil', 'fertilizer'],
+    'pest_disease':     ['maladie', 'ravageur', 'insecte', 'aretina', 'disease', 'pest', 'fungus'],
+    'varieties':        ['variété', 'fofifa', 'semence', 'hybride', 'variety', 'cultivar', 'karazana'],
+    'yield_prediction': ['rendement', 'production', 'famokarana', 'kg', 'tonne', 'yield'],
+    'climate':          ['pluie', 'orana', 'température', 'saison', 'cyclone', 'climate', 'rain'],
+    'market':           ['prix', 'vente', 'marché', 'exportation', 'price', 'market'],
 }
+
+
+def _get_ontology_keywords() -> dict:
+    """Retourne les keywords du graphe rdflib, avec fallback sur le dict local."""
+    try:
+        from rag.ontology_graph import get_domain_keywords
+        kw = get_domain_keywords()
+        # Vérification minimale
+        if kw and len(kw.get('fr', [])) > 20:
+            return kw
+    except Exception as e:
+        logger.warning("ontology_graph indisponible, fallback keywords : %s", e)
+    return _FALLBACK_KEYWORDS
+
+
+def _detect_tags_from_ontology(text_lower: str, matched_keywords: list) -> list:
+    """
+    Détecte les context_tags en deux passes :
+    1. Via les classes OWL des entités trouvées (get_class_tag)
+    2. Via le matching de mots-clés de _TOPIC_KEYWORDS (fallback)
+    """
+    tags = set()
+
+    # Passe 1 : tag via classe OWL
+    try:
+        from rag.ontology_graph import get_class_tag
+        for kw in matched_keywords:
+            tag = get_class_tag(kw)
+            if tag:
+                tags.add(tag)
+    except Exception:
+        pass
+
+    # Passe 2 : topic keywords (toujours actif, complémentaire)
+    for tag, kws in _TOPIC_KEYWORDS.items():
+        if any(kw in text_lower for kw in kws):
+            tags.add(tag)
+
+    return list(tags)
+
+
+def _get_ontology_facts(text_lower: str, matched_keywords: list, original_text: str = '') -> str:
+    """
+    Récupère les faits ontologiques pour les entités nommées trouvées dans le texte.
+    Cherche en deux passes :
+    1. Mots capitalisés dans le texte original (Bemasoha, Fiaramanitra, FOFIFA…)
+    2. Keywords matchés qui ont un pedigree dans le graphe
+    """
+    try:
+        from rag.ontology_graph import get_facts_block, get_pedigree
+        blocks = []
+        seen = set()
+
+        # Passe 1 : mots capitalisés / noms propres dans le texte original
+        candidates = []
+        if original_text:
+            import re
+            # Mots commençant par une majuscule ou tout en majuscules (≥ 4 chars)
+            proper_nouns = re.findall(r'\b([A-ZÀÁÂÉÈÊÎÏÔÙÛ][a-zàáâéèêîïôùû]+(?:\s[A-ZÀÁÂÉÈÊÎÏÔÙÛ][a-zàáâéèêîïôùû]+)*)\b', original_text)
+            # Aussi les termes tout-caps comme FOFIFA, NERICA
+            all_caps = re.findall(r'\b([A-Z]{3,}(?:\s\d+)?)\b', original_text)
+            candidates = list(dict.fromkeys(proper_nouns + all_caps))  # déduplique, garde l'ordre
+
+        # Passe 2 : keywords matchés
+        candidates += matched_keywords
+
+        for kw in candidates:
+            kw_clean = kw.strip()
+            if not kw_clean or kw_clean.lower() in seen:
+                continue
+            seen.add(kw_clean.lower())
+
+            pedigree = get_pedigree(kw_clean)
+            if pedigree["found"]:
+                block = get_facts_block(kw_clean)
+                if block:
+                    blocks.append(block)
+
+        return "\n\n".join(blocks)
+    except Exception as e:
+        logger.debug("Erreur get_ontology_facts : %s", e)
+        return ""
 
 
 def validate_and_enrich(normalized: dict) -> dict:
     text_lower = normalized['text'].lower()
-    lang = normalized['language']
+    lang = normalized.get('language', 'fr')
 
-    keywords = AGRICULTURAL_KEYWORDS.get(lang, AGRICULTURAL_KEYWORDS['fr'])
-    matched_keywords = [kw for kw in keywords if kw in text_lower]
+    # ── 1. Chargement des keywords depuis l'ontologie ──────────────────────────
+    all_keywords = _get_ontology_keywords()
+    lang_keywords = all_keywords.get(lang, all_keywords.get('fr', []))
 
-    if not matched_keywords:
-        # Vérifier dans toutes les langues (question multilingue possible)
-        all_keywords = [kw for kws in AGRICULTURAL_KEYWORDS.values() for kw in kws]
-        matched_keywords = [kw for kw in all_keywords if kw in text_lower]
+    # Matching dans la langue détectée
+    matched = [kw for kw in lang_keywords if kw in text_lower]
 
-    is_valid = len(matched_keywords) > 0
+    # Fallback multilingue si aucun match
+    if not matched:
+        for kws in all_keywords.values():
+            matched += [kw for kw in kws if kw in text_lower]
+
+    is_valid = len(matched) > 0
 
     if not is_valid:
         return {
             'is_valid': False,
             'rejection_reason': (
                 "Cette question semble hors du domaine agricole. "
-                "Je suis spécialisé en agriculture malgache (riziculture, cultures, sol, etc.)."
+                "Je suis CropGPT, spécialisé en agriculture malgache "
+                "(riziculture, cultures, sol, maladies, rendements, etc.)."
             ),
             'domain': None,
             'context_tags': [],
             'enriched_text': normalized['text'],
+            'matched_keywords': [],
+            'ontology_facts': '',
         }
 
-    # Détection des tags ontologiques
-    context_tags = []
-    for tag, tag_keywords in TOPIC_TAGS.items():
-        if any(kw in text_lower for kw in tag_keywords):
-            context_tags.append(tag)
+    # ── 2. Détection des context_tags ─────────────────────────────────────────
+    context_tags = _detect_tags_from_ontology(text_lower, matched)
+    if not context_tags:
+        context_tags = ['varieties']  # tag par défaut si question agricole générale
 
-    # Enrichissement : ajouter contexte riziculture malgache si pertinent
-    enrichment_notes = []
-    if 'rice' in matched_keywords or 'riz' in matched_keywords or 'vary' in matched_keywords:
-        enrichment_notes.append(
-            "Contexte: riziculture malgache, focus variétés FOFIFA, "
-            "système SRI (Système de Riziculture Intensive), bas-fonds et tanety."
-        )
+    # ── 3. Faits ontologiques (pedigree / entités nommées) ─────────────────────
+    ontology_facts = _get_ontology_facts(text_lower, matched, normalized['text'])
+
+    # ── 4. Enrichissement du texte ────────────────────────────────────────────
+    enrichment_parts = []
+
+    if ontology_facts:
+        enrichment_parts.append(ontology_facts)
+
     if 'yield_prediction' in context_tags:
-        enrichment_notes.append(
-            "Contexte rendement: données historiques Madagascar 2.5-4t/ha en pluvial, "
-            "jusqu'à 6-8t/ha en irrigué avec SRI."
+        enrichment_parts.append(
+            "Contexte rendement Madagascar : 2.5–4 t/ha en pluvial, "
+            "jusqu'à 6–8 t/ha en irrigué avec SRI."
+        )
+    if 'varieties' in context_tags and not ontology_facts:
+        enrichment_parts.append(
+            "Contexte variétés : focus FOFIFA 154, 161, 3069, Makalioka, NERICA 4."
         )
 
     enriched_text = normalized['text']
-    if enrichment_notes:
-        enriched_text += '\n[Contexte ontologique: ' + ' | '.join(enrichment_notes) + ']'
+    if enrichment_parts:
+        enriched_text += '\n[Contexte ontologique]\n' + '\n'.join(enrichment_parts)
+
+    logger.debug(
+        "Ontologie → tags=%s matched=%d facts=%s",
+        context_tags, len(matched), bool(ontology_facts)
+    )
 
     return {
         'is_valid': True,
         'domain': 'agriculture',
         'context_tags': context_tags,
         'enriched_text': enriched_text,
-        'matched_keywords': matched_keywords,
+        'matched_keywords': matched[:10],
+        'ontology_facts': ontology_facts,
         'rejection_reason': None,
     }

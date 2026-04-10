@@ -140,7 +140,8 @@ gen:descendsFrom a owl:ObjectProperty ;
     skos:definition "Relation ancestrale à travers les générations"@fr ;
     rdfs:domain gen:Organism ;
     rdfs:range gen:Organism ;
-    owl:propertyChainAxiom ( gen:hasParent* gen:hasParent ) ;
+    owl:propertyChainAxiom ( gen:hasParent gen:hasParent ) ;
+    a owl:TransitiveProperty ;
     owl:inverseOf gen:ancestorOf ;
     rdfs:subPropertyOf crm:P11_had_participant ;
     .
@@ -193,9 +194,7 @@ gen:hasSibling a owl:ObjectProperty ;
     skos:definition "Partage au moins un parent"@fr ;
     rdfs:domain gen:Organism ;
     rdfs:range gen:Organism ;
-    owl:propertyChainAxiom ( 
-        [ a owl:Restriction ; owl:onProperty gen:hasParent ; owl:someValuesFrom gen:Organism ]
-    ) ;
+    owl:propertyChainAxiom ( gen:hasParent gen:hasParent ) ;
     .
 
 # ---------- Breeding and Cultivation Relations ----------

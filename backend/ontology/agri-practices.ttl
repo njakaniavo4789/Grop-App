@@ -12,6 +12,7 @@
 @prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
 
 @prefix agri:  <http://example.org/agri/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 @prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
 
