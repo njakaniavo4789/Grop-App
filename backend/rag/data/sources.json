@@ -62,5 +62,14 @@
     "type": "pdf",
     "language": "en",
     "topics": ["soil_health"]
-  }
+  },
+  {
+  "id": "fao_ca5162_rice_madagascar",
+  "title": "FAO — Rice sector policy note Madagascar",
+  "url": "https://www.fao.org/3/ca5162en/CA5162EN.pdf",
+  "type": "pdf",
+  "language": "en",
+  "topics": ["yield_prediction", "market", "varieties"]
+}
+
 ]

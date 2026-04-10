@@ -33,17 +33,40 @@ function MainLayout() {
     navigate('/login');
   };
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      setMessages([...messages, { text: inputValue, sender: 'user' }]);
-      setInputValue('');
+  const handleSendMessage = async () => {
+    const text = inputValue.trim();
+    if (!text) return;
 
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          text: "Merci pour votre message! Comment puis-je vous aider avec vos activités agricoles aujourd'hui?",
-          sender: 'ai'
-        }]);
-      }, 1000);
+    // Afficher le message utilisateur immédiatement
+    setMessages(prev => [...prev, { text, sender: 'user' }]);
+    setInputValue('');
+
+    // Indicateur "en train de répondre..."
+    setMessages(prev => [...prev, { text: '...', sender: 'ai', loading: true }]);
+
+    try {
+      const token = getAccessToken();
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+
+      const response = await fetch(`${API_BASE}/api/chat/direct/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      const data = await response.json();
+
+      // Remplacer l'indicateur de chargement par la vraie réponse
+      setMessages(prev =>
+        prev.map(m => m.loading ? { text: data.reply || data.error || 'Erreur inconnue', sender: 'ai' } : m)
+      );
+    } catch (err) {
+      setMessages(prev =>
+        prev.map(m => m.loading ? { text: 'Erreur de connexion. Vérifiez que le serveur est démarré.', sender: 'ai' } : m)
+      );
     }
   };
 

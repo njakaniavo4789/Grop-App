@@ -96,7 +96,9 @@ SIMPLE_JWT = {
 }
 
 # LLM
-LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'anthropic')  # 'anthropic' | 'openai' | 'ollama'
+LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'gemini')  # 'gemini' | 'anthropic' | 'openai' | 'ollama'
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
