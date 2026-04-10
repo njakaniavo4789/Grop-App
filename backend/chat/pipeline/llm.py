@@ -12,9 +12,43 @@ Tous les providers retournent maintenant un dict :
 """
 import logging
 import time
+from datetime import date
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+# ─── Compteur de requêtes journalier ─────────────────────────────────────────
+# Limites connues des free tiers (requêtes/jour)
+_DAILY_LIMITS = {
+    "gemini":       {"gemini-2.5-flash": 20, "gemini-2.0-flash": 200, "gemini-2.0-flash-lite": 1500},
+    "huggingface":  {"default": 1000},
+    "openai":       {"default": 0},   # pas de free tier
+    "anthropic":    {"default": 0},
+    "ollama":       {"default": -1},  # illimité
+}
+
+_request_counter = {"date": None, "count": 0}
+
+def _get_daily_limit() -> int:
+    provider = getattr(settings, "LLM_PROVIDER", "gemini")
+    if provider == "gemini":
+        model = getattr(settings, "GEMINI_MODEL", "")
+        limits = _DAILY_LIMITS["gemini"]
+        return limits.get(model, 200)
+    limits = _DAILY_LIMITS.get(provider, {"default": 0})
+    return limits.get("default", 0)
+
+def _track_request() -> dict:
+    """Incrémente le compteur et retourne {used, limit, remaining}."""
+    today = date.today()
+    if _request_counter["date"] != today:
+        _request_counter["date"] = today
+        _request_counter["count"] = 0
+    _request_counter["count"] += 1
+    limit = _get_daily_limit()
+    used = _request_counter["count"]
+    remaining = max(0, limit - used) if limit > 0 else -1
+    return {"used": used, "limit": limit, "remaining": remaining}
 
 SYSTEM_PROMPT = """Tu es CropGPT, un assistant agricole expert spécialisé dans l'agriculture malgache,
 en particulier la riziculture. Tu aides les agriculteurs et chercheurs à :
@@ -113,11 +147,21 @@ def call_gemini(messages: list, system: str) -> dict:
         latency = round((time.time() - t0) * 1000)
         logger.error("Erreur Gemini : %s", error_str)
 
-        if "429" in error_str or "quota" in error_str.lower() or "RESOURCE_EXHAUSTED" in error_str:
-            logger.warning("Gemini rate limit — attente 60s...")
-            time.sleep(60)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            # Quota journalier (PerDay) → fallback immédiat sur modèle plus léger
+            # Quota par minute (RPM) → attente courte puis retry
+            is_daily_quota = "PerDay" in error_str or "per_day" in error_str.lower()
+
+            if is_daily_quota:
+                fallback_model = "gemini-2.0-flash-lite"
+                logger.warning("Quota journalier Gemini atteint — fallback %s", fallback_model)
+            else:
+                logger.warning("Gemini RPM rate limit — attente 35s...")
+                time.sleep(35)
+                fallback_model = model_name
+
             response = client.models.generate_content(
-                model=model_name, contents=contents,
+                model=fallback_model, contents=contents,
                 config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=2048),
             )
             return {
@@ -141,9 +185,9 @@ def call_gemini(messages: list, system: str) -> dict:
             }
 
         if "503" in error_str or "UNAVAILABLE" in error_str:
-            logger.warning("Gemini 503 — fallback gemini-2.0-flash...")
+            logger.warning("Gemini 503 — fallback gemini-2.0-flash-lite...")
             response = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.0-flash-lite",
                 contents=contents,
                 config=types.GenerateContentConfig(system_instruction=system, max_output_tokens=2048),
             )
@@ -218,6 +262,67 @@ def call_ollama(messages: list, system: str) -> dict:
     }
 
 
+# ─── HuggingFace Inference API ────────────────────────────────────────────────
+
+def call_huggingface(messages: list, system: str) -> dict:
+    """
+    Appelle l'API d'inférence HuggingFace (gratuit, sans quota strict).
+    Modèle configuré via HF_MODEL dans .env (défaut : Qwen/Qwen2.5-3B-Instruct).
+    """
+    from huggingface_hub import InferenceClient
+
+    t0 = time.time()
+    model = getattr(settings, "HF_MODEL", "Qwen/Qwen2.5-3B-Instruct")
+    api_key = getattr(settings, "HF_API_KEY", None)
+
+    client = InferenceClient(model=model, token=api_key)
+
+    # Construire le prompt chat — InferenceClient accepte le format OpenAI
+    hf_messages = [{"role": "system", "content": system}]
+    for msg in messages:
+        hf_messages.append({"role": msg["role"], "content": msg["content"]})
+
+    try:
+        response = client.chat_completion(
+            messages=hf_messages,
+            max_tokens=1024,
+            temperature=0.7,
+        )
+        latency = round((time.time() - t0) * 1000)
+        reply = response.choices[0].message.content or ""
+        input_tok  = getattr(response.usage, "prompt_tokens", 0) or 0
+        output_tok = getattr(response.usage, "completion_tokens", 0) or 0
+
+        return {
+            "reply": reply,
+            "thinking": "",
+            "input_tokens": input_tok,
+            "output_tokens": output_tok,
+            "latency_ms": latency,
+        }
+
+    except Exception as e:
+        error_str = str(e)
+        latency = round((time.time() - t0) * 1000)
+        logger.error("Erreur HuggingFace (%s) : %s", model, error_str)
+
+        # Modèle non disponible → essayer un modèle de fallback plus léger
+        if "loading" in error_str.lower() or "503" in error_str or "unavailable" in error_str.lower():
+            logger.warning("Modèle HF en chargement — fallback microsoft/Phi-3-mini-4k-instruct")
+            fallback_client = InferenceClient(model="Qwen/Qwen2.5-7B-Instruct", token=api_key)
+            fb_response = fallback_client.chat_completion(
+                messages=hf_messages, max_tokens=1024, temperature=0.7
+            )
+            return {
+                "reply": fb_response.choices[0].message.content or "",
+                "thinking": "",
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "latency_ms": latency,
+            }
+        raise
+
+
 # ─── Prompt builder ───────────────────────────────────────────────────────────
 
 def build_prompt(user_message: str, rag_context: str, history: list,
@@ -266,15 +371,22 @@ def generate(pipeline_data: dict, history: list = None) -> dict:
 
     try:
         if provider == "gemini":
-            return call_gemini(messages, SYSTEM_PROMPT)
+            result = call_gemini(messages, SYSTEM_PROMPT)
         elif provider == "anthropic":
-            return call_anthropic(messages, SYSTEM_PROMPT)
+            result = call_anthropic(messages, SYSTEM_PROMPT)
         elif provider == "openai":
-            return call_openai(messages, SYSTEM_PROMPT)
+            result = call_openai(messages, SYSTEM_PROMPT)
         elif provider == "ollama":
-            return call_ollama(messages, SYSTEM_PROMPT)
+            result = call_ollama(messages, SYSTEM_PROMPT)
+        elif provider == "huggingface":
+            result = call_huggingface(messages, SYSTEM_PROMPT)
         else:
             raise ValueError(f"Provider inconnu : {provider}")
+
+        # Injecter les infos de quota dans le résultat
+        result["quota"] = _track_request()
+        return result
+
     except Exception as e:
         logger.error("Erreur LLM (%s) : %s", provider, e)
         return {
@@ -283,4 +395,5 @@ def generate(pipeline_data: dict, history: list = None) -> dict:
             "input_tokens": 0,
             "output_tokens": 0,
             "latency_ms": 0,
+            "quota": _track_request(),
         }

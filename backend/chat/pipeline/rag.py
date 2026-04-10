@@ -194,13 +194,18 @@ def _no_data_result(context_tags: list, ontology_facts: str = '') -> dict:
     fallback = _fallback_static(context_tags, ontology_facts)
 
     if fallback['has_data']:
-        # On a des données générales dans le fallback
-        fallback['confidence_level'] = 'low'
-        fallback['disclaimer'] = (
-            "ℹ️ Je n'ai pas trouvé de données spécifiques à votre question dans ma base. "
-            "Je réponds avec des informations générales sur la riziculture malgache. "
-            "Pour des conseils précis à votre situation, consultez le MAEP ou un technicien FOFIFA."
-        )
+        # Si des faits ontologiques sont présents → données spécifiques trouvées,
+        # pas de disclaimer trompeur
+        if ontology_facts:
+            fallback['confidence_level'] = 'high'
+            fallback['disclaimer'] = None
+        else:
+            fallback['confidence_level'] = 'low'
+            fallback['disclaimer'] = (
+                "ℹ️ Je n'ai pas trouvé de données spécifiques à votre question dans ma base. "
+                "Je réponds avec des informations générales sur la riziculture malgache. "
+                "Pour des conseils précis à votre situation, consultez le MAEP ou un technicien FOFIFA."
+            )
         return fallback
 
     # Vraiment rien — retourner un résultat vide avec instructions au LLM

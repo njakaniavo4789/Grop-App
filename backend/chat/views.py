@@ -64,6 +64,7 @@ def chat(request):
         input_tok   = llm_result.get("input_tokens", 0)
         output_tok  = llm_result.get("output_tokens", 0)
         llm_latency = llm_result.get("latency_ms", 0)
+        quota       = llm_result.get("quota", {})
 
         # Si disclaimer RAG → l'ajouter en tête de la réponse
         disclaimer = rag_result.get('disclaimer')
@@ -105,6 +106,7 @@ def chat(request):
         'thinking': thinking,
         'sources': rag_result.get('retrieved_docs', []),
         'meta': pipeline_meta,
+        'quota': quota,
     })
 
 

@@ -102,6 +102,8 @@ GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
+HF_API_KEY = os.environ.get('HF_API_KEY', '')
+HF_MODEL = os.environ.get('HF_MODEL', 'Qwen/Qwen2.5-3B-Instruct')
 
 # RAG
 RAG_VECTOR_STORE_PATH = BASE_DIR / 'rag' / 'data' / 'vector_store'
