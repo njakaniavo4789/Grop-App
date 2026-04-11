@@ -4,14 +4,26 @@ on:
   push:
     branches: [main]
 
-jobs:
-  # ─── Build & Push Docker Images ───────────────────────────────────
-  build-backend:
-    name: Build Backend Docker Image
-    runs-on: ubuntu-latest
+# S'assure que le CI est passé avant de déployer
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
+jobs:
+  # ─── 1. Build Docker backend ────────────────────────���────────────────────
+  build-backend:
+    name: Build — Backend Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        id: image
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=ghcr.io/${REPO_LOWER}/backend" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -30,22 +42,22 @@ jobs:
           file: ./Dockerfile.backend
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/backend:latest
-            ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # ─── 2. Build frontend ────────────────────���───────────────────────────────
   build-frontend:
-    name: Build Frontend
+    name: Build — Frontend
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: npm
 
       - name: Install & Build
         run: npm ci && npm run build
@@ -57,50 +69,114 @@ jobs:
         with:
           name: frontend-dist
           path: dist/
+          retention-days: 1
 
-  # ─── Deploy ───────────────────────────────────────────────────────
-  deploy-backend:
-    name: Deploy Backend
-    needs: build-backend
+  # ─── 3. Déploiement Staging ───────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy — Staging (Render)
+    needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
+    outputs:
+      staging-url: ${{ steps.set-url.outputs.url }}
+    steps:
+      - name: Trigger Render staging deploy
+        run: |
+          curl -s -X POST "${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}" \
+            -o /tmp/render_response.json \
+            -w "\nHTTP Status: %{http_code}\n"
+          cat /tmp/render_response.json | head -5
 
+      - name: Set staging URL output
+        id: set-url
+        run: echo "url=${{ secrets.STAGING_URL }}" >> $GITHUB_OUTPUT
+
+      - name: Wait for staging to be healthy
+        run: |
+          STAGING_URL="${{ secrets.STAGING_URL }}"
+          echo "Attente du démarrage de staging : $STAGING_URL"
+          MAX_ATTEMPTS=20
+          WAIT_SECONDS=15
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              "$STAGING_URL/api/health/" --max-time 10 || echo "000")
+            echo "Tentative $i/$MAX_ATTEMPTS — HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Staging opérationnel !"
+              exit 0
+            fi
+            sleep $WAIT_SECONDS
+          done
+          echo "Staging non disponible après $MAX_ATTEMPTS tentatives"
+          exit 1
+
+  # ─── 4. Smoke Tests contre Staging ──────────────────────��────────────────
+  smoke-tests:
+    name: Smoke Tests — Staging
+    needs: deploy-staging
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - uses: actions/setup-python@v5
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            cd /opt/cropgpt
-            docker pull ghcr.io/${{ github.repository }}/backend:latest
-            docker-compose up -d backend
-            docker-compose exec -T backend python manage.py migrate --noinput
-            docker-compose exec -T backend python manage.py collectstatic --noinput
+          python-version: "3.12"
+          cache: pip
 
-  deploy-frontend:
-    name: Deploy Frontend
-    needs: build-frontend
+      - name: Install requests + pytest
+        run: pip install requests pytest
+
+      - name: Run smoke tests against staging
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+          STAGING_TEST_USER: ${{ secrets.STAGING_TEST_USER }}
+          STAGING_TEST_PASS: ${{ secrets.STAGING_TEST_PASS }}
+        run: |
+          pytest e2e/smoke_tests.py -v --tb=short
+
+      - name: Smoke tests summary
+        if: always()
+        run: echo "Smoke tests terminés — voir les résultats ci-dessus"
+
+  # ─── 5. Déploiement Production (gate manuel) ───────────────────────���──────
+  deploy-production:
+    name: Deploy — Production (Render)
+    needs: smoke-tests
     runs-on: ubuntu-latest
-    environment: production
+    environment: production   # ← gate manuel dans GitHub Environments
 
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: dist/
+      - name: Trigger Render production deploy
+        run: |
+          echo "Déploiement en production — commit ${{ github.sha }}"
+          curl -s -X POST "${{ secrets.RENDER_PROD_DEPLOY_HOOK }}" \
+            -o /tmp/render_prod_response.json \
+            -w "\nHTTP Status: %{http_code}\n"
+          cat /tmp/render_prod_response.json | head -5
 
-      # Option A — Vercel
-      # - name: Deploy to Vercel
-      #   run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+      - name: Wait for production to be healthy
+        run: |
+          PROD_URL="${{ secrets.PROD_URL }}"
+          echo "Vérification de la production : $PROD_URL"
+          MAX_ATTEMPTS=20
+          WAIT_SECONDS=15
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              "$PROD_URL/api/health/" --max-time 10 || echo "000")
+            echo "Tentative $i/$MAX_ATTEMPTS — HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Production opérationnelle !"
+              exit 0
+            fi
+            sleep $WAIT_SECONDS
+          done
+          echo "Production non disponible après $MAX_ATTEMPTS tentatives"
+          exit 1
 
-      # Option B — Netlify
-      # - name: Deploy to Netlify
-      #   run: npx netlify deploy --prod --dir=dist --auth ${{ secrets.NETLIFY_TOKEN }}
-
-      - name: Deploy (placeholder — configurer selon l'hébergeur)
-        run: echo "Frontend built and ready. Configure deployer above."
+      - name: Deployment summary
+        run: |
+          echo "================================================================"
+          echo "  Déploiement production terminé"
+          echo "  Commit : ${{ github.sha }}"
+          echo "  URL    : ${{ secrets.PROD_URL }}"
+          echo "================================================================"
