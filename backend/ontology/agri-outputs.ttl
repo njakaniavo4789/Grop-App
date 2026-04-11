@@ -1,0 +1,332 @@
+# ============================================================
+# OUTPUTS MODULE - agri-outputs.ttl
+# Agricultural products and outputs from Madagascar farming
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
+
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# OUTPUT SUBCLASSES
+# ============================================================
+
+# ---------- Food Products (Produits Alimentaires) ----------
+agri:FoodProduct a owl:Class ;
+    rdfs:label "Food Product"@en ;
+    rdfs:label "Produit Alimentaire"@fr ;
+    rdfs:label "Sakafo"@mg ;
+    skos:definition "Products intended for human consumption"@en ;
+    skos:definition "Produits destinés à la consommation humaine"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    owl:equivalentClass agrovoc:c_2945 ;
+    .
+
+# ---------- Fiber Products (Produits Fibreux) ----------
+agri:Fiber a owl:Class ;
+    rdfs:label "Fiber"@en ;
+    rdfs:label "Fibre"@fr ;
+    rdfs:label "Tasy"@mg ;
+    skos:definition "Plant or animal fibers for industrial use"@en ;
+    skos:definition "Fibres végétales ou animales pour usage industriel"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    owl:equivalentClass agrovoc:c_cd655 ;
+    .
+
+# ---------- Biofuel (Biocarburant) ----------
+agri:Biofuel a owl:Class ;
+    rdfs:label "Biofuel"@en ;
+    rdfs:label "Biocarburant"@fr ;
+    rdfs:label "Biodiesela"@mg ;
+    skos:definition "Fuel derived from agricultural biomass"@en ;
+    skos:definition "Carburant dérivé de la biomasse agricole"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    owl:equivalentClass agrovoc:c_1144 ;
+    .
+
+# ---------- Animal Products ----------
+agri:AnimalProduct a owl:Class ;
+    rdfs:label "Animal Product"@en ;
+    rdfs:label "Produit Animal"@fr ;
+    rdfs:label "Vokatry ny Biby"@mg ;
+    skos:definition "Products derived from livestock"@en ;
+    skos:definition "Produits dérivés du bétail"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    .
+
+# ---------- Feed and Fodder ----------
+agri:Feed a owl:Class ;
+    rdfs:label "Animal Feed"@en ;
+    rdfs:label "Aliment pour Animaux"@fr ;
+    rdfs:label "Sakafo ho an' ny Omby"@mg ;
+    skos:definition "Food for livestock consumption"@en ;
+    skos:definition "Nourriture pour la consommation du bétail"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    owl:equivalentClass agrovoc:c_2534 ;
+    .
+
+# ---------- Processed Product ----------
+agri:ProcessedProduct a owl:Class ;
+    rdfs:label "Processed Agricultural Product"@en ;
+    rdfs:label "Produit Agricole Transformé"@fr ;
+    rdfs:label "Vokatra Fambolena Nosintonina"@mg ;
+    skos:definition "Agricultural output after processing"@en ;
+    skos:definition "Production agricole après transformation"@fr ;
+    rdfs:subClassOf agri:AgriculturalOutput ;
+    .
+
+# ============================================================
+# SPECIFIC FOOD PRODUCTS
+# ============================================================
+
+# Rice Products
+agri:RiceGrain a owl:Class ;
+    rdfs:label "Rice Grain"@en ;
+    rdfs:label "Grain de Riz"@fr ;
+    rdfs:label "Voan-tsimparifary"@mg ;
+    skos:definition "Unprocessed rice for consumption or seed"@en ;
+    skos:definition "Riz non transformé pour consommation ou semence"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    .
+
+agri:RiceFlour a owl:Class ;
+    rdfs:label "Rice Flour"@en ;
+    rdfs:label "Farine de Riz"@fr ;
+    rdfs:label "Tosika vary"@mg ;
+    skos:definition "Ground rice for culinary use"@en ;
+    skos:definition "Riz moulu pour usage culinaire"@fr ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    rdfs:subClassOf agri:FoodProduct ;
+    .
+
+# Cassava Products
+agri:CassavaFlour a owl:Class ;
+    rdfs:label "Cassava Flour"@en ;
+    rdfs:label "Farine de Manioc"@fr ;
+    rdfs:label "Tosika manga"@mg ;
+    skos:definition "Ground cassava for food use"@en ;
+    skos:definition "Manioc moulu pour usage alimentaire"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+agri:CassavaStarch a owl:Class ;
+    rdfs:label "Cassava Starch"@en ;
+    rdfs:label "Amidon de Manioc"@fr ;
+    rdfs:label "Glykogen"@mg ;
+    skos:definition "Starch extracted from cassava"@en ;
+    skos:definition "Amidon extrait du manioc"@fr ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+# Maize Products
+agri:CornMeal a owl:Class ;
+    rdfs:label "Corn Meal"@en ;
+    rdfs:label "Semoule de Maïs"@fr ;
+    rdfs:label "Tosika maoty"@mg ;
+    skos:definition "Ground maize for food preparation"@en ;
+    skos:definition "Maïs moulu pour la préparation alimentaire"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    .
+
+# Fruit Products
+agri:DriedFruit a owl:Class ;
+    rdfs:label "Dried Fruit"@en ;
+    rdfs:label "Fruit Séché"@fr ;
+    rdfs:label "Voankazo maina"@mg ;
+    skos:definition "Dehydrated fruit products"@en ;
+    skos:definition "Produits fruitiers déshydratés"@fr ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    rdfs:subClassOf agri:FoodProduct ;
+    .
+
+# Spice Products (Important for Madagascar)
+agri:Cloves a owl:Class ;
+    rdfs:label "Cloves"@en ;
+    rdfs:label "Girofle"@fr ;
+    rdfs:label "Jirofo"@mg ;
+    skos:definition "Dried flower buds of Syzygium aromaticum"@en ;
+    skos:definition "Boutons floraux séchés de Syzygium aromaticum"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+agri:VanillaPod a owl:Class ;
+    rdfs:label "Vanilla Pod"@en ;
+    rdfs:label "Gousse de Vanille"@fr ;
+    rdfs:label "Voanio"@mg ;
+    skos:definition "Cured vanilla beans"@en ;
+    skos:definition "Gousses de vanille préparées"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+# Coffee Products
+agri:CoffeeBean a owl:Class ;
+    rdfs:label "Coffee Bean"@en ;
+    rdfs:label "Grain de Café"@fr ;
+    rdfs:label "Voam-parihy"@mg ;
+    skos:definition "Processed coffee seeds"@en ;
+    skos:definition "Graines de café transformées"@fr ;
+    rdfs:subClassOf agri:FoodProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+# ============================================================
+# FIBER PRODUCTS
+# ============================================================
+
+agri:Cotton a owl:Class ;
+    rdfs:label "Cotton"@en ;
+    rdfs:label "Coton"@fr ;
+    rdfs:label "Kotomy"@mg ;
+    skos:definition "Natural cellulose fiber from cotton plants"@en ;
+    skos:definition "Fibre cellulosique naturelle du cotonnier"@fr ;
+    rdfs:subClassOf agri:Fiber ;
+    owl:equivalentClass agrovoc:c_1847 ;
+    .
+
+agri:Sisal a owl:Class ;
+    rdfs:label "Sisal"@en ;
+    rdfs:label "Sisal"@fr ;
+    skos:definition "Agave fiber for cordage and textiles"@en ;
+    skos:definition "Fibre d'agave pour cordage et textiles"@fr ;
+    rdfs:subClassOf agri:Fiber ;
+    owl:equivalentClass agrovoc:c_6997 ;
+    .
+
+agri:Raffia a owl:Class ;
+    rdfs:label "Raffia"@en ;
+    rdfs:label "Raphia"@fr ;
+    rdfs:label "Rafia"@mg ;
+    skos:definition "Palm fiber for crafts and textiles"@en ;
+    skos:definition "Fibre de palmier pour artisanat et textiles"@fr ;
+    rdfs:subClassOf agri:Fiber ;
+    .
+
+# ============================================================
+# BIOFUEL PRODUCTS
+# ============================================================
+
+agri:Bioethanol a owl:Class ;
+    rdfs:label "Bioethanol"@en ;
+    rdfs:label "Bioéthanol"@fr ;
+    skos:definition "Ethanol fuel from agricultural feedstocks"@en ;
+    skos:definition "Carburant éthanol à partir de matières premières agricoles"@fr ;
+    rdfs:subClassOf agri:Biofuel ;
+    owl:equivalentClass agrovoc:c_1150 ;
+    .
+
+agri:Biodiesel a owl:Class ;
+    rdfs:label "Biodiesel"@en ;
+    rdfs:label "Biodiesel"@fr ;
+    skos:definition "Diesel fuel from vegetable oils"@en ;
+    skos:definition "Carburant diesel à partir d'huiles végétales"@fr ;
+    rdfs:subClassOf agri:Biofuel ;
+    owl:equivalentClass agrovoc:c_1138 ;
+    .
+
+# ============================================================
+# ANIMAL PRODUCTS
+# ============================================================
+
+agri:Meat a owl:Class ;
+    rdfs:label "Meat"@en ;
+    rdfs:label "Viande"@fr ;
+    rdfs:label "Hena"@mg ;
+    skos:definition "Edible animal tissue"@en ;
+    skos:definition "Tissu animal comestible"@fr ;
+    rdfs:subClassOf agri:AnimalProduct ;
+    owl:equivalentClass agrovoc:c_5066 ;
+    .
+
+agri:Milk a owl:Class ;
+    rdfs:label "Milk"@en ;
+    rdfs:label "Lait"@fr ;
+    rdfs:label "Siramamy"@mg ;
+    skos:definition "Lacteal secretion from mammals"@en ;
+    skos:definition "Sécrétion lactée des mammifères"@fr ;
+    rdfs:subClassOf agri:AnimalProduct ;
+    owl:equivalentClass agrovoc:c_5067 ;
+    .
+
+agri:Cheese a owl:Class ;
+    rdfs:label "Cheese"@en ;
+    rdfs:label "Fromage"@fr ;
+    rdfs:label "Fromage"@mg ;
+    skos:definition "Dairy product from milk coagulation"@en ;
+    skos:definition "Produit laitier issu de la coagulation du lait"@fr ;
+    rdfs:subClassOf agri:AnimalProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+agri:Leather a owl:Class ;
+    rdfs:label "Leather"@en ;
+    rdfs:label "Cuir"@fr ;
+    rdfs:label " hoditra"@mg ;
+    skos:definition "Processed animal hide"@en ;
+    skos:definition "Peau animale transformée"@fr ;
+    rdfs:subClassOf agri:AnimalProduct ;
+    rdfs:subClassOf agri:ProcessedProduct ;
+    .
+
+# ============================================================
+# OUTPUT OBJECT PROPERTIES
+# ============================================================
+
+# Derived from crop
+agri:derivedFromCrop a owl:ObjectProperty ;
+    rdfs:label "derived from crop"@en ;
+    rdfs:label "dérivé de la culture"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range agri:Crop ;
+    rdfs:subPropertyOf gen:descendsFrom ;
+    .
+
+# Derived from livestock
+agri:derivedFromLivestock a owl:ObjectProperty ;
+    rdfs:label "derived from livestock"@en ;
+    rdfs:label "dérivé du bétail"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range agri:Livestock ;
+    .
+
+# Produced by practice
+agri:producedBy a owl:ObjectProperty ;
+    rdfs:label "produced by"@en ;
+    rdfs:label "produit par"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range agri:AgriculturalPractice ;
+    .
+
+# Has quantity
+agri:hasQuantity a owl:DatatypeProperty ;
+    rdfs:label "has quantity"@en ;
+    rdfs:label "a une quantité"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range xsd:decimal ;
+    .
+
+# Has unit
+agri:hasUnit a owl:DatatypeProperty ;
+    rdfs:label "has unit"@en ;
+    rdfs:label "a une unité"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range xsd:string ;
+    .
+
+# Quality grade
+agri:hasQualityGrade a owl:DatatypeProperty ;
+    rdfs:label "has quality grade"@en ;
+    rdfs:label "a un grade de qualité"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range xsd:string ;
+    .
+

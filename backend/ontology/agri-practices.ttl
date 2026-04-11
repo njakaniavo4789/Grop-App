@@ -1,0 +1,271 @@
+# ============================================================
+# AGRICULTURAL PRACTICES MODULE - agri-practices.ttl
+# Classification of farming practices in Madagascar
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+
+@prefix agri:  <http://example.org/agri/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# PRACTICE SUBCLASSES
+# ============================================================
+
+# ---------- Irrigation (Irrigation) ----------
+agri:Irrigation a owl:Class ;
+    rdfs:label "Irrigation"@en ;
+    rdfs:label "Irrigation"@fr ;
+    rdfs:label "Fandatsahana"@mg ;
+    skos:definition "Artificial application of water to crops"@en ;
+    skos:definition "Application artificielle d'eau aux cultures"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_3779 ;
+    .
+
+# ---------- Fertilization (Fertilisation) ----------
+agri:Fertilization a owl:Class ;
+    rdfs:label "Fertilization"@en ;
+    rdfs:label "Fertilisation"@fr ;
+    rdfs:label "Fandatsahana"@mg ;
+    skos:definition "Application of nutrients to enhance crop growth"@en ;
+    skos:definition "Application de nutriments pour améliorer la croissance des cultures"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_2854 ;
+    .
+
+# ---------- Pest Management (Lutte Antiparasitaire) ----------
+agri:PestManagement a owl:Class ;
+    rdfs:label "Pest Management"@en ;
+    rdfs:label "Lutte Antiparasitaire"@fr ;
+    rdfs:label "Fiarovana Tsy maty"@mg ;
+    skos:definition "Control of pests affecting crops"@en ;
+    skos:definition "Contrôle des ravageurs affectant les cultures"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_5665 ;
+    .
+
+# ---------- Soil Management ----------
+agri:SoilManagement a owl:Class ;
+    rdfs:label "Soil Management"@en ;
+    rdfs:label "Gestion des Sols"@fr ;
+    rdfs:label "Fandraharahana Tany"@mg ;
+    skos:definition "Practices to maintain and improve soil quality"@en ;
+    skos:definition "Pratiques pour maintenir et améliorer la qualité du sol"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_7237 ;
+    .
+
+# ---------- Harvesting ----------
+agri:Harvesting a owl:Class ;
+    rdfs:label "Harvesting"@en ;
+    rdfs:label "Récolte"@fr ;
+    rdfs:label "Fiotazana"@mg ;
+    skos:definition "Collection of mature crops"@en ;
+    skos:definition "Collecte des cultures mûres"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_3058 ;
+    .
+
+# ---------- Land Preparation ----------
+agri:LandPreparation a owl:Class ;
+    rdfs:label "Land Preparation"@en ;
+    rdfs:label "Préparation du Terrain"@fr ;
+    rdfs:label "Fandrindrana Tany"@mg ;
+    skos:definition "Activities to prepare land for planting"@en ;
+    skos:definition "Activités pour préparer le terrain pour la plantation"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_4193 ;
+    .
+
+# ---------- Planting ----------
+agri:Planting a owl:Class ;
+    rdfs:label "Planting"@en ;
+    rdfs:label "Plantation"@fr ;
+    rdfs:label "Famboly"@mg ;
+    skos:definition "Sowing or transplanting of crops"@en ;
+    skos:definition "Semis ou transplantation de cultures"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_5972 ;
+    .
+
+# ---------- Crop Rotation ----------
+agri:CropRotation a owl:Class ;
+    rdfs:label "Crop Rotation"@en ;
+    rdfs:label "Rotation des Cultures"@fr ;
+    rdfs:label "Fihodinan' ny Vokatra"@mg ;
+    skos:definition "Successive cultivation of different crops on same land"@en ;
+    skos:definition "Culture successive de différentes cultures sur le même terrain"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_1963 ;
+    .
+
+# ---------- Organic Farming ----------
+agri:OrganicFarming a owl:Class ;
+    rdfs:label "Organic Farming"@en ;
+    rdfs:label "Agriculture Biologique"@fr ;
+    rdfs:label "Fambolena Organika"@mg ;
+    skos:definition "Farming without synthetic inputs"@en ;
+    skos:definition "Agriculture sans intrants synthétiques"@fr ;
+    rdfs:subClassOf agri:AgriculturalPractice ;
+    owl:equivalentClass agrovoc:c_5190 ;
+    .
+
+# ============================================================
+# IRRIGATION TYPES
+# ============================================================
+
+agri:FloodIrrigation a owl:Class ;
+    rdfs:label "Flood Irrigation"@en ;
+    rdfs:label "Irrigation par Inondation"@fr ;
+    skos:definition "Surface irrigation by flooding"@en ;
+    rdfs:subClassOf agri:Irrigation ;
+    .
+
+agri:DripIrrigation a owl:Class ;
+    rdfs:label "Drip Irrigation"@en ;
+    rdfs:label "Irrigation Goutte à Goutte"@fr ;
+    skos:definition "Targeted water delivery to plant roots"@en ;
+    rdfs:subClassOf agri:Irrigation ;
+    .
+
+agri:SprinklerIrrigation a owl:Class ;
+    rdfs:label "Sprinkler Irrigation"@en ;
+    rdfs:label "Irrigation par Aspersion"@fr ;
+    skos:definition "Overhead water application system"@en ;
+    rdfs:subClassOf agri:Irrigation ;
+    .
+
+agri:RicePaddyIrrigation a owl:Class ;
+    rdfs:label "Rice Paddy Irrigation"@en ;
+    rdfs:label "Irrigation de Rizière"@fr ;
+    rdfs:label "Fandatsahana Vary"@mg ;
+    skos:definition "Flooded field irrigation for rice cultivation"@en ;
+    rdfs:subClassOf agri:FloodIrrigation ;
+    .
+
+# ============================================================
+# FERTILIZATION TYPES
+# ============================================================
+
+agri:OrganicFertilization a owl:Class ;
+    rdfs:label "Organic Fertilization"@en ;
+    rdfs:label "Fertilisation Organique"@fr ;
+    rdfs:label "Fandatsahana Organika"@mg ;
+    skos:definition "Use of organic matter as fertilizer"@en ;
+    rdfs:subClassOf agri:Fertilization ;
+    .
+
+agri:ChemicalFertilization a owl:Class ;
+    rdfs:label "Chemical Fertilization"@en ;
+    rdfs:label "Fertilisation Chimique"@fr ;
+    skos:definition "Use of synthetic fertilizers"@en ;
+    rdfs:subClassOf agri:Fertilization ;
+    .
+
+agri:Composting a owl:Class ;
+    rdfs:label "Composting"@en ;
+    rdfs:label "Compostage"@fr ;
+    rdfs:label "Komposta"@mg ;
+    skos:definition "Biological decomposition of organic matter"@en ;
+    rdfs:subClassOf agri:OrganicFertilization ;
+    .
+
+agri:ManureApplication a owl:Class ;
+    rdfs:label "Manure Application"@en ;
+    rdfs:label "Application de Fumier"@fr ;
+    skos:definition "Use of animal waste as fertilizer"@en ;
+    rdfs:subClassOf agri:OrganicFertilization ;
+    .
+
+# ============================================================
+# PEST MANAGEMENT TYPES
+# ============================================================
+
+agri:BiologicalControl a owl:Class ;
+    rdfs:label "Biological Control"@en ;
+    rdfs:label "Lutte Biologique"@fr ;
+    skos:definition "Use of natural enemies to control pests"@en ;
+    rdfs:subClassOf agri:PestManagement ;
+    .
+
+agri:ChemicalControl a owl:Class ;
+    rdfs:label "Chemical Control"@en ;
+    rdfs:label "Lutte Chimique"@fr ;
+    skos:definition "Use of pesticides for pest control"@en ;
+    rdfs:subClassOf agri:PestManagement ;
+    .
+
+agri:IntegratedPestManagement a owl:Class ;
+    rdfs:label "Integrated Pest Management"@en ;
+    rdfs:label "Lutte Intégrée"@fr ;
+    rdfs:label "Fiarovana Mifototra"@mg ;
+    skos:definition "Combined pest control methods"@en ;
+    rdfs:subClassOf agri:PestManagement ;
+    owl:equivalentClass agrovoc:c_4149 ;
+    .
+
+# ============================================================
+# PRACTICE OBJECT PROPERTIES
+# ============================================================
+
+# Practice applied to crop
+agri:practicedOn a owl:ObjectProperty ;
+    rdfs:label "practiced on"@en ;
+    rdfs:label "pratiqué sur"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:Crop ;
+    rdfs:subPropertyOf crm:P16_used_specific_object ;
+    .
+
+# Practice uses resource
+agri:usesResource a owl:ObjectProperty ;
+    rdfs:label "uses resource"@en ;
+    rdfs:label "utilise la ressource"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:Resource ;
+    rdfs:subPropertyOf crm:P16_used_specific_object ;
+    .
+
+# Practice performed by actor
+agri:performedBy a owl:ObjectProperty ;
+    rdfs:label "performed by"@en ;
+    rdfs:label "réalisé par"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range foaf:Agent ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    .
+
+# Has practice duration
+agri:hasDuration a owl:DatatypeProperty ;
+    rdfs:label "has duration"@en ;
+    rdfs:label "a une durée"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range xsd:duration ;
+    .
+
+# Has practice date
+agri:hasPracticeDate a owl:DatatypeProperty ;
+    rdfs:label "has practice date"@en ;
+    rdfs:label "a une date de pratique"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range xsd:date ;
+    .
+
+# Produces output
+agri:producesOutput a owl:ObjectProperty ;
+    rdfs:label "produces output"@en ;
+    rdfs:label "produit une sortie"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:AgriculturalOutput ;
+    rdfs:subPropertyOf crm:P108_has_produced ;
+    .
+

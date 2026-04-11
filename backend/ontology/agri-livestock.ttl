@@ -1,0 +1,277 @@
+# ============================================================
+# LIVESTOCK MODULE - agri-livestock.ttl
+# Animal husbandry and livestock in Madagascar
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
+
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# LIVESTOCK SUBCLASSES
+# ============================================================
+
+# ---------- Cattle ----------
+agri:Cattle a owl:Class ;
+    rdfs:label "Cattle"@en ;
+    rdfs:label "Bovins"@fr ;
+    rdfs:label "Omby"@mg ;
+    skos:definition "Domesticated bovine animals"@en ;
+    skos:definition "Animaux bovins domestiqués"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_757 ;
+    .
+
+# ---------- Zebu (Native Malagasy cattle) ----------
+agri:Zebu a owl:Class ;
+    rdfs:label "Zebu"@en ;
+    rdfs:label "Zébu"@fr ;
+    rdfs:label "Omby"@mg ;
+    skos:definition "Bos taurus indicus - humped cattle native to Madagascar"@en ;
+    skos:definition "Bos taurus indicus - bétail à bosse natif de Madagascar"@fr ;
+    rdfs:subClassOf agri:Cattle ;
+    owl:equivalentClass agrovoc:c_8455 ;
+    .
+
+# ---------- Small Ruminants ----------
+agri:Sheep a owl:Class ;
+    rdfs:label "Sheep"@en ;
+    rdfs:label "Mouton"@fr ;
+    rdfs:label "Ovy"@mg ;
+    skos:definition "Domesticated wool and meat animals"@en ;
+    skos:definition "Animaux domestiqués pour la laine et la viande"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_6945 ;
+    .
+
+agri:Goat a owl:Class ;
+    rdfs:label "Goat"@en ;
+    rdfs:label "Chèvre"@fr ;
+    rdfs:label "osy"@mg ;
+    skos:definition "Domesticated caprine animals"@en ;
+    skos:definition "Animaux caprins domestiqués"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_330707 ;
+    .
+
+# ---------- Poultry ----------
+agri:Poultry a owl:Class ;
+    rdfs:label "Poultry"@en ;
+    rdfs:label "Volaille"@fr ;
+    rdfs:label "Akoho"@mg ;
+    skos:definition "Domesticated birds for meat and eggs"@en ;
+    skos:definition "Oiseaux domestiqués pour la viande et les œufs"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_6077 ;
+    .
+
+agri:Chicken a owl:Class ;
+    rdfs:label "Chicken"@en ;
+    rdfs:label "Poulet"@fr ;
+    rdfs:label "Akoho"@mg ;
+    skos:definition "Gallus gallus domesticus"@en ;
+    skos:definition "Gallus gallus domesticus"@fr ;
+    rdfs:subClassOf agri:Poultry ;
+    owl:equivalentClass agrovoc:c_1665 ;
+    .
+
+agri:Duck a owl:Class ;
+    rdfs:label "Duck"@en ;
+    rdfs:label "Canard"@fr ;
+    rdfs:label "RENDRIKA"@mg ;
+    skos:definition "Domesticated waterfowl"@en ;
+    skos:definition "Palmipède domestique"@fr ;
+    rdfs:subClassOf agri:Poultry ;
+    owl:equivalentClass agrovoc:c_2489 ;
+    .
+
+# ---------- Pigs ----------
+agri:Pig a owl:Class ;
+    rdfs:label "Pig"@en ;
+    rdfs:label "Porc"@fr ;
+    rdfs:label "Kisoa"@mg ;
+    skos:definition "Sus scrofa domesticus"@en ;
+    skos:definition "Sus scrofa domesticus"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_6024 ;
+    .
+
+# ---------- Rabbits ----------
+agri:Rabbit a owl:Class ;
+    rdfs:label "Rabbit"@en ;
+    rdfs:label "Lapin"@fr ;
+    rdfs:label "Tanty"@mg ;
+    skos:definition "Domesticated lagomorphs"@en ;
+    skos:definition "Lagomorphes domestiqués"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_6507 ;
+    .
+
+# ---------- Aquaculture ----------
+agri:Fish a owl:Class ;
+    rdfs:label "Fish"@en ;
+    rdfs:label "Poisson"@fr ;
+    rdfs:label "Trondro"@mg ;
+    skos:definition "Aquatic animals for farming"@en ;
+    skos:definition "Animaux aquatiques pour l'élevage"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    owl:equivalentClass agrovoc:c_3003 ;
+    .
+
+# ============================================================
+# LIVESTOCK BREED CLASSES
+# ============================================================
+
+# Malagasy Zebu Breeds
+agri:BaraZebu a owl:Class ;
+    rdfs:label "Bara Zebu"@en ;
+    rdfs:label "Zébu Bara"@fr ;
+    skos:definition "Zebu breed from Bara region"@en ;
+    skos:definition "Race zébu de la région Bara"@fr ;
+    rdfs:subClassOf agri:Zebu ;
+    rdfs:subClassOf gen:Breed ;
+    .
+
+agri:MahafalyZebu a owl:Class ;
+    rdfs:label "Mahafaly Zebu"@en ;
+    rdfs:label "Zébu Mahafaly"@fr ;
+    skos:definition "Zebu breed from Mahafaly region"@en ;
+    skos:definition "Race zébu de la région Mahafaly"@fr ;
+    rdfs:subClassOf agri:Zebu ;
+    rdfs:subClassOf gen:Breed ;
+    .
+
+agri:TrongaZebu a owl:Class ;
+    rdfs:label "Tronga Zebu"@en ;
+    rdfs:label "Zébu Tronga"@fr ;
+    skos:definition "Zebu breed from Tronga region"@en ;
+    skos:definition "Race zébu de la région Tronga"@fr ;
+    rdfs:subClassOf agri:Zebu ;
+    rdfs:subClassOf gen:Breed ;
+    .
+
+# Crossbred cattle
+agri:CrossbredCattle a owl:Class ;
+    rdfs:label "Crossbred Cattle"@en ;
+    rdfs:label "Bovins Croisés"@fr ;
+    skos:definition "Cattle resulting from crossbreeding"@en ;
+    skos:definition "Bovins résultant de croisements"@fr ;
+    rdfs:subClassOf agri:Cattle ;
+    rdfs:subClassOf gen:Hybrid ;
+    .
+
+# ============================================================
+# LIVESTOCK SEX CLASSES
+# ============================================================
+
+agri:MaleLivestock a owl:Class ;
+    rdfs:label "Male Livestock"@en ;
+    rdfs:label "Bétail Mâle"@fr ;
+    skos:definition "Male animals for breeding or meat"@en ;
+    skos:definition "Animaux mâles pour reproduction ou viande"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    .
+
+agri:FemaleLivestock a owl:Class ;
+    rdfs:label "Female Livestock"@en ;
+    rdfs:label "Bétail Femelle"@fr ;
+    skos:definition "Female animals for breeding or milk"@en ;
+    skos:definition "Animaux femelles pour reproduction ou lait"@fr ;
+    rdfs:subClassOf agri:Livestock ;
+    .
+
+agri:Bull a owl:Class ;
+    rdfs:label "Bull"@en ;
+    rdfs:label "Taureau"@fr ;
+    rdfs:label "Tongotra"@mg ;
+    skos:definition "Adult male cattle"@en ;
+    skos:definition "Bovin mâle adulte"@fr ;
+    rdfs:subClassOf agri:MaleLivestock ;
+    rdfs:subClassOf agri:Zebu ;
+    .
+
+agri:Cow a owl:Class ;
+    rdfs:label "Cow"@en ;
+    rdfs:label "Vache"@fr ;
+    rdfs:label "Ombivavy"@mg ;
+    skos:definition "Adult female cattle"@en ;
+    skos:definition "Bovin femelle adulte"@fr ;
+    rdfs:subClassOf agri:FemaleLivestock ;
+    rdfs:subClassOf agri:Zebu ;
+    .
+
+# ============================================================
+# LIVESTOCK OBJECT PROPERTIES
+# ============================================================
+
+# Has breed
+agri:hasBreed a owl:ObjectProperty ;
+    rdfs:label "has breed"@en ;
+    rdfs:label "a une race"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range gen:Breed ;
+    .
+
+# Is breed of
+agri:isBreedOf a owl:ObjectProperty ;
+    rdfs:label "is breed of"@en ;
+    rdfs:label "est une race de"@fr ;
+    owl:inverseOf agri:hasBreed ;
+    .
+
+# Produces product
+agri:producesAnimalProduct a owl:ObjectProperty ;
+    rdfs:label "produces animal product"@en ;
+    rdfs:label "produit un produit animal"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range agri:AnimalProduct ;
+    rdfs:subPropertyOf agri:producesOutput ;
+    .
+
+# Managed by
+agri:managedBy a owl:ObjectProperty ;
+    rdfs:label "managed by"@en ;
+    rdfs:label "géré par"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range <http://xmlns.com/foaf/0.1/Agent> ;
+    .
+
+# Has health status
+agri:hasHealthStatus a owl:DatatypeProperty ;
+    rdfs:label "has health status"@en ;
+    rdfs:label "a un état de santé"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range xsd:string ;
+    .
+
+# Birth date
+agri:hasBirthDate a owl:DatatypeProperty ;
+    rdfs:label "has birth date"@en ;
+    rdfs:label "a une date de naissance"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range xsd:date ;
+    .
+
+# Weight
+agri:hasWeight a owl:DatatypeProperty ;
+    rdfs:label "has weight"@en ;
+    rdfs:label "a un poids"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range xsd:decimal ;
+    .
+
+# Color/Marking
+agri:hasColor a owl:DatatypeProperty ;
+    rdfs:label "has color"@en ;
+    rdfs:label "a une couleur"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range xsd:string ;
+    .
+

@@ -1,0 +1,1567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY foaf "http://xmlns.com/foaf/0.1/" >
+    <!ENTITY agrovoc "http://aims.fao.org/aos/agrovoc/" >
+    <!ENTITY agri "http://example.org/agri/" >
+    <!ENTITY gen "http://example.org/gen/" >
+    <!ENTITY geo "http://www.w3.org/2003/01/geo/wgs84_pos/" >
+    <!ENTITY skos "http://www.w3.org/2004/02/skos/core#" >
+    <!ENTITY dcterms "http://purl.org/dc/terms/" >
+    <!ENTITY ontology "http://example.org/ontology/madagascar-agriculture" >
+]>
+
+<rdf:RDF 
+    xmlns="&ontology;"
+    xml:base="&ontology;"
+    xmlns:owl="&owl;"
+    xmlns:xsd="&xsd;"
+    xmlns:rdfs="&rdfs;"
+    xmlns:rdf="&rdf;"
+    xmlns:foaf="&foaf;"
+    xmlns:agrovoc="&agrovoc;"
+    xmlns:agri="&agri;"
+    xmlns:gen="&gen;"
+    xmlns:geo="&geo;"
+    xmlns:skos="&skos;"
+    xmlns:dcterms="&dcterms;"
+>
+
+<!-- ============================================================ -->
+<!-- ONTOLOGY HEADER -->
+<!-- ============================================================ -->
+
+<owl:Ontology rdf:about="http://example.org/ontology/madagascar-agriculture">
+    <rdfs:label xml:lang="en">Madagascar Agriculture Ontology</rdfs:label>
+    <rdfs:label xml:lang="fr">Ontologie de l'Agriculture de Madagascar</rdfs:label>
+    <dcterms:title xml:lang="en">Madagascar Agriculture Ontology</dcterms:title>
+    <dcterms:title xml:lang="fr">Ontologie de l'Agriculture de Madagascar</dcterms:title>
+    <dcterms:creator>Ontology Engineering Team - FOFIFA &amp; Partner Institutions</dcterms:creator>
+    <dcterms:created rdf:datatype="&xsd;date">2026-04-10</dcterms:created>
+    <dcterms:description xml:lang="en">An OWL ontology for tracking crop varieties, agricultural practices, and soil types specifically designed for Madagascar agriculture.</dcterms:description>
+    <dcterms:description xml:lang="fr">Une ontologie OWL pour le suivi des variétés de cultures, des pratiques agricoles et des types de sols, spécifiquement conçue pour l'agriculture malgache.</dcterms:description>
+    <owl:versionInfo>1.0.0</owl:versionInfo>
+    <rdfs:seeAlso rdf:resource="http://aims.fao.org/aos/agrovoc/"/>
+</owl:Ontology>
+
+<!-- ============================================================ -->
+<!-- TOP LEVEL CLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;Crop">
+    <rdfs:label xml:lang="en">Crop</rdfs:label>
+    <rdfs:label xml:lang="fr">Culture</rdfs:label>
+    <rdfs:label xml:lang="mg">Famboly</rdfs:label>
+    <skos:definition>Cultivated plants grown for agricultural production</skos:definition>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    <rdfs:subClassOf rdf:resource="&gen;Organism"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;AgriculturalPractice">
+    <rdfs:label xml:lang="en">Agricultural Practice</rdfs:label>
+    <rdfs:label xml:lang="fr">Pratique Agricole</rdfs:label>
+    <rdfs:label xml:lang="mg">Fampiharana Fambolena</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Resource">
+    <rdfs:label xml:lang="en">Agricultural Resource</rdfs:label>
+    <rdfs:label xml:lang="fr">Ressource Agricole</rdfs:label>
+    <rdfs:label xml:lang="mg">Harena Fambolena</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;AgriculturalOutput">
+    <rdfs:label xml:lang="en">Agricultural Output</rdfs:label>
+    <rdfs:label xml:lang="fr">Production Agricole</rdfs:label>
+    <rdfs:label xml:lang="mg">Vokatra Fambolena</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- GENEALOGICAL CLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&gen;Organism">
+    <rdfs:label xml:lang="en">Organism</rdfs:label>
+    <rdfs:label xml:lang="fr">Organisme</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&gen;Hybrid">
+    <rdfs:label xml:lang="en">Hybrid</rdfs:label>
+    <rdfs:label xml:lang="fr">Hybride</rdfs:label>
+    <rdfs:label xml:lang="mg">Ibrida</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&gen;Organism"/>
+    <rdfs:subClassOf>
+        <owl:Restriction>
+            <owl:onProperty rdf:resource="&gen;hasParent"/>
+            <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:minQualifiedCardinality>
+            <owl:onClass rdf:resource="&gen;Organism"/>
+        </owl:Restriction>
+    </rdfs:subClassOf>
+</owl:Class>
+
+<owl:Class rdf:about="&gen;Cultivar">
+    <rdfs:label xml:lang="en">Cultivar</rdfs:label>
+    <rdfs:label xml:lang="fr">Cultivar</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&gen;Organism"/>
+</owl:Class>
+
+<owl:Class rdf:about="&gen;Variety">
+    <rdfs:label xml:lang="en">Variety</rdfs:label>
+    <rdfs:label xml:lang="fr">Variété</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&gen;Cultivar"/>
+</owl:Class>
+
+<owl:Class rdf:about="&gen;Landrace">
+    <rdfs:label xml:lang="en">Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Variété Traditionnelle</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary an-tanindrazana</rdfs:label>
+    <skos:definition>Traditional crop variety adapted to local conditions over long periods</skos:definition>
+    <rdfs:subClassOf rdf:resource="&gen;Variety"/>
+</owl:Class>
+
+<owl:Class rdf:about="&gen;ImprovedVariety">
+    <rdfs:label xml:lang="en">Improved Variety</rdfs:label>
+    <rdfs:label xml:lang="fr">Variété Améliorée</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary voatsara</rdfs:label>
+    <skos:definition>Variety developed through breeding programs with improved characteristics</skos:definition>
+    <rdfs:subClassOf rdf:resource="&gen;Variety"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- CROP SUBCLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;Cereal">
+    <rdfs:label xml:lang="en">Cereal</rdfs:label>
+    <rdfs:label xml:lang="fr">Céréale</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Legume">
+    <rdfs:label xml:lang="en">Legume</rdfs:label>
+    <rdfs:label xml:lang="fr">Légumineuse</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Fruit">
+    <rdfs:label xml:lang="en">Fruit</rdfs:label>
+    <rdfs:label xml:lang="fr">Fruit</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Vegetable">
+    <rdfs:label xml:lang="en">Vegetable</rdfs:label>
+    <rdfs:label xml:lang="fr">Légume</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;RootCrop">
+    <rdfs:label xml:lang="en">Root Crop</rdfs:label>
+    <rdfs:label xml:lang="fr">Culture Racine</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;CashCrop">
+    <rdfs:label xml:lang="en">Cash Crop</rdfs:label>
+    <rdfs:label xml:lang="fr">Culture Commerciale</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Tuber">
+    <rdfs:label xml:lang="en">Tuber</rdfs:label>
+    <rdfs:label xml:lang="fr">Tubercule</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Spice">
+    <rdfs:label xml:lang="en">Spice</rdfs:label>
+    <rdfs:label xml:lang="fr">Épice</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;OilSeed">
+    <rdfs:label xml:lang="en">Oil Seed Crop</rdfs:label>
+    <rdfs:label xml:lang="fr">Culture Oléagineuse</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Crop"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- SPECIFIC CROP TYPES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;Rice">
+    <rdfs:label xml:lang="en">Rice</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Cereal"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Maize">
+    <rdfs:label xml:lang="en">Maize</rdfs:label>
+    <rdfs:label xml:lang="fr">Maïs</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsakafody</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Cereal"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Cassava">
+    <rdfs:label xml:lang="en">Cassava</rdfs:label>
+    <rdfs:label xml:lang="fr">Manioc</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahatsanga</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;RootCrop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SweetPotato">
+    <rdfs:label xml:lang="en">Sweet Potato</rdfs:label>
+    <rdfs:label xml:lang="fr">Patate Douce</rdfs:label>
+    <rdfs:label xml:lang="mg">Ovy</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;RootCrop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;IrishPotato">
+    <rdfs:label xml:lang="en">Irish Potato</rdfs:label>
+    <rdfs:label xml:lang="fr">Pomme de Terre</rdfs:label>
+    <rdfs:label xml:lang="mg">Ovy</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Tuber"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Vanilla">
+    <rdfs:label xml:lang="en">Vanilla</rdfs:label>
+    <rdfs:label xml:lang="fr">Vanille</rdfs:label>
+    <rdfs:label xml:lang="mg">Voanio</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;CashCrop"/>
+    <rdfs:subClassOf rdf:resource="&agri;Spice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Clove">
+    <rdfs:label xml:lang="en">Clove</rdfs:label>
+    <rdfs:label xml:lang="fr">Girofle</rdfs:label>
+    <rdfs:label xml:lang="mg">Jirofo</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Fruit"/>
+    <rdfs:subClassOf rdf:resource="&agri;CashCrop"/>
+    <rdfs:subClassOf rdf:resource="&agri;Spice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Coffee">
+    <rdfs:label xml:lang="en">Coffee</rdfs:label>
+    <rdfs:label xml:lang="fr">Café</rdfs:label>
+    <rdfs:label xml:lang="mg">Kafe</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;CashCrop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Cocoa">
+    <rdfs:label xml:lang="en">Cocoa</rdfs:label>
+    <rdfs:label xml:lang="fr">Cacao</rdfs:label>
+    <rdfs:label xml:lang="mg">Kakao</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;CashCrop"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Peanut">
+    <rdfs:label xml:lang="en">Peanut</rdfs:label>
+    <rdfs:label xml:lang="fr">Arachide</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahazo-tsaramaso</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Legume"/>
+    <rdfs:subClassOf rdf:resource="&agri;OilSeed"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Soybean">
+    <rdfs:label xml:lang="en">Soybean</rdfs:label>
+    <rdfs:label xml:lang="fr">Soja</rdfs:label>
+    <rdfs:label xml:lang="mg">Soya</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Legume"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Beans">
+    <rdfs:label xml:lang="en">Beans</rdfs:label>
+    <rdfs:label xml:lang="fr">Haricot</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsaramaso</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Legume"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Groundnut">
+    <rdfs:label xml:lang="en">Groundnut</rdfs:label>
+    <rdfs:label xml:lang="fr">Cacahuète</rdfs:label>
+    <rdfs:label xml:lang="mg">Kalana</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Legume"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Banana">
+    <rdfs:label xml:lang="en">Banana</rdfs:label>
+    <rdfs:label xml:lang="fr">Banane</rdfs:label>
+    <rdfs:label xml:lang="mg">Akondro</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Fruit"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Litchi">
+    <rdfs:label xml:lang="en">Litchi</rdfs:label>
+    <rdfs:label xml:lang="fr">Litchi</rdfs:label>
+    <rdfs:label xml:lang="mg">Litsi</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Fruit"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Mango">
+    <rdfs:label xml:lang="en">Mango</rdfs:label>
+    <rdfs:label xml:lang="fr">Mangue</rdfs:label>
+    <rdfs:label xml:lang="mg">Manga</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Fruit"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Tomato">
+    <rdfs:label xml:lang="en">Tomato</rdfs:label>
+    <rdfs:label xml:lang="fr">Tomate</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsipika</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Vegetable"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Onion">
+    <rdfs:label xml:lang="en">Onion</rdfs:label>
+    <rdfs:label xml:lang="fr">Oignon</rdfs:label>
+    <rdfs:label xml:lang="mg">Somary</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Vegetable"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Cabbage">
+    <rdfs:label xml:lang="en">Cabbage</rdfs:label>
+    <rdfs:label xml:lang="fr">Chou</rdfs:label>
+    <rdfs:label xml:lang="mg">Lakabanina</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Vegetable"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Pepper">
+    <rdfs:label xml:lang="en">Pepper</rdfs:label>
+    <rdfs:label xml:lang="fr">Poivron</rdfs:label>
+    <rdfs:label xml:lang="mg">Tongolava</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Vegetable"/>
+    <rdfs:subClassOf rdf:resource="&agri;Spice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Ginger">
+    <rdfs:label xml:lang="en">Ginger</rdfs:label>
+    <rdfs:label xml:lang="fr">Gingembre</rdfs:label>
+    <rdfs:label xml:lang="mg">Sakay</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Spice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Turmeric">
+    <rdfs:label xml:lang="en">Turmeric</rdfs:label>
+    <rdfs:label xml:lang="fr">Curcuma</rdfs:label>
+    <rdfs:label xml:lang="mg">Tamotamo</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Spice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Sorghum">
+    <rdfs:label xml:lang="en">Sorghum</rdfs:label>
+    <rdfs:label xml:lang="fr">Sorgho</rdfs:label>
+    <rdfs:label xml:lang="mg">放Fahitra</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Cereal"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Millet">
+    <rdfs:label xml:lang="en">Millet</rdfs:label>
+    <rdfs:label xml:lang="fr">Millet</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsangaina</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Cereal"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- PRACTICE SUBCLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;Irrigation">
+    <rdfs:label xml:lang="en">Irrigation</rdfs:label>
+    <rdfs:label xml:lang="fr">Irrigation</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Fertilization">
+    <rdfs:label xml:lang="en">Fertilization</rdfs:label>
+    <rdfs:label xml:lang="fr">Fertilisation</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;PestManagement">
+    <rdfs:label xml:lang="en">Pest Management</rdfs:label>
+    <rdfs:label xml:lang="fr">Lutte Antiparasitaire</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Planting">
+    <rdfs:label xml:lang="en">Planting</rdfs:label>
+    <rdfs:label xml:lang="fr">Plantation</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Harvesting">
+    <rdfs:label xml:lang="en">Harvesting</rdfs:label>
+    <rdfs:label xml:lang="fr">Récolte</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Tillage">
+    <rdfs:label xml:lang="en">Tillage</rdfs:label>
+    <rdfs:label xml:lang="fr">Labour</rdfs:label>
+    <rdfs:label xml:lang="mg">Fikarakavana</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;CropRotation">
+    <rdfs:label xml:lang="en">Crop Rotation</rdfs:label>
+    <rdfs:label xml:lang="fr">Rotation des Cultures</rdfs:label>
+    <rdfs:label xml:lang="mg">Famadihana famboly</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Mulching">
+    <rdfs:label xml:lang="en">Mulching</rdfs:label>
+    <rdfs:label xml:lang="fr">Paillage</rdfs:label>
+    <rdfs:label xml:lang="mg">Fanampiana tany</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalPractice"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- RESOURCE SUBCLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;Land">
+    <rdfs:label xml:lang="en">Agricultural Land</rdfs:label>
+    <rdfs:label xml:lang="fr">Terre Agricole</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Resource"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SoilType">
+    <rdfs:label xml:lang="en">Soil Type</rdfs:label>
+    <rdfs:label xml:lang="fr">Type de Sol</rdfs:label>
+    <rdfs:label xml:lang="mg">Karazana Tany</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Resource"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Water">
+    <rdfs:label xml:lang="en">Water Resource</rdfs:label>
+    <rdfs:label xml:lang="fr">Ressource en Eau</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Resource"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Climate">
+    <rdfs:label xml:lang="en">Climate</rdfs:label>
+    <rdfs:label xml:lang="fr">Climat</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Resource"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Tool">
+    <rdfs:label xml:lang="en">Agricultural Tool</rdfs:label>
+    <rdfs:label xml:lang="fr">Outil Agricole</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;Resource"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- SOIL TYPE SUBCLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;ClaySoil">
+    <rdfs:label xml:lang="en">Clay Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Argileux</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany tsy aminy</rdfs:label>
+    <skos:definition>Heavy soil with high water retention, good for rice paddies</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SandySoil">
+    <rdfs:label xml:lang="en">Sandy Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Sableux</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany fasika</rdfs:label>
+    <skos:definition>Light soil with good drainage, suitable for cassava and peanuts</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;LoamySoil">
+    <rdfs:label xml:lang="en">Loamy Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Limoneux</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany fototra</rdfs:label>
+    <skos:definition>Balanced soil with good fertility, suitable for most crops</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SiltySoil">
+    <rdfs:label xml:lang="en">Silty Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Limoneux Fin</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany tsin-dranomasina</rdfs:label>
+    <skos:definition>Fine textured soil, good water retention</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;VolcanicSoil">
+    <rdfs:label xml:lang="en">Volcanic Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Volcanique</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany an-tanety</rdfs:label>
+    <skos:definition>Fertile soil from volcanic regions, rich in minerals</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;LateriteSoil">
+    <rdfs:label xml:lang="en">Laterite Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Lateritique</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany lateritika</rdfs:label>
+    <skos:definition>Red or yellow soil common in tropical regions, iron-rich</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;RedSoil">
+    <rdfs:label xml:lang="en">Red Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Rouge</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany maina</rdfs:label>
+    <skos:definition>Ferralitic soil typical of Madagascar highlands</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;BlackCottonSoil">
+    <rdfs:label xml:lang="en">Black Cotton Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Noir Cotonnier</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany mainty</rdfs:label>
+    <skos:definition>Dark clayey soil, cracks in dry season, good for cotton</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+    <rdfs:subClassOf rdf:resource="&agri;ClaySoil"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;PeatSoil">
+    <rdfs:label xml:lang="en">Peat Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Tourbeux</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany volon-dranomasina</rdfs:label>
+    <skos:definition>Organic-rich soil from wetland areas</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;AlluvialSoil">
+    <rdfs:label xml:lang="en">Alluvial Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Alluvial</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany rian-dranoka</rdfs:label>
+    <skos:definition>Fertile soil deposited by rivers, ideal for rice</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+    <rdfs:subClassOf rdf:resource="&agri;LoamySoil"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SulfuricSoil">
+    <rdfs:label xml:lang="en">Sulfuric Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Sulfatique</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany somary</rdfs:label>
+    <skos:definition>Acidic sulfate soil found in coastal areas</skos:definition>
+    <rdfs:subClassOf rdf:resource="&agri;SoilType"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- SOIL PROPERTY CLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;SoilPH">
+    <rdfs:label xml:lang="en">Soil pH Class</rdfs:label>
+    <rdfs:label xml:lang="fr">Classe de pH du Sol</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;AcidicSoil">
+    <rdfs:label xml:lang="en">Acidic Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Acide</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany ahidrano</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilPH"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;NeutralSoil">
+    <rdfs:label xml:lang="en">Neutral Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Neutre</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany tsy misy ahidrano</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilPH"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;AlkalineSoil">
+    <rdfs:label xml:lang="en">Alkaline Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Alcalin</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany madinika</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilPH"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SoilFertility">
+    <rdfs:label xml:lang="en">Soil Fertility Level</rdfs:label>
+    <rdfs:label xml:lang="fr">Niveau de Fertilité du Sol</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;HighFertility">
+    <rdfs:label xml:lang="en">High Fertility</rdfs:label>
+    <rdfs:label xml:lang="fr">Haute Fertilité</rdfs:label>
+    <rdfs:label xml:lang="mg">Famahendrena avo</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilFertility"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;MediumFertility">
+    <rdfs:label xml:lang="en">Medium Fertility</rdfs:label>
+    <rdfs:label xml:lang="fr">Fertilité Moyenne</rdfs:label>
+    <rdfs:label xml:lang="mg">Famahendrena antonony</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilFertility"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;LowFertility">
+    <rdfs:label xml:lang="en">Low Fertility</rdfs:label>
+    <rdfs:label xml:lang="fr">Faible Fertilité</rdfs:label>
+    <rdfs:label xml:lang="mg">Famahendrena ambany</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilFertility"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;SoilDrainage">
+    <rdfs:label xml:lang="en">Soil Drainage</rdfs:label>
+    <rdfs:label xml:lang="fr">Drainage du Sol</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;WellDrained">
+    <rdfs:label xml:lang="en">Well Drained</rdfs:label>
+    <rdfs:label xml:lang="fr">Bien Drainé</rdfs:label>
+    <rdfs:label xml:lang="mg">Mandro tsara</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilDrainage"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;PoorlyDrained">
+    <rdfs:label xml:lang="en">Poorly Drained</rdfs:label>
+    <rdfs:label xml:lang="fr">Mal Drainé</rdfs:label>
+    <rdfs:label xml:lang="mg">Mandro ratsy</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilDrainage"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Waterlogged">
+    <rdfs:label xml:lang="en">Waterlogged</rdfs:label>
+    <rdfs:label xml:lang="fr">Engorgé</rdfs:label>
+    <rdfs:label xml:lang="mg">Mandrobe</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;SoilDrainage"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- OUTPUT SUBCLASSES -->
+<!-- ============================================================ -->
+
+<owl:Class rdf:about="&agri;FoodProduct">
+    <rdfs:label xml:lang="en">Food Product</rdfs:label>
+    <rdfs:label xml:lang="fr">Produit Alimentaire</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalOutput"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Fiber">
+    <rdfs:label xml:lang="en">Fiber</rdfs:label>
+    <rdfs:label xml:lang="fr">Fibre</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalOutput"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;Biofuel">
+    <rdfs:label xml:lang="en">Biofuel</rdfs:label>
+    <rdfs:label xml:lang="fr">Biocarburant</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalOutput"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;ProcessedProduct">
+    <rdfs:label xml:lang="en">Processed Agricultural Product</rdfs:label>
+    <rdfs:label xml:lang="fr">Produit Agricole Transformé</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;AgriculturalOutput"/>
+</owl:Class>
+
+<owl:Class rdf:about="&agri;EssentialOil">
+    <rdfs:label xml:lang="en">Essential Oil</rdfs:label>
+    <rdfs:label xml:lang="fr">Huile Essentielle</rdfs:label>
+    <rdfs:label xml:lang="mg">Menaholy</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&agri;ProcessedProduct"/>
+</owl:Class>
+
+<!-- ============================================================ -->
+<!-- OBJECT PROPERTIES -->
+<!-- ============================================================ -->
+
+<owl:ObjectProperty rdf:about="&gen;hasParent">
+    <rdfs:label xml:lang="en">has parent</rdfs:label>
+    <rdfs:label xml:lang="fr">a un parent</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Organism"/>
+    <rdfs:range rdf:resource="&gen;Organism"/>
+    <owl:inverseOf rdf:resource="&gen;hasOffspring"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&gen;hasOffspring">
+    <rdfs:label xml:lang="en">has offspring</rdfs:label>
+    <rdfs:label xml:lang="fr">a une progéniture</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Organism"/>
+    <rdfs:range rdf:resource="&gen;Organism"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&gen;isHybridOf">
+    <rdfs:label xml:lang="en">is hybrid of</rdfs:label>
+    <rdfs:label xml:lang="fr">est hybride de</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Hybrid"/>
+    <rdfs:range rdf:resource="&gen;Organism"/>
+    <rdfs:subPropertyOf rdf:resource="&gen;hasParent"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&gen;descendsFrom">
+    <rdfs:label xml:lang="en">descends from</rdfs:label>
+    <rdfs:label xml:lang="fr">descend de</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Organism"/>
+    <rdfs:range rdf:resource="&gen;Organism"/>
+    <owl:inverseOf rdf:resource="&gen;ancestorOf"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&gen;ancestorOf">
+    <rdfs:label xml:lang="en">is ancestor of</rdfs:label>
+    <rdfs:label xml:lang="fr">est l'ancêtre de</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Organism"/>
+    <rdfs:range rdf:resource="&gen;Organism"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&gen;developedBy">
+    <rdfs:label xml:lang="en">developed by</rdfs:label>
+    <rdfs:label xml:lang="fr">développé par</rdfs:label>
+    <rdfs:domain rdf:resource="&gen;Organism"/>
+    <rdfs:range rdf:resource="&foaf;Agent"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;practicedOn">
+    <rdfs:label xml:lang="en">practiced on</rdfs:label>
+    <rdfs:label xml:lang="fr">pratiqué sur</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;AgriculturalPractice"/>
+    <rdfs:range rdf:resource="&agri;Crop"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;usesResource">
+    <rdfs:label xml:lang="en">uses resource</rdfs:label>
+    <rdfs:label xml:lang="fr">utilise la ressource</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;AgriculturalPractice"/>
+    <rdfs:range rdf:resource="&agri;Resource"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;performedBy">
+    <rdfs:label xml:lang="en">performed by</rdfs:label>
+    <rdfs:label xml:lang="fr">réalisé par</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;AgriculturalPractice"/>
+    <rdfs:range rdf:resource="&foaf;Agent"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;producesOutput">
+    <rdfs:label xml:lang="en">produces output</rdfs:label>
+    <rdfs:label xml:lang="fr">produit une sortie</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;AgriculturalPractice"/>
+    <rdfs:range rdf:resource="&agri;AgriculturalOutput"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;derivedFromCrop">
+    <rdfs:label xml:lang="en">derived from crop</rdfs:label>
+    <rdfs:label xml:lang="fr">dérivé de la culture</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;AgriculturalOutput"/>
+    <rdfs:range rdf:resource="&agri;Crop"/>
+    <rdfs:subPropertyOf rdf:resource="&gen;descendsFrom"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;hasSoilType">
+    <rdfs:label xml:lang="en">has soil type</rdfs:label>
+    <rdfs:label xml:lang="fr">a un type de sol</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;Land"/>
+    <rdfs:range rdf:resource="&agri;SoilType"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;hasWaterSource">
+    <rdfs:label xml:lang="en">has water source</rdfs:label>
+    <rdfs:label xml:lang="fr">a une source d'eau</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;Land"/>
+    <rdfs:range rdf:resource="&agri;Water"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;hasSoilPH">
+    <rdfs:label xml:lang="en">has soil pH</rdfs:label>
+    <rdfs:label xml:lang="fr">a un pH du sol</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;SoilType"/>
+    <rdfs:range rdf:resource="&agri;SoilPH"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;hasFertility">
+    <rdfs:label xml:lang="en">has fertility level</rdfs:label>
+    <rdfs:label xml:lang="fr">a un niveau de fertilité</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;SoilType"/>
+    <rdfs:range rdf:resource="&agri;SoilFertility"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;hasDrainage">
+    <rdfs:label xml:lang="en">has drainage</rdfs:label>
+    <rdfs:label xml:lang="fr">a un drainage</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;SoilType"/>
+    <rdfs:range rdf:resource="&agri;SoilDrainage"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;suitableForCrop">
+    <rdfs:label xml:lang="en">suitable for crop</rdfs:label>
+    <rdfs:label xml:lang="fr">adapté à la culture</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;SoilType"/>
+    <rdfs:range rdf:resource="&agri;Crop"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;cultivatedIn">
+    <rdfs:label xml:lang="en">cultivated in</rdfs:label>
+    <rdfs:label xml:lang="fr">cultivé dans</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;Crop"/>
+    <rdfs:range rdf:resource="&agri;Land"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="&agri;followsInRotation">
+    <rdfs:label xml:lang="en">follows in rotation</rdfs:label>
+    <rdfs:label xml:lang="fr">suit en rotation</rdfs:label>
+    <rdfs:domain rdf:resource="&agri;Crop"/>
+    <rdfs:range rdf:resource="&agri;Crop"/>
+</owl:ObjectProperty>
+
+<!-- ============================================================ -->
+<!-- DATATYPE PROPERTIES -->
+<!-- ============================================================ -->
+
+<owl:DatatypeProperty rdf:about="&gen;hasGenerationNumber">
+    <rdfs:label xml:lang="en">has generation number</rdfs:label>
+    <rdfs:label xml:lang="fr">a un numéro de génération</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;integer"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&gen;hasRegistrationDate">
+    <rdfs:label xml:lang="en">has registration date</rdfs:label>
+    <rdfs:label xml:lang="fr">a une date d'enregistrement</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;date"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&gen;hasPedigreeCode">
+    <rdfs:label xml:lang="en">has pedigree code</rdfs:label>
+    <rdfs:label xml:lang="fr">a un code de pedigree</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasYieldPotential">
+    <rdfs:label xml:lang="en">has yield potential</rdfs:label>
+    <rdfs:label xml:lang="fr">a un potentiel de rendement</rdfs:label>
+    <rdfs:label xml:lang="mg">misy tombotsoa</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasQuantity">
+    <rdfs:label xml:lang="en">has quantity</rdfs:label>
+    <rdfs:label xml:lang="fr">a une quantité</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasUnit">
+    <rdfs:label xml:lang="en">has unit</rdfs:label>
+    <rdfs:label xml:lang="fr">a une unité</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasPracticeDate">
+    <rdfs:label xml:lang="en">has practice date</rdfs:label>
+    <rdfs:label xml:lang="fr">a une date de pratique</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;date"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasHarvestDate">
+    <rdfs:label xml:lang="en">has harvest date</rdfs:label>
+    <rdfs:label xml:lang="fr">a une date de récolte</rdfs:label>
+    <rdfs:label xml:lang="mg">andro fikarapahana</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;date"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasPlantingDate">
+    <rdfs:label xml:lang="en">has planting date</rdfs:label>
+    <rdfs:label xml:lang="fr">a une date de plantation</rdfs:label>
+    <rdfs:label xml:lang="mg">andro fambolena</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;date"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasMaturityDays">
+    <rdfs:label xml:lang="en">has days to maturity</rdfs:label>
+    <rdfs:label xml:lang="fr">a le nombre de jours avant maturité</rdfs:label>
+    <rdfs:label xml:lang="mg">isan'ny androm-pahamatana</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;integer"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasYieldPerHectare">
+    <rdfs:label xml:lang="en">has yield per hectare</rdfs:label>
+    <rdfs:label xml:lang="fr">a un rendement à l'hectare</rdfs:label>
+    <rdfs:label xml:lang="mg">vokatra isaky ny hekatara</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasPHValue">
+    <rdfs:label xml:lang="en">has pH value</rdfs:label>
+    <rdfs:label xml:lang="fr">a une valeur de pH</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasNitrogenContent">
+    <rdfs:label xml:lang="en">has nitrogen content</rdfs:label>
+    <rdfs:label xml:lang="fr">a une teneur en azote</rdfs:label>
+    <rdfs:label xml:lang="mg">misy nitizena</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasOrganicMatter">
+    <rdfs:label xml:lang="en">has organic matter content</rdfs:label>
+    <rdfs:label xml:lang="fr">a une teneur en matière organique</rdfs:label>
+    <rdfs:label xml:lang="mg">misy organika</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasAltitude">
+    <rdfs:label xml:lang="en">has altitude</rdfs:label>
+    <rdfs:label xml:lang="fr">a une altitude</rdfs:label>
+    <rdfs:label xml:lang="mg">hasaritanin'i Tany</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;integer"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasAreaHectares">
+    <rdfs:label xml:lang="en">has area in hectares</rdfs:label>
+    <rdfs:label xml:lang="fr">a une superficie en hectares</rdfs:label>
+    <rdfs:label xml:lang="mg">hasaritanin'ny tany</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasLatitude">
+    <rdfs:label xml:lang="en">has latitude</rdfs:label>
+    <rdfs:label xml:lang="fr">a une latitude</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="&agri;hasLongitude">
+    <rdfs:label xml:lang="en">has longitude</rdfs:label>
+    <rdfs:label xml:lang="fr">a une longitude</rdfs:label>
+    <rdfs:range rdf:resource="&xsd;decimal"/>
+</owl:DatatypeProperty>
+
+<!-- ============================================================ -->
+<!-- SOIL TYPE INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;HighlandsRedSoil">
+    <rdf:type rdf:resource="&agri;RedSoil"/>
+    <rdf:type rdf:resource="&agri;LateriteSoil"/>
+    <rdfs:label xml:lang="en">Highlands Red Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Rouge des Hautes Terres</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany maina an-tanety</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;MediumFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">5.5</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.15</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">2.5</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;Maize"/>
+    <agri:suitableForCrop rdf:resource="&agri;Beans"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;BemarahaAlluvialSoil">
+    <rdf:type rdf:resource="&agri;AlluvialSoil"/>
+    <rdfs:label xml:lang="en">Bemaraha Alluvial Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Alluvial de Bemaraha</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany rian-dranoka Bemaha</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;NeutralSoil"/>
+    <agri:hasFertility rdf:resource="&agri;HighFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">6.8</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.25</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">4.0</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;Sugarcane"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;SambiranoVolcanicSoil">
+    <rdf:type rdf:resource="&agri;VolcanicSoil"/>
+    <rdfs:label xml:lang="en">Sambirano Volcanic Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Volcanique de Sambirano</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany an-tanety Sambirano</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;NeutralSoil"/>
+    <agri:hasFertility rdf:resource="&agri;HighFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">6.5</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.30</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">5.5</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Coffee"/>
+    <agri:suitableForCrop rdf:resource="&agri;Cacao"/>
+    <agri:suitableForCrop rdf:resource="&agri;Vanilla"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;EastCoastClaySoil">
+    <rdf:type rdf:resource="&agri;ClaySoil"/>
+    <rdfs:label xml:lang="en">East Coast Clay Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Argileux de la Côte Est</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany tsy aminy morontsiraka</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;MediumFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;PoorlyDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">5.2</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.20</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">3.5</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;Banana"/>
+    <agri:suitableForCrop rdf:resource="&agri;Ginger"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;MenabeSandySoil">
+    <rdf:type rdf:resource="&agri;SandySoil"/>
+    <rdfs:label xml:lang="en">Menabe Sandy Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Sableux de Ménabé</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany fasika Menabe</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;LowFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">5.0</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.08</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">1.2</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Cassava"/>
+    <agri:suitableForCrop rdf:resource="&agri;Peanut"/>
+    <agri:suitableForCrop rdf:resource="&agri;Millet"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;AlaotraPeatSoil">
+    <rdf:type rdf:resource="&agri;PeatSoil"/>
+    <rdfs:label xml:lang="en">Alaotra Peat Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Tourbeux d'Alaotra</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany volon-dranomasina Alaotra</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;HighFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;Waterlogged"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">4.8</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.35</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">12.0</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;SugarCane"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;SofiaBlackCottonSoil">
+    <rdf:type rdf:resource="&agri;BlackCottonSoil"/>
+    <rdfs:label xml:lang="en">Sofia Black Cotton Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Noir Cotonnier de Sofia</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany mainty Sofia</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AlkalineSoil"/>
+    <agri:hasFertility rdf:resource="&agri;MediumFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;PoorlyDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">8.2</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.12</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">2.0</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Cotton"/>
+    <agri:suitableForCrop rdf:resource="&agri;Sorghum"/>
+    <agri:suitableForCrop rdf:resource="&agri;Millet"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;ItasyLoamySoil">
+    <rdf:type rdf:resource="&agri;LoamySoil"/>
+    <rdfs:label xml:lang="en">Itasy Loamy Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Limoneux d'Itasy</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany fototra Itasy</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;NeutralSoil"/>
+    <agri:hasFertility rdf:resource="&agri;HighFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">6.5</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.28</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">4.5</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;Maize"/>
+    <agri:suitableForCrop rdf:resource="&agri;Beans"/>
+    <agri:suitableForCrop rdf:resource="&agri;IrishPotato"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;DianaLateriteSoil">
+    <rdf:type rdf:resource="&agri;LateriteSoil"/>
+    <rdfs:label xml:lang="en">Diana Laterite Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Lateritique de Diana</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany lateritika Antsiranana</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;LowFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;WellDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">5.3</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.10</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">1.8</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Litchi"/>
+    <agri:suitableForCrop rdf:resource="&agri;Pepper"/>
+    <agri:suitableForCrop rdf:resource="&agri;Vanilla"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;AnalamangaSiltySoil">
+    <rdf:type rdf:resource="&agri;SiltySoil"/>
+    <rdfs:label xml:lang="en">Analamanga Silty Soil</rdfs:label>
+    <rdfs:label xml:lang="fr">Sol Limoneux Fin d'Analamanga</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany tsin-dranomasina Analamanga</rdfs:label>
+    <agri:hasSoilPH rdf:resource="&agri;AcidicSoil"/>
+    <agri:hasFertility rdf:resource="&agri;MediumFertility"/>
+    <agri:hasDrainage rdf:resource="&agri;PoorlyDrained"/>
+    <agri:hasPHValue rdf:datatype="&xsd;decimal">5.6</agri:hasPHValue>
+    <agri:hasNitrogenContent rdf:datatype="&xsd;decimal">0.18</agri:hasNitrogenContent>
+    <agri:hasOrganicMatter rdf:datatype="&xsd;decimal">3.0</agri:hasOrganicMatter>
+    <agri:suitableForCrop rdf:resource="&agri;Rice"/>
+    <agri:suitableForCrop rdf:resource="&agri;Cabbage"/>
+    <agri:suitableForCrop rdf:resource="&agri;Onion"/>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- RICE VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Makalioka-Variety">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Makalioka Rice Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Traditionnel Makalioka</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary Makalioka</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1995-03-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">150</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">3.5</agri:hasYieldPerHectare>
+    <agri:hasPlantingDate rdf:datatype="&xsd;date">2025-11-01</agri:hasPlantingDate>
+    <agri:hasHarvestDate rdf:datatype="&xsd;date">2026-03-15</agri:hasHarvestDate>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Tsipory-Variety">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Tsipory Rice Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Traditionnel Tsipory</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary Tsipory</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1998-07-22</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-002</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">165</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">4.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Bemasoha-Rice">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdf:type rdf:resource="&gen;Hybrid"/>
+    <rdfs:label xml:lang="en">Bemasoha Rice Hybrid</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Hybride Bemasoha</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary Bemasoha</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2010-05-10</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-HYB-001</gen:hasPedigreeCode>
+    <gen:hasGenerationNumber rdf:datatype="&xsd;integer">1</gen:hasGenerationNumber>
+    <gen:isHybridOf rdf:resource="&agri;Makalioka-Variety"/>
+    <gen:isHybridOf rdf:resource="&agri;Tsipory-Variety"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">120</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">6.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Fiaramanitra-Rice">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdf:type rdf:resource="&gen;Hybrid"/>
+    <rdfs:label xml:lang="en">Fiaramanitra Rice Hybrid</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Hybride Fiaramanitra</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary Fiaramanitra</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2018-03-20</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-HYB-002</gen:hasPedigreeCode>
+    <gen:hasGenerationNumber rdf:datatype="&xsd;integer">2</gen:hasGenerationNumber>
+    <gen:isHybridOf rdf:resource="&agri;Bemasoha-Rice"/>
+    <gen:isHybridOf rdf:resource="&agri;Tsipory-Variety"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">115</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">7.2</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;FOM-31-Rice">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">FOM-31 Improved Rice</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Amélioré FOM-31</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary FOM-31</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2020-01-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-FOM-031</gen:hasPedigreeCode>
+    <gen:developedBy rdf:resource="&foaf;FOFIFA"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">110</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">8.0</agri:hasYieldPerHectare>
+    <agri:hasYieldPotential rdf:datatype="&xsd;decimal">9.5</agri:hasYieldPotential>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;SAHEL-108-Rice">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">SAHEL-108 Upland Rice</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz de Plateau SAHEL-108</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary ampany SAHEL-108</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2019-06-20</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-SAH-108</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">100</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">5.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;VaryGasy-Landrace">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Vary Gasy Traditional Rice</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Traditionnel Vary Gasy</rdfs:label>
+    <rdfs:label xml:lang="mg">Vary gasy</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1985-04-10</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-LR-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">180</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">2.8</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;ToakaLava-Rice">
+    <rdf:type rdf:resource="&agri;Rice"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Toaka Lava Rice</rdfs:label>
+    <rdfs:label xml:lang="fr">Riz Toaka Lava</rdfs:label>
+    <rdfs:label xml:lang="mg">Toaka lava</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1992-08-30</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-RIC-002</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">170</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">3.2</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- MAIZE VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;MaizeVarietyA">
+    <rdf:type rdf:resource="&agri;Maize"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Maize Variety A (Local Highland)</rdfs:label>
+    <rdfs:label xml:lang="fr">Variété de Maïs A (Hautes Terres Local)</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsakafody A</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2000-01-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-MZ-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">150</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">2.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;MaizeVarietyB">
+    <rdf:type rdf:resource="&agri;Maize"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Maize Variety B (Coastal Lowland)</rdfs:label>
+    <rdfs:label xml:lang="fr">Variété de Maïs B (Basses Terres Côtières)</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsakafody B</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2000-01-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-MZ-002</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">130</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">3.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;HybridMaize1">
+    <rdf:type rdf:resource="&agri;Maize"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdf:type rdf:resource="&gen;Hybrid"/>
+    <rdfs:label xml:lang="en">Hybrid Maize 1 (Makiry)</rdfs:label>
+    <rdfs:label xml:lang="fr">Maïs Hybride 1 (Makiry)</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsakafody Makiry</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2005-11-30</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-MZ-HYB-001</gen:hasPedigreeCode>
+    <gen:hasGenerationNumber rdf:datatype="&xsd;integer">1</gen:hasGenerationNumber>
+    <gen:isHybridOf rdf:resource="&agri;MaizeVarietyA"/>
+    <gen:isHybridOf rdf:resource="&agri;MaizeVarietyB"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">120</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">6.0</agri:hasYieldPerHectare>
+    <agri:hasYieldPotential rdf:datatype="&xsd;decimal">8.5</agri:hasYieldPotential>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;IRBY-Maize">
+    <rdf:type rdf:resource="&agri;Maize"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">IRBY Maize Improved Variety</rdfs:label>
+    <rdfs:label xml:lang="fr">Maïs Amélioré IRBY</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsakafody IRBY</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2015-03-10</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-MZ-IRBY-001</gen:hasPedigreeCode>
+    <gen:developedBy rdf:resource="&foaf;CIRAD"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">100</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">7.5</agri:hasYieldPerHectare>
+    <agri:hasYieldPotential rdf:datatype="&xsd;decimal">10.0</agri:hasYieldPotential>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- CASSAVA VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Tsiafahevitra-Cassava">
+    <rdf:type rdf:resource="&agri;Cassava"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Tsiafahevitra Cassava Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Manioc Traditionnel Tsiafahevitra</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahatsanga Tsiafahevitra</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2001-05-20</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-CAS-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">365</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">15.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Meva-Cassava">
+    <rdf:type rdf:resource="&agri;Cassava"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Meva Cassava Improved</rdfs:label>
+    <rdfs:label xml:lang="fr">Manioc Amélioré Meva</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahatsanga Meva</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2012-09-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-CAS-MEVA-001</gen:hasPedigreeCode>
+    <gen:developedBy rdf:resource="&foaf;FOFIFA"/>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">270</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">25.0</agri:hasYieldPerHectare>
+    <agri:hasYieldPotential rdf:datatype="&xsd;decimal">35.0</agri:hasYieldPotential>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Bojy-Cassava">
+    <rdf:type rdf:resource="&agri;Cassava"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Bojy Cassava Improved</rdfs:label>
+    <rdfs:label xml:lang="fr">Manioc Amélioré Bojy</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahatsanga Bojy</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2018-02-28</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-CAS-BOJY-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">250</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">28.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- VANILLA VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Bourbon-Vanilla">
+    <rdf:type rdf:resource="&agri;Vanilla"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Bourbon Vanilla</rdfs:label>
+    <rdfs:label xml:lang="fr">Vanille Bourbon</rdfs:label>
+    <rdfs:label xml:lang="mg">Voanio Boribory</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2000-01-01</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-VAN-BRB-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1095</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">0.8</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Maha-Vanilla">
+    <rdf:type rdf:resource="&agri;Vanilla"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Maha Vanilla Local</rdfs:label>
+    <rdfs:label xml:lang="fr">Vanille Locale Maha</rdfs:label>
+    <rdfs:label xml:lang="mg">Voanio Maha</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1990-06-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-VAN-MAHA-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1460</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">0.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- COFFEE VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Bourbon-Coffee">
+    <rdf:type rdf:resource="&agri;Coffee"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Bourbon Coffee</rdfs:label>
+    <rdfs:label xml:lang="fr">Café Bourbon</rdfs:label>
+    <rdfs:label xml:lang="mg">Kafe Boribory</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1985-03-20</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-COF-BRB-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1095</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">1.2</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;MundoNovo-Coffee">
+    <rdf:type rdf:resource="&agri;Coffee"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Mundo Novo Coffee</rdfs:label>
+    <rdfs:label xml:lang="fr">Café Mundo Novo</rdfs:label>
+    <rdfs:label xml:lang="mg">Kafe Mundo Novo</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2010-08-12</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-COF-MND-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">730</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">2.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Typica-Coffee">
+    <rdf:type rdf:resource="&agri;Coffee"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Typica Coffee Traditional</rdfs:label>
+    <rdfs:label xml:lang="fr">Café Typica Traditionnel</rdfs:label>
+    <rdfs:label xml:lang="mg">Kafe Typika</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1975-05-30</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-COF-TYP-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1095</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">0.8</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- LITCHI VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Mathiot-Litchi">
+    <rdf:type rdf:resource="&agri;Litchi"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Mathiot Litchi</rdfs:label>
+    <rdfs:label xml:lang="fr">Litchi Mathiot</rdfs:label>
+    <rdfs:label xml:lang="mg">Litsi Mathiot</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2005-11-01</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-LIT-MTH-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">365</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">8.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Local-Litchi">
+    <rdf:type rdf:resource="&agri;Litchi"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Local Litchi</rdfs:label>
+    <rdfs:label xml:lang="fr">Litchi Local</rdfs:label>
+    <rdfs:label xml:lang="mg">Litsi an-tanindrazana</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1990-01-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-LIT-LOC-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">400</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">5.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- LEGUME VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;WhiteBean-Landrace">
+    <rdf:type rdf:resource="&agri;Beans"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">White Bean Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Haricot Blanc Traditionnel</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsaramaso fotsy</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1995-04-10</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-BEA-WHT-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">75</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">1.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;RedBean-Landrace">
+    <rdf:type rdf:resource="&agri;Beans"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Red Bean Landrace</rdfs:label>
+    <rdfs:label xml:lang="fr">Haricot Rouge Traditionnel</rdfs:label>
+    <rdfs:label xml:lang="mg">Tsaramaso mena</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1995-04-10</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-BEA-RED-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">80</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">1.8</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;ICGV-91008-Peanut">
+    <rdf:type rdf:resource="&agri;Peanut"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">ICGV-91008 Peanut Improved</rdfs:label>
+    <rdfs:label xml:lang="fr">Arachide ICGV-91008</rdfs:label>
+    <rdfs:label xml:lang="mg">Mahazo-tsaramaso ICGV-91008</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2015-10-20</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-PEA-ICGV-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">120</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">2.5</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- SWEET POTATO VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;B了什么-Beans">
+    <rdf:type rdf:resource="&agri;SweetPotato"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Local Orange Sweet Potato</rdfs:label>
+    <rdfs:label xml:lang="fr">Patate Douce Orange Locale</rdfs:label>
+    <rdfs:label xml:lang="mg">Ovy mainty an-tanindrazana</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2000-07-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-SWP-LOC-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">150</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">12.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Africa-Orange">
+    <rdf:type rdf:resource="&agri;SweetPotato"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Africa Orange Sweet Potato</rdfs:label>
+    <rdfs:label xml:lang="fr">Patate Douce Orange Afrique</rdfs:label>
+    <rdfs:label xml:lang="mg">Ovy matahorano</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2010-03-01</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-SWP-AFR-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">120</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">18.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- CLOVE VARIETY INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Sambirano-Clove">
+    <rdf:type rdf:resource="&agri;Clove"/>
+    <rdf:type rdf:resource="&gen;Landrace"/>
+    <rdfs:label xml:lang="en">Sambirano Clove</rdfs:label>
+    <rdfs:label xml:lang="fr">Girofle de Sambirano</rdfs:label>
+    <rdfs:label xml:lang="mg">Jirofo Sambirano</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">1980-05-15</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-CLO-SAM-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1825</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">0.6</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;Antsiranana-Clove">
+    <rdf:type rdf:resource="&agri;Clove"/>
+    <rdf:type rdf:resource="&gen;ImprovedVariety"/>
+    <rdfs:label xml:lang="en">Antsiranana Clove Improved</rdfs:label>
+    <rdfs:label xml:lang="fr">Girofle d'Antsiranana Amélioré</rdfs:label>
+    <rdfs:label xml:lang="mg">Jirofo Antsiranana</rdfs:label>
+    <gen:hasRegistrationDate rdf:datatype="&xsd;date">2012-09-01</gen:hasRegistrationDate>
+    <gen:hasPedigreeCode>MG-CLO-ANT-001</gen:hasPedigreeCode>
+    <agri:hasMaturityDays rdf:datatype="&xsd;integer">1460</agri:hasMaturityDays>
+    <agri:hasYieldPerHectare rdf:datatype="&xsd;decimal">1.0</agri:hasYieldPerHectare>
+</rdf:Description>
+
+<!-- ============================================================ -->
+<!-- LAND INDIVIDUALS -->
+<!-- ============================================================ -->
+
+<rdf:Description rdf:about="&agri;Tanety-Highlands">
+    <rdf:type rdf:resource="&agri;Land"/>
+    <rdfs:label xml:lang="en">Highlands Upland Field</rdfs:label>
+    <rdfs:label xml:lang="fr">Champ de Plateau des Hautes Terres</rdfs:label>
+    <rdfs:label xml:lang="mg">Tany ampany an-tanety</rdfs:label>
+    <agri:hasSoilType rdf:resource="&agri;HighlandsRedSoil"/>
+    <agri:hasAltitude rdf:datatype="&xsd;integer">1200</agri:hasAltitude>
+    <agri:hasAreaHectares rdf:datatype="&xsd;decimal">2.5</agri:hasAreaHectares>
+    <agri:hasLatitude rdf:datatype="&xsd;decimal">-18.9167</agri:hasLatitude>
+    <agri:hasLongitude rdf:datatype="&xsd;decimal">47.5167</agri:hasLongitude>
+    <agri:hasWaterSource rdf:resource="&agri;Rainfed"/>
+</rdf:Description>
+
+<rdf:Date rdf:about="&agri;Rainfed">
+    <rdfs:label xml:lang="en">Rainfed Water Source</rdfs:label>
+    <rdfs:label xml:lang="fr">Source d'Eau Pluviale</rdfs:label>
+</rdf:Date>
+
+<rdf:Description rdf:about="&agri;Baiboho-Valley">
+    <rdf:type rdf:resource="&agri;Land"/>
+    <rdfs:label xml:lang="en">Baiboho Valley Rice Field</rdfs:label>
+    <rdfs:label xml:lang="fr">Rizière de Vallée Baiboho</rdfs:label>
+    <rdfs:label xml:lang="mg">Tanorano baiboho</rdfs:label>
+    <agri:hasSoilType rdf:resource="&agri;ItasyLoamySoil"/>
+    <agri:hasAltitude rdf:datatype="&xsd;integer">950</agri:hasAltitude>
+    <agri:hasAreaHectares rdf:datatype="&xsd;decimal">1.8</agri:hasAreaHectares>
+    <agri:hasLatitude rdf:datatype="&xsd;decimal">-18.7500</agri:hasLatitude>
+    <agri:hasLongitude rdf:datatype="&xsd;decimal">46.9833</agri:hasLongitude>
+    <agri:hasWaterSource rdf:resource="&agri;IrrigationChannel"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;IrrigationChannel">
+    <rdf:type rdf:resource="&agri;Water"/>
+    <rdfs:label xml:lang="en">Irrigation Channel</rdfs:label>
+    <rdfs:label xml:lang="fr">Canal d'Irrigation</rdfs:label>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;LacAlaotra-RiceField">
+    <rdf:type rdf:resource="&agri;Land"/>
+    <rdfs:label xml:lang="en">Lake Alaotra Rice Field</rdfs:label>
+    <rdfs:label xml:lang="fr">Rizière du Lac Alaotra</rdfs:label>
+    <rdfs:label xml:lang="mg">Tanorano Alaotra</rdfs:label>
+    <agri:hasSoilType rdf:resource="&agri;AlaotraPeatSoil"/>
+    <agri:hasAltitude rdf:datatype="&xsd;integer">750</agri:hasAltitude>
+    <agri:hasAreaHectares rdf:datatype="&xsd;decimal">15000</agri:hasAreaHectares>
+    <agri:hasLatitude rdf:datatype="&xsd;decimal">-17.5000</agri:hasLatitude>
+    <agri:hasLongitude rdf:datatype="&xsd;decimal">48.5000</agri:hasLongitude>
+    <agri:hasWaterSource rdf:resource="&agri;LakeWater"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="&agri;LakeWater">
+    <rdf:type rdf:resource="&agri;Water"/>
+    <rdfs:label xml:lang="en">Lake Water</rdfs:label>
+    <rdfs:label xml:lang="fr">Eau du Lac</rdfs:label>
+</rdf:Description>
+
+</rdf:RDF>

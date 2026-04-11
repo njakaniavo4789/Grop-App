@@ -1,0 +1,11 @@
+{
+  "id": "kb_riz_rendements_regions",
+  "title": "Rendements moyens du riz par région à Madagascar",
+  "source": "knowledge_base",
+  "author": "MAEP / FAO 2022 — compilé par équipe CropGPT",
+  "validated": true,
+  "language": "fr",
+  "topics": ["yield_prediction", "climate"],
+  "regions": ["all"],
+  "content": "Rendements moyens du riz par région à Madagascar (données MAEP/FAO 2022).\n\nHautes Terres Centrales :\n- Analamanga : irrigué 3.5-4.5 t/ha, pluvial 1.8-2.5 t/ha. Superficie rizicole : 180 000 ha. Principale région productrice.\n- Vakinankaratra : irrigué 3.2-4.2 t/ha, pluvial 1.5-2.2 t/ha. Superficie : 95 000 ha. Antsirabe centre névralgique.\n- Itasy : irrigué 2.8-3.8 t/ha, pluvial 1.5-2.0 t/ha. Superficie : 45 000 ha.\n- Amoron'i Mania : irrigué 2.5-3.5 t/ha. Superficie : 55 000 ha.\n\nLac Alaotra (grenier à riz de Madagascar) :\n- Alaotra-Mangoro : irrigué 3.8-5.0 t/ha, pluvial 2.0-3.0 t/ha. Superficie : 120 000 ha. Production mécanisée importante. Variété Makalioka cultivée ici.\n\nCôte Ouest (riziculture irriguée) :\n- Boeny (Mahajanga) : irrigué 3.0-4.0 t/ha. Superficie : 80 000 ha. 2 cycles par an possibles.\n- Sofia : irrigué 2.5-3.5 t/ha. Superficie : 95 000 ha.\n- Menabe : irrigué 2.2-3.2 t/ha. Superficie : 35 000 ha.\n- Betsiboka : irrigué 2.0-3.0 t/ha.\n\nCôte Est (riziculture pluviale) :\n- Atsinanana : pluvial 1.5-2.5 t/ha. Forte pluviométrie (2500-3500mm/an). Risque cyclones élevé.\n- Analanjirofo : pluvial 1.5-2.2 t/ha. Région vanille + riz.\n- SAVA : pluvial 1.8-2.5 t/ha.\n\nSud (riziculture difficile) :\n- Atsimo-Andrefana : pluvial 0.8-1.5 t/ha. Zone semi-aride. Forte variabilité selon pluies.\n- Androy : pluvial 0.5-1.2 t/ha. Zone à déficit alimentaire chronique.\n- Anosy : pluvial 1.0-1.8 t/ha.\n\nMoyenne nationale : 2.5 t/ha (toutes zones confondues).\nObjectif MAEP 2030 : atteindre 4.0 t/ha de moyenne nationale.\nPotentiel avec SRI généralisé : 5.0-6.0 t/ha estimé."
+}

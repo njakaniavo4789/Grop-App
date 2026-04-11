@@ -1,0 +1,29 @@
+You are an ontology engineer. Begin constructing a modular OWL ontology for agriculture with genealogical integration. 
+
+Tasks:
+1. Create top-level classes for Madagascar agriculture:
+   - Crops,  Practices, Resources, Outputs.
+2. Add subclasses and properties:
+   - Crops → Cereals, Legumes, Fruits, Vegetables.
+   - Practices → Irrigation, Fertilization, PestManagement.
+   - Resources → Land, Soil type, Water, Climate, Tools.
+   - Outputs → FoodProduct, Fiber, Biofuel.
+3. Define genealogical relations:
+   - Object properties: hasParent, hasOffspring, isHybridOf, descendsFrom.
+   - Apply to plants (cultivar lineages).
+4. Align with external vocabularies:
+   - Reuse AGROVOC for agricultural terms.
+   - Reuse FOAF or CIDOC CRM for genealogical/historical relations.
+5. Keep modular namespaces:
+   - agri: for agriculture
+   - gen: for genealogy
+   - Define bridge axioms (e.g., agri:Crop ⊆ gen:Organism).
+6. Generate bilingual labels (English/French) for all top-level classes and properties.
+7. Output OWL/RDF code snippets for each module, including at least one example of a crop lineage and one livestock pedigree.
+8. Provide a visualization-ready concept hierarchy (in Turtle or RDF/XML) that can be imported into Protégé.
+9. Link them to other reliable web ontologies to extend them and use them for our needs
+
+Deliverables:
+- OWL ontology fragments for each domain.
+- Example individuals showing genealogical links (e.g., HybridMaize1 with parents MaizeVarietyA and MaizeVarietyB).
+- Clear namespace declarations and bilingual labels.

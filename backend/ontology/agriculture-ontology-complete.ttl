@@ -1,0 +1,732 @@
+# ============================================================
+# COMPLETE AGRICULTURE AND GENEALOGY ONTOLOGY
+# Visualization-Ready for Protégé Import
+# All modules combined in Turtle/RDF format
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+@prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
+
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+
+# ============================================================
+# ONTOLOGY DECLARATION
+# ============================================================
+
+<http://example.org/ontology/madagascar-agriculture-genealogy> 
+    a owl:Ontology ;
+    rdfs:label "Madagascar Agriculture and Genealogy Ontology"@en ;
+    rdfs:label "Ontologie de l'Agriculture et de la Généalogie de Madagascar"@fr ;
+    dcterms:title "Madagascar Agriculture and Genealogy Ontology"@en ;
+    dcterms:title "Ontologie de l'Agriculture et de la Généalogie de Madagascar"@fr ;
+    dcterms:creator "Ontology Engineering Team - FOFIFA & Partner Institutions"@en ;
+    dcterms:created "2026-04-10"^^xsd:date ;
+    dcterms:modified "2026-04-10"^^xsd:date ;
+    dcterms:description """A modular OWL ontology integrating agricultural concepts 
+with genealogical relations for tracking crop varieties and livestock pedigrees 
+specifically designed for Madagascar agriculture."""@en ;
+    dcterms:description """Une ontologie OWL modulaire intégrant les concepts agricoles 
+avec les relations généalogiques pour le suivi des variétés de cultures et des pedigrees 
+du bétail, spécifiquement conçue pour l'agriculture malgache."""@fr ;
+    owl:versionInfo "1.0.0" ;
+    rdfs:seeAlso <https://github.com/example/madagascar-agri-ontology> ;
+    rdfs:seeAlso <http://aims.fao.org/aos/agrovoc/> ;
+    .
+
+# ============================================================
+# CLASS HIERARCHY - Complete Overview
+# ============================================================
+
+# ----- Top Level -----
+owl:Thing a owl:Class .
+
+agri:AgriculturalEntity a owl:Class ;
+    rdfs:label "Agricultural Entity"@en ;
+    rdfs:label "Entité Agricole"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+# ----- Crops (Level 1) -----
+agri:Crop a owl:Class ;
+    rdfs:label "Crop"@en ;
+    rdfs:label "Culture"@fr ;
+    rdfs:label "Famboly"@mg ;
+    skos:definition "Cultivated plants grown for agricultural production"@en ;
+    skos:definition "Plantes cultivées destinées à la production agricole"@fr ;
+    rdfs:subClassOf agri:AgriculturalEntity ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+    # Level 2: Crop Categories
+    agri:Cereal a owl:Class ;
+        rdfs:label "Cereal"@en ;
+        rdfs:label "Céréale"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        owl:equivalentClass agrovoc:c_9214 ;
+        .
+        
+        agri:Rice a owl:Class ;
+            rdfs:label "Rice"@en ;
+            rdfs:label "Riz"@fr ;
+            rdfs:label "Vary"@mg ;
+            rdfs:subClassOf agri:Cereal ;
+            owl:equivalentClass agrovoc:c_6666 ;
+            .
+            
+        agri:Maize a owl:Class ;
+            rdfs:label "Maize"@en ;
+            rdfs:label "Maïs"@fr ;
+            rdfs:label "Tsakafody"@mg ;
+            rdfs:subClassOf agri:Cereal ;
+            owl:equivalentClass agrovoc:c_331409 ;
+            .
+
+    agri:Legume a owl:Class ;
+        rdfs:label "Legume"@en ;
+        rdfs:label "Légumineuse"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        owl:equivalentClass agrovoc:c_4254 ;
+        .
+        
+        agri:Bean a owl:Class ;
+            rdfs:label "Bean"@en ;
+            rdfs:label "Haricot"@fr ;
+            rdfs:subClassOf agri:Legume ;
+            .
+            
+        agri:Groundnut a owl:Class ;
+            rdfs:label "Groundnut"@en ;
+            rdfs:label "Arachide"@fr ;
+            rdfs:subClassOf agri:Legume ;
+            .
+
+    agri:Fruit a owl:Class ;
+        rdfs:label "Fruit"@en ;
+        rdfs:label "Fruit"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        owl:equivalentClass agrovoc:c_3031 ;
+        .
+        
+        agri:Clove a owl:Class ;
+            rdfs:label "Clove"@en ;
+            rdfs:label "Girofle"@fr ;
+            rdfs:label "Jirofo"@mg ;
+            rdfs:subClassOf agri:Fruit ;
+            rdfs:subClassOf agri:CashCrop ;
+            .
+
+    agri:Vegetable a owl:Class ;
+        rdfs:label "Vegetable"@en ;
+        rdfs:label "Légume"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        owl:equivalentClass agrovoc:c_8376 ;
+        .
+
+    agri:RootCrop a owl:Class ;
+        rdfs:label "Root Crop"@en ;
+        rdfs:label "Culture Racine"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        .
+        
+        agri:Cassava a owl:Class ;
+            rdfs:label "Cassava"@en ;
+            rdfs:label "Manioc"@fr ;
+            rdfs:label "Mahatsanga"@mg ;
+            rdfs:subClassOf agri:RootCrop ;
+            .
+            
+        agri:SweetPotato a owl:Class ;
+            rdfs:label "Sweet Potato"@en ;
+            rdfs:label "Patate Douce"@fr ;
+            rdfs:subClassOf agri:RootCrop ;
+            .
+
+    agri:CashCrop a owl:Class ;
+        rdfs:label "Cash Crop"@en ;
+        rdfs:label "Culture Commerciale"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        .
+        
+        agri:Vanilla a owl:Class ;
+            rdfs:label "Vanilla"@en ;
+            rdfs:label "Vanille"@fr ;
+            rdfs:label "Voanio"@mg ;
+            rdfs:subClassOf agri:CashCrop ;
+            .
+            
+        agri:Coffee a owl:Class ;
+            rdfs:label "Coffee"@en ;
+            rdfs:label "Café"@fr ;
+            rdfs:subClassOf agri:CashCrop ;
+            .
+
+    agri:CropVariety a owl:Class ;
+        rdfs:label "Crop Variety"@en ;
+        rdfs:label "Variété de Culture"@fr ;
+        rdfs:subClassOf agri:Crop ;
+        rdfs:subClassOf gen:Cultivar ;
+        .
+
+# ----- Practices (Level 1) -----
+agri:AgriculturalPractice a owl:Class ;
+    rdfs:label "Agricultural Practice"@en ;
+    rdfs:label "Pratique Agricole"@fr ;
+    rdfs:label "Fampiharana Fambolena"@mg ;
+    rdfs:subClassOf agri:AgriculturalEntity ;
+    rdfs:subClassOf crm:E7_Activity ;
+    .
+
+    agri:Irrigation a owl:Class ;
+        rdfs:label "Irrigation"@en ;
+        rdfs:label "Irrigation"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+        
+        agri:RicePaddyIrrigation a owl:Class ;
+            rdfs:label "Rice Paddy Irrigation"@en ;
+            rdfs:label "Irrigation de Rizière"@fr ;
+            rdfs:subClassOf agri:Irrigation ;
+            .
+
+    agri:Fertilization a owl:Class ;
+        rdfs:label "Fertilization"@en ;
+        rdfs:label "Fertilisation"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+        
+        agri:OrganicFertilization a owl:Class ;
+            rdfs:label "Organic Fertilization"@en ;
+            rdfs:label "Fertilisation Organique"@fr ;
+            rdfs:subClassOf agri:Fertilization ;
+            .
+            
+        agri:Composting a owl:Class ;
+            rdfs:label "Composting"@en ;
+            rdfs:label "Compostage"@fr ;
+            rdfs:subClassOf agri:OrganicFertilization ;
+            .
+
+    agri:PestManagement a owl:Class ;
+        rdfs:label "Pest Management"@en ;
+        rdfs:label "Lutte Antiparasitaire"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+        
+        agri:IntegratedPestManagement a owl:Class ;
+            rdfs:label "Integrated Pest Management"@en ;
+            rdfs:label "Lutte Intégrée"@fr ;
+            rdfs:subClassOf agri:PestManagement ;
+            .
+
+    agri:Planting a owl:Class ;
+        rdfs:label "Planting"@en ;
+        rdfs:label "Plantation"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+
+    agri:Harvesting a owl:Class ;
+        rdfs:label "Harvesting"@en ;
+        rdfs:label "Récolte"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+
+    agri:LandPreparation a owl:Class ;
+        rdfs:label "Land Preparation"@en ;
+        rdfs:label "Préparation du Terrain"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+
+    agri:CropRotation a owl:Class ;
+        rdfs:label "Crop Rotation"@en ;
+        rdfs:label "Rotation des Cultures"@fr ;
+        rdfs:subClassOf agri:AgriculturalPractice ;
+        .
+
+# ----- Resources (Level 1) -----
+agri:Resource a owl:Class ;
+    rdfs:label "Agricultural Resource"@en ;
+    rdfs:label "Ressource Agricole"@fr ;
+    rdfs:label "Harena Fambolena"@mg ;
+    rdfs:subClassOf agri:AgriculturalEntity ;
+    .
+
+    agri:Land a owl:Class ;
+        rdfs:label "Agricultural Land"@en ;
+        rdfs:label "Terre Agricole"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+        
+        agri:PaddyField a owl:Class ;
+            rdfs:label "Paddy Field"@en ;
+            rdfs:label "Rizière"@fr ;
+            rdfs:subClassOf agri:Land ;
+            .
+
+    agri:SoilType a owl:Class ;
+        rdfs:label "Soil Type"@en ;
+        rdfs:label "Type de Sol"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+        
+        agri:Ferralsol a owl:Class ;
+            rdfs:label "Ferralsol"@en ;
+            rdfs:label "Ferralsol"@fr ;
+            rdfs:subClassOf agri:SoilType ;
+            .
+            
+        agri:Andosol a owl:Class ;
+            rdfs:label "Andosol"@en ;
+            rdfs:label "Andosol"@fr ;
+            rdfs:subClassOf agri:SoilType ;
+            .
+
+    agri:Water a owl:Class ;
+        rdfs:label "Water Resource"@en ;
+        rdfs:label "Ressource en Eau"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+        
+        agri:River a owl:Class ;
+            rdfs:label "River"@en ;
+            rdfs:label "Rivière"@fr ;
+            rdfs:subClassOf agri:Water ;
+            .
+            
+        agri:Well a owl:Class ;
+            rdfs:label "Well"@en ;
+            rdfs:label "Puits"@fr ;
+            rdfs:subClassOf agri:Water ;
+            .
+
+    agri:Climate a owl:Class ;
+        rdfs:label "Climate"@en ;
+        rdfs:label "Climat"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+        
+        agri:TropicalClimate a owl:Class ;
+            rdfs:label "Tropical Climate"@en ;
+            rdfs:label "Climat Tropical"@fr ;
+            rdfs:subClassOf agri:Climate ;
+            .
+            
+        agri:HighlandClimate a owl:Class ;
+            rdfs:label "Highland Climate"@en ;
+            rdfs:label "Climat de Haute Altitude"@fr ;
+            rdfs:subClassOf agri:Climate ;
+            .
+
+    agri:Tool a owl:Class ;
+        rdfs:label "Agricultural Tool"@en ;
+        rdfs:label "Outil Agricole"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+        
+        agri:Hoe a owl:Class ;
+            rdfs:label "Hoe"@en ;
+            rdfs:label "Houe"@fr ;
+            rdfs:subClassOf agri:Tool ;
+            .
+            
+        agri:Plow a owl:Class ;
+            rdfs:label "Plow"@en ;
+            rdfs:label "Charrue"@fr ;
+            rdfs:subClassOf agri:Tool ;
+            .
+
+    agri:Seed a owl:Class ;
+        rdfs:label "Seed"@en ;
+        rdfs:label "Semence"@fr ;
+        rdfs:subClassOf agri:Resource ;
+        .
+
+# ----- Outputs (Level 1) -----
+agri:AgriculturalOutput a owl:Class ;
+    rdfs:label "Agricultural Output"@en ;
+    rdfs:label "Production Agricole"@fr ;
+    rdfs:label "Vokatra Fambolena"@mg ;
+    rdfs:subClassOf agri:AgriculturalEntity ;
+    .
+
+    agri:FoodProduct a owl:Class ;
+        rdfs:label "Food Product"@en ;
+        rdfs:label "Produit Alimentaire"@fr ;
+        rdfs:subClassOf agri:AgriculturalOutput ;
+        .
+        
+        agri:RiceGrain a owl:Class ;
+            rdfs:label "Rice Grain"@en ;
+            rdfs:label "Grain de Riz"@fr ;
+            rdfs:subClassOf agri:FoodProduct ;
+            .
+            
+        agri:CassavaFlour a owl:Class ;
+            rdfs:label "Cassava Flour"@en ;
+            rdfs:label "Farine de Manioc"@fr ;
+            rdfs:subClassOf agri:FoodProduct ;
+            .
+            
+        agri:VanillaPod a owl:Class ;
+            rdfs:label "Vanilla Pod"@en ;
+            rdfs:label "Gousse de Vanille"@fr ;
+            rdfs:subClassOf agri:FoodProduct ;
+            .
+            
+        agri:Cloves a owl:Class ;
+            rdfs:label "Cloves"@en ;
+            rdfs:label "Girofle"@fr ;
+            rdfs:subClassOf agri:FoodProduct ;
+            .
+            
+        agri:CoffeeBean a owl:Class ;
+            rdfs:label "Coffee Bean"@en ;
+            rdfs:label "Grain de Café"@fr ;
+            rdfs:subClassOf agri:FoodProduct ;
+            .
+
+    agri:Fiber a owl:Class ;
+        rdfs:label "Fiber"@en ;
+        rdfs:label "Fibre"@fr ;
+        rdfs:subClassOf agri:AgriculturalOutput ;
+        .
+        
+        agri:Cotton a owl:Class ;
+            rdfs:label "Cotton"@en ;
+            rdfs:label "Coton"@fr ;
+            rdfs:subClassOf agri:Fiber ;
+            .
+            
+        agri:Raffia a owl:Class ;
+            rdfs:label "Raffia"@en ;
+            rdfs:label "Raphia"@fr ;
+            rdfs:subClassOf agri:Fiber ;
+            .
+
+    agri:Biofuel a owl:Class ;
+        rdfs:label "Biofuel"@en ;
+        rdfs:label "Biocarburant"@fr ;
+        rdfs:subClassOf agri:AgriculturalOutput ;
+        .
+
+    agri:AnimalProduct a owl:Class ;
+        rdfs:label "Animal Product"@en ;
+        rdfs:label "Produit Animal"@fr ;
+        rdfs:subClassOf agri:AgriculturalOutput ;
+        .
+        
+        agri:Meat a owl:Class ;
+            rdfs:label "Meat"@en ;
+            rdfs:label "Viande"@fr ;
+            rdfs:subClassOf agri:AnimalProduct ;
+            .
+            
+        agri:Milk a owl:Class ;
+            rdfs:label "Milk"@en ;
+            rdfs:label "Lait"@fr ;
+            rdfs:subClassOf agri:AnimalProduct ;
+            .
+            
+        agri:Leather a owl:Class ;
+            rdfs:label "Leather"@en ;
+            rdfs:label "Cuir"@fr ;
+            rdfs:subClassOf agri:AnimalProduct ;
+            .
+
+# ----- Livestock -----
+agri:Livestock a owl:Class ;
+    rdfs:label "Livestock"@en ;
+    rdfs:label "Bétail"@fr ;
+    rdfs:label "Omby"@mg ;
+    rdfs:subClassOf agri:AgriculturalEntity ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+    agri:Cattle a owl:Class ;
+        rdfs:label "Cattle"@en ;
+        rdfs:label "Bovins"@fr ;
+        rdfs:subClassOf agri:Livestock ;
+        .
+        
+        agri:Zebu a owl:Class ;
+            rdfs:label "Zebu"@en ;
+            rdfs:label "Zébu"@fr ;
+            rdfs:subClassOf agri:Cattle ;
+            .
+            
+            agri:Bull a owl:Class ;
+                rdfs:label "Bull"@en ;
+                rdfs:label "Taureau"@fr ;
+                rdfs:subClassOf agri:Zebu ;
+                .
+                
+            agri:Cow a owl:Class ;
+                rdfs:label "Cow"@en ;
+                rdfs:label "Vache"@fr ;
+                rdfs:subClassOf agri:Zebu ;
+                .
+                
+        agri:CrossbredCattle a owl:Class ;
+            rdfs:label "Crossbred Cattle"@en ;
+            rdfs:label "Bovins Croisés"@fr ;
+            rdfs:subClassOf agri:Cattle ;
+            rdfs:subClassOf gen:Hybrid ;
+            .
+
+    agri:SmallRuminant a owl:Class ;
+        rdfs:label "Small Ruminant"@en ;
+        rdfs:label "Petit Ruminant"@fr ;
+        rdfs:subClassOf agri:Livestock ;
+        .
+        
+        agri:Sheep a owl:Class ;
+            rdfs:label "Sheep"@en ;
+            rdfs:label "Mouton"@fr ;
+            rdfs:subClassOf agri:SmallRuminant ;
+            .
+            
+        agri:Goat a owl:Class ;
+            rdfs:label "Goat"@en ;
+            rdfs:label "Chèvre"@fr ;
+            rdfs:subClassOf agri:SmallRuminant ;
+            .
+
+    agri:Poultry a owl:Class ;
+        rdfs:label "Poultry"@en ;
+        rdfs:label "Volaille"@fr ;
+        rdfs:subClassOf agri:Livestock ;
+        .
+        
+        agri:Chicken a owl:Class ;
+            rdfs:label "Chicken"@en ;
+            rdfs:label "Poulet"@fr ;
+            rdfs:subClassOf agri:Poultry ;
+            .
+
+    agri:Pig a owl:Class ;
+        rdfs:label "Pig"@en ;
+        rdfs:label "Porc"@fr ;
+        rdfs:subClassOf agri:Livestock ;
+        .
+
+# ============================================================
+# GENEALOGICAL CLASSES
+# ============================================================
+
+gen:Organism a owl:Class ;
+    rdfs:label "Organism"@en ;
+    rdfs:label "Organisme"@fr ;
+    skos:definition "A living biological entity"@en ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+gen:Cultivar a owl:Class ;
+    rdfs:label "Cultivar"@en ;
+    rdfs:label "Cultivar"@fr ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+gen:Breed a owl:Class ;
+    rdfs:label "Breed"@en ;
+    rdfs:label "Race"@fr ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+gen:Hybrid a owl:Class ;
+    rdfs:label "Hybrid"@en ;
+    rdfs:label "Hybride"@fr ;
+    skos:definition "Offspring of genetically different parents"@en ;
+    rdfs:subClassOf gen:Organism ;
+    ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty gen:hasParent ;
+        owl:minQualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+        owl:onClass gen:Organism ;
+    ] ;
+    .
+
+# ============================================================
+# OBJECT PROPERTIES
+# ============================================================
+
+# ----- Genealogical Properties -----
+gen:hasParent a owl:ObjectProperty ;
+    rdfs:label "has parent"@en ;
+    rdfs:label "a un parent"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:inverseOf gen:hasOffspring ;
+    .
+
+gen:hasOffspring a owl:ObjectProperty ;
+    rdfs:label "has offspring"@en ;
+    rdfs:label "a une progéniture"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    .
+
+gen:hasFather a owl:ObjectProperty ;
+    rdfs:label "has father"@en ;
+    rdfs:label "a un père"@fr ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+gen:hasMother a owl:ObjectProperty ;
+    rdfs:label "has mother"@en ;
+    rdfs:label "a une mère"@fr ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+gen:isHybridOf a owl:ObjectProperty ;
+    rdfs:label "is hybrid of"@en ;
+    rdfs:label "est hybride de"@fr ;
+    rdfs:domain gen:Hybrid ;
+    rdfs:range gen:Organism ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+gen:descendsFrom a owl:ObjectProperty ;
+    rdfs:label "descends from"@en ;
+    rdfs:label "descend de"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:inverseOf gen:ancestorOf ;
+    .
+
+gen:ancestorOf a owl:ObjectProperty ;
+    rdfs:label "is ancestor of"@en ;
+    rdfs:label "est l'ancêtre de"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    .
+
+gen:bredBy a owl:ObjectProperty ;
+    rdfs:label "bred by"@en ;
+    rdfs:label "élevé par"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range foaf:Agent ;
+    .
+
+# ----- Agricultural Properties -----
+agri:practicedOn a owl:ObjectProperty ;
+    rdfs:label "practiced on"@en ;
+    rdfs:label "pratiqué sur"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:Crop ;
+    .
+
+agri:usesResource a owl:ObjectProperty ;
+    rdfs:label "uses resource"@en ;
+    rdfs:label "utilise la ressource"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:Resource ;
+    .
+
+agri:performedBy a owl:ObjectProperty ;
+    rdfs:label "performed by"@en ;
+    rdfs:label "réalisé par"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range foaf:Agent ;
+    .
+
+agri:producesOutput a owl:ObjectProperty ;
+    rdfs:label "produces output"@en ;
+    rdfs:label "produit une sortie"@fr ;
+    rdfs:domain agri:AgriculturalPractice ;
+    rdfs:range agri:AgriculturalOutput ;
+    .
+
+agri:derivedFromCrop a owl:ObjectProperty ;
+    rdfs:label "derived from crop"@en ;
+    rdfs:label "dérivé de la culture"@fr ;
+    rdfs:domain agri:AgriculturalOutput ;
+    rdfs:range agri:Crop ;
+    rdfs:subPropertyOf gen:descendsFrom ;
+    .
+
+agri:hasBreed a owl:ObjectProperty ;
+    rdfs:label "has breed"@en ;
+    rdfs:label "a une race"@fr ;
+    rdfs:domain agri:Livestock ;
+    rdfs:range gen:Breed ;
+    .
+
+agri:hasSoilType a owl:ObjectProperty ;
+    rdfs:label "has soil type"@en ;
+    rdfs:label "a un type de sol"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range agri:SoilType ;
+    .
+
+agri:hasWaterSource a owl:ObjectProperty ;
+    rdfs:label "has water source"@en ;
+    rdfs:label "a une source d'eau"@fr ;
+    rdfs:domain agri:Land ;
+    rdfs:range agri:Water ;
+    .
+
+# ----- Data Properties -----
+gen:hasGenerationNumber a owl:DatatypeProperty ;
+    rdfs:label "has generation number"@en ;
+    rdfs:label "a un numéro de génération"@fr ;
+    rdfs:range xsd:integer ;
+    .
+
+gen:hasRegistrationDate a owl:DatatypeProperty ;
+    rdfs:label "has registration date"@en ;
+    rdfs:label "a une date d'enregistrement"@fr ;
+    rdfs:range xsd:date ;
+    .
+
+gen:hasPedigreeCode a owl:DatatypeProperty ;
+    rdfs:label "has pedigree code"@en ;
+    rdfs:label "a un code de pedigree"@fr ;
+    rdfs:range xsd:string ;
+    .
+
+agri:hasYieldPotential a owl:DatatypeProperty ;
+    rdfs:label "has yield potential"@en ;
+    rdfs:label "a un potentiel de rendement"@fr ;
+    rdfs:range xsd:decimal ;
+    .
+
+agri:hasQuantity a owl:DatatypeProperty ;
+    rdfs:label "has quantity"@en ;
+    rdfs:label "a une quantité"@fr ;
+    rdfs:range xsd:decimal ;
+    .
+
+agri:hasUnit a owl:DatatypeProperty ;
+    rdfs:label "has unit"@en ;
+    rdfs:label "a une unité"@fr ;
+    rdfs:range xsd:string ;
+    .
+
+agri:hasPracticeDate a owl:DatatypeProperty ;
+    rdfs:label "has practice date"@en ;
+    rdfs:label "a une date de pratique"@fr ;
+    rdfs:range xsd:date ;
+    .
+
+agri:hasBirthDate a owl:DatatypeProperty ;
+    rdfs:label "has birth date"@en ;
+    rdfs:label "a une date de naissance"@fr ;
+    rdfs:range xsd:date ;
+    .
+
+agri:hasWeight a owl:DatatypeProperty ;
+    rdfs:label "has weight"@en ;
+    rdfs:label "a un poids"@fr ;
+    rdfs:range xsd:decimal ;
+    .
+

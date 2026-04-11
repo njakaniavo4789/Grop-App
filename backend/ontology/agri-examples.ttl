@@ -1,0 +1,309 @@
+# ============================================================
+# EXAMPLE INDIVIDUALS - agri-examples.ttl
+# Demonstrating genealogical links with real examples
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix agri:  <http://example.org/agri/> .
+@prefix gen:   <http://example.org/gen/> .
+
+# ============================================================
+# CROP LINEAGE EXAMPLES - Rice Varieties
+# ============================================================
+
+# ---------- Foundation Rice Varieties ----------
+
+# Makalioka - Traditional highland variety
+agri:Makalioka-Variety a agri:Rice ;
+    a agri:CropVariety ;
+    a gen:Cultivar ;
+    rdfs:label "Makalioka Rice Variety"@en ;
+    rdfs:label "Variété de Riz Makalioka"@fr ;
+    skos:definition "Traditional highland rice variety from Madagascar"@en ;
+    gen:hasRegistrationDate "1995-03-15"^^xsd:date ;
+    gen:hasPedigreeCode "MG-RIC-001" ;
+    gen:developedIn <http://sws.geonames.org/1062894/> ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    .
+
+# Tsipory - Traditional lowland variety
+agri:Tsipory-Variety a agri:Rice ;
+    a agri:CropVariety ;
+    a gen:Cultivar ;
+    rdfs:label "Tsipory Rice Variety"@en ;
+    rdfs:label "Variété de Riz Tsipory"@fr ;
+    skos:definition "Traditional lowland rice variety from Madagascar"@en ;
+    gen:hasRegistrationDate "1998-07-22"^^xsd:date ;
+    gen:hasPedigreeCode "MG-RIC-002" ;
+    gen:developedIn <http://sws.geonames.org/1062894/> ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    .
+
+# ---------- First Generation Hybrid ----------
+
+# Bemasoha-Rice - First generation hybrid
+agri:Bemasoha-Rice a agri:Rice ;
+    a agri:CropVariety ;
+    a gen:Hybrid ;
+    rdfs:label "Bemasoha Rice Hybrid"@en ;
+    rdfs:label "Riz Hybride Bemasoha"@fr ;
+    skos:definition "First generation hybrid rice variety"@en ;
+    gen:hasRegistrationDate "2010-05-10"^^xsd:date ;
+    gen:hasPedigreeCode "MG-RIC-HYB-001" ;
+    gen:isHybridOf agri:Makalioka-Variety ;
+    gen:isHybridOf agri:Tsipory-Variety ;
+    gen:developedIn <http://sws.geonames.org/1062894/> ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    gen:hasGenerationNumber 1 ;
+    .
+
+# ---------- Second Generation Hybrid ----------
+
+# Fiaramanitra-Rice - Second generation hybrid
+agri:Fiaramanitra-Rice a agri:Rice ;
+    a agri:CropVariety ;
+    a gen:Hybrid ;
+    rdfs:label "Fiaramanitra Rice Hybrid"@en ;
+    rdfs:label "Riz Hybride Fiaramanitra"@fr ;
+    skos:definition "Second generation hybrid rice variety with improved yield"@en ;
+    gen:hasRegistrationDate "2018-03-20"^^xsd:date ;
+    gen:hasPedigreeCode "MG-RIC-HYB-002" ;
+    gen:isHybridOf agri:Bemasoha-Rice ;
+    gen:isHybridOf agri:Tsipory-Variety ;
+    gen:developedIn <http://sws.geonames.org/1062894/> ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    gen:hasGenerationNumber 2 ;
+    .
+
+# ============================================================
+# MAIZE HYBRID EXAMPLES
+# ============================================================
+
+# ---------- Parent Maize Varieties ----------
+
+agri:MaizeVarietyA a agri:Maize ;
+    a agri:CropVariety ;
+    a gen:Cultivar ;
+    rdfs:label "Maize Variety A (Local Highland)"@en ;
+    rdfs:label "Variété de Maïs A (Hautes Terres Local)"@fr ;
+    skos:definition "Local highland maize cultivar"@en ;
+    gen:hasRegistrationDate "2000-01-15"^^xsd:date ;
+    gen:hasPedigreeCode "MG-MZ-001" ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    .
+
+agri:MaizeVarietyB a agri:Maize ;
+    a agri:CropVariety ;
+    a gen:Cultivar ;
+    rdfs:label "Maize Variety B (Coastal Lowland)"@en ;
+    rdfs:label "Variété de Maïs B (Basses Terres Côtières)"@fr ;
+    skos:definition "Coastal lowland maize cultivar"@en ;
+    gen:hasRegistrationDate "2000-01-15"^^xsd:date ;
+    gen:hasPedigreeCode "MG-MZ-002" ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    .
+
+# ---------- Hybrid Maize ----------
+
+agri:HybridMaize1 a agri:Maize ;
+    a agri:CropVariety ;
+    a gen:Hybrid ;
+    rdfs:label "Hybrid Maize 1 (Makiry)"@en ;
+    rdfs:label "Maïs Hybride 1 (Makiry)"@fr ;
+    skos:definition "First generation hybrid maize developed for Malagasy conditions"@en ;
+    gen:hasRegistrationDate "2005-11-30"^^xsd:date ;
+    gen:hasPedigreeCode "MG-MZ-HYB-001" ;
+    gen:isHybridOf agri:MaizeVarietyA ;
+    gen:isHybridOf agri:MaizeVarietyB ;
+    gen:developedIn <http://sws.geonames.org/1062894/> ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    gen:hasGenerationNumber 1 ;
+    agri:hasYieldPotential 8.5 ;
+    .
+
+# ============================================================
+# CASSAVA VARIETY LINEAGE
+# ============================================================
+
+agri:TsaraMasoa-Cassava a agri:Cassava ;
+    a agri:CropVariety ;
+    a gen:Cultivar ;
+    rdfs:label "TsaraMasoa Cassava Variety"@en ;
+    rdfs:label "Variété de Manioc TsaraMasoa"@fr ;
+    skos:definition "Improved cassava cultivar with good taste"@en ;
+    gen:hasRegistrationDate "2012-06-15"^^xsd:date ;
+    gen:hasPedigreeCode "MG-CAS-001" ;
+    gen:bredBy <http://example.org/agents/FOFIFA> ;
+    .
+
+# ============================================================
+# LIVESTOCK PEDIGREE EXAMPLES - Zebu Cattle
+# ============================================================
+
+# ---------- Foundation Zebu Bulls ----------
+
+agri:ToamasinaBull-001 a agri:Bull ;
+    a agri:Zebu ;
+    a gen:Breed ;
+    rdfs:label "Toamasina Bull 001"@en ;
+    rdfs:label "Taureau Toamasina 001"@fr ;
+    skos:definition "Foundation bull from Toamasina lineage"@en ;
+    agri:hasBreed agri:MahafalyZebu ;
+    agri:hasBirthDate "2010-03-15"^^xsd:date ;
+    agri:hasWeight 450.0 ;
+    agri:hasColor "Grey"@en ;
+    agri:hasHealthStatus "Healthy"@en ;
+    gen:hasPedigreeCode "MG-ZEB-TOAM-001" ;
+    gen:bredBy <http://example.org/farmers/Ramanate> ;
+    .
+
+agri:AntsirabeCow-001 a agri:Cow ;
+    a agri:Zebu ;
+    a gen:Breed ;
+    rdfs:label "Antsirabe Cow 001"@en ;
+    rdfs:label "Vache Antsirabe 001"@fr ;
+    skos:definition "Foundation cow from Antsirabe lineage"@en ;
+    agri:hasBreed agri:BaraZebu ;
+    agri:hasBirthDate "2009-07-20"^^xsd:date ;
+    agri:hasWeight 380.0 ;
+    agri:hasColor "White"@en ;
+    agri:hasHealthStatus "Healthy"@en ;
+    gen:hasPedigreeCode "MG-ZEB-ANTS-001" ;
+    gen:bredBy <http://example.org/farmers/Rakoto> ;
+    .
+
+# ---------- First Generation Crossbred ----------
+
+agri:MahazoRaha-Crossbred1 a agri:Cattle ;
+    a agri:CrossbredCattle ;
+    a gen:Hybrid ;
+    rdfs:label "MahazoRaha Crossbred 1"@en ;
+    rdfs:label "Croisé MahazoRaha 1"@fr ;
+    skos:definition "First generation crossbred Zebu from Toamasina x Antsirabe"@en ;
+    agri:hasBirthDate "2015-04-10"^^xsd:date ;
+    agri:hasWeight 420.0 ;
+    agri:hasColor "Grey-White"@en ;
+    agri:hasHealthStatus "Healthy"@en ;
+    gen:hasPedigreeCode "MG-ZEB-CB-001" ;
+    gen:isHybridOf agri:ToamasinaBull-001 ;
+    gen:isHybridOf agri:AntsirabeCow-001 ;
+    gen:hasFather agri:ToamasinaBull-001 ;
+    gen:hasMother agri:AntsirabeCow-001 ;
+    gen:hasGenerationNumber 1 ;
+    gen:bredBy <http://example.org/farmers/Ramanate> ;
+    .
+
+# ---------- Second Generation Crossbred ----------
+
+agri:Fahavalon-002 a agri:Cattle ;
+    a agri:CrossbredCattle ;
+    a gen:Hybrid ;
+    rdfs:label "Fahavalon Crossbred 2"@en ;
+    rdfs:label "Croisé Fahavalon 2"@fr ;
+    skos:definition "Second generation crossbred with improved traits"@en ;
+    agri:hasBirthDate "2019-08-25"^^xsd:date ;
+    agri:hasWeight 480.0 ;
+    agri:hasColor "Grey"@en ;
+    agri:hasHealthStatus "Healthy"@en ;
+    gen:hasPedigreeCode "MG-ZEB-CB-002" ;
+    gen:isHybridOf agri:MahazoRaha-Crossbred1 ;
+    gen:isHybridOf agri:ToamasinaBull-001 ;
+    gen:hasGenerationNumber 2 ;
+    gen:bredBy <http://example.org/farmers/Rakoto> ;
+    .
+
+# ============================================================
+# CHICKEN BREEDING LINEAGE
+# ============================================================
+
+agri:LocalHen-A01 a agri:Chicken ;
+    rdfs:label "Local Hen A01"@en ;
+    rdfs:label "Poule Locale A01"@fr ;
+    agri:hasBreed gen:Breed ;
+    agri:hasBirthDate "2022-01-15"^^xsd:date ;
+    agri:hasColor "Black"@en ;
+    gen:hasPedigreeCode "MG-CHK-LOC-001" ;
+    .
+
+agri:ImprovedCock-B01 a agri:Chicken ;
+    rdfs:label "Improved Cock B01"@en ;
+    rdfs:label "Coq Amélioré B01"@fr ;
+    agri:hasBreed gen:Breed ;
+    agri:hasBirthDate "2021-06-20"^^xsd:date ;
+    agri:hasColor "Red"@en ;
+    gen:hasPedigreeCode "MG-CHK-IMP-001" ;
+    .
+
+agri:F1Chicks-A01B01 a agri:Chicken ;
+    rdfs:label "F1 Chicks A01B01"@en ;
+    rdfs:label "Poussins F1 A01B01"@fr ;
+    a gen:Hybrid ;
+    agri:hasBirthDate "2023-03-10"^^xsd:date ;
+    gen:isHybridOf agri:LocalHen-A01 ;
+    gen:isHybridOf agri:ImprovedCock-B01 ;
+    gen:hasFather agri:ImprovedCock-B01 ;
+    gen:hasMother agri:LocalHen-A01 ;
+    gen:hasGenerationNumber 1 ;
+    .
+
+# ============================================================
+# AGRICULTURAL PRACTICES EXAMPLES
+# ============================================================
+
+agri:RicePlanting-2024-S1 a agri:Planting ;
+    rdfs:label "Rice Planting Season 1 2024"@en ;
+    rdfs:label "Plantation de Riz Saison 1 2024"@fr ;
+    agri:practicedOn agri:Bemasoha-Rice ;
+    agri:performedBy <http://example.org/farmers/Ramanate> ;
+    agri:usesResource agri:Tsipory-Variety ;
+    agri:hasPracticeDate "2024-10-15"^^xsd:date ;
+    agri:hasDuration "P30D"^^xsd:duration ;
+    .
+
+agri:RiceHarvest-2024 a agri:Harvesting ;
+    rdfs:label "Rice Harvest 2024"@en ;
+    rdfs:label "Récolte de Riz 2024"@fr ;
+    agri:practicedOn agri:Bemasoha-Rice ;
+    agri:performedBy <http://example.org/farmers/Ramanate> ;
+    agri:hasPracticeDate "2025-02-15"^^xsd:date ;
+    agri:hasDuration "P14D"^^xsd:duration ;
+    agri:producesOutput agri:RiceGrain-Batch-001 ;
+    .
+
+# ============================================================
+# OUTPUT EXAMPLES
+# ============================================================
+
+agri:RiceGrain-Batch-001 a agri:RiceGrain ;
+    rdfs:label "Rice Grain Batch 001"@en ;
+    rdfs:label "Lot de Grains de Riz 001"@fr ;
+    agri:derivedFromCrop agri:Bemasoha-Rice ;
+    agri:producedBy agri:RiceHarvest-2024 ;
+    agri:hasQuantity 2500.0 ;
+    agri:hasUnit "kg" ;
+    agri:hasQualityGrade "A" ;
+    .
+
+agri:VanillaPods-2024 a agri:VanillaPod ;
+    rdfs:label "Vanilla Pods Harvest 2024"@en ;
+    rdfs:label "Gousses de Vanille Récolte 2024"@fr ;
+    agri:derivedFromCrop agri:Vanilla ;
+    agri:hasQuantity 150.0 ;
+    agri:hasUnit "kg" ;
+    agri:hasQualityGrade "Premium"@en ;
+    .
+
+agri:Cloves-Batch-001 a agri:Cloves ;
+    rdfs:label "Cloves Batch 001"@en ;
+    rdfs:label "Lot de Girofle 001"@fr ;
+    agri:derivedFromCrop agri:Clove ;
+    agri:hasQuantity 500.0 ;
+    agri:hasUnit "kg" ;
+    agri:hasQualityGrade "Export Grade"@en ;
+    .
+

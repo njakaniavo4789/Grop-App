@@ -1,0 +1,11 @@
+{
+  "id": "kb_riz_maladies_ravageurs",
+  "title": "Maladies et ravageurs du riz à Madagascar — diagnostic et traitement",
+  "source": "knowledge_base",
+  "author": "FOFIFA / IRRI — compilé par équipe CropGPT",
+  "validated": true,
+  "language": "fr",
+  "topics": ["pest_disease"],
+  "regions": ["all"],
+  "content": "Principales maladies et ravageurs du riz à Madagascar.\n\nMALADIES FONGIQUES :\n\nPyriculariose (Magnaporthe oryzae) — la plus dangereuse à Madagascar :\nSymptômes : taches en forme de losange avec centre gris et bords brun-rouge sur les feuilles. Peut attaquer le cou de la panicule (blast du cou) et détruire toute la récolte.\nConditions favorantes : temps frais et humide (15-25°C), rosée nocturne, excès d'azote.\nTraitement : fongicides triazoles (tricyclazole, isoprothiolane). Variétés résistantes : FOFIFA 154, FOFIFA 161.\nPrévention : éviter l'excès d'engrais azoté, semer des variétés résistantes, rotation culturale.\n\nHelminthosporiose (Bipolaris oryzae) :\nSymptômes : taches ovales brun-foncé avec halo jaune sur les feuilles.\nFavorisée par carence en potassium et silice.\nTraitement : améliorer la fertilité du sol, fongicides si sévère.\n\nRAVAGEURS INSECTES :\n\nForeur des tiges (Scirpophaga incertulas) :\nSymptômes : tallons morts (cœur mort) en phase végétative, panicules blanches (panicules mortes) en phase reproductive.\nPrésent dans toutes les régions de Madagascar.\nTraitement : insecticides en cas d'infestation sévère (chlorpyrifos, cartap). Méthode culturale : arrachage et destruction des plants infestés.\n\nCigale du riz (Nephotettix virescens) :\nTransmet la tungro (maladie virale grave).\nTraitement préventif : insecticides systémiques en cas de pression élevée.\n\nRats des rizières :\nDégâts importants en saison, surtout Alaotra-Mangoro.\nLutte : pièges collectifs, campagnes communautaires de dératisation.\n\nACARIENS :\nOrizophagus oryzae : charançon aquatique, présent dans les rizières irriguées.\nLarves s'alimentent des racines. Réduire la durée d'inondation en début de cycle.\n\nCALENDRIER DE SURVEILLANCE :\nSemis - tallage : surveiller foreurs, pyriculariose foliaire.\nMontaison - épiaison : surveiller blast du cou (critique), cigales.\nMaturité : surveiller rats, oiseaux (Quelea quelea dans l'ouest)."
+}

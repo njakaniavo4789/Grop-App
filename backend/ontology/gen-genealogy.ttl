@@ -1,0 +1,282 @@
+# ============================================================
+# GENEALOGICAL RELATIONS MODULE - gen-genealogy.ttl
+# For tracking plant cultivars and livestock pedigrees
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix gen:   <http://example.org/gen/> .
+
+# Import FOAF and CIDOC CRM for genealogical/historical relations
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+
+# ============================================================
+# CORE GENEALOGICAL CLASSES
+# ============================================================
+
+gen:Organism a owl:Class ;
+    rdfs:label "Organism"@en ;
+    rdfs:label "Organisme"@fr ;
+    skos:definition "A living biological entity"@en ;
+    skos:definition "Une entité biologique vivante"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+gen:Variety a owl:Class ;
+    rdfs:label "Variety"@en ;
+    rdfs:label "Variété"@fr ;
+    rdfs:label "Karazana"@mg ;
+    skos:definition "A distinct form within a species"@en ;
+    skos:definition "Une forme distincte au sein d'une espèce"@fr ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+gen:Cultivar a owl:Class ;
+    rdfs:label "Cultivar"@en ;
+    rdfs:label "Cultivar"@fr ;
+    skos:definition "A plant variety produced through selective breeding"@en ;
+    skos:definition "Une variété végétale produite par sélection"@fr ;
+    rdfs:subClassOf gen:Variety ;
+    .
+
+gen:Breed a owl:Class ;
+    rdfs:label "Breed"@en ;
+    rdfs:label "Race"@fr ;
+    rdfs:label "Raza"@mg ;
+    skos:definition "A domesticated animal variety"@en ;
+    skos:definition "Une variété animale domestiquée"@fr ;
+    rdfs:subClassOf gen:Variety ;
+    .
+
+gen:Hybrid a owl:Class ;
+    rdfs:label "Hybrid"@en ;
+    rdfs:label "Hybride"@fr ;
+    rdfs:label "Ibrida"@mg ;
+    skos:definition "Offspring of genetically different parents"@en ;
+    skos:definition "Descendant de parents génétiquement différents"@fr ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+gen:Ancestor a owl:Class ;
+    rdfs:label "Ancestor"@en ;
+    rdfs:label "Ancêtre"@fr ;
+    rdfs:label "Razambe"@mg ;
+    skos:definition "A preceding generation in lineage"@en ;
+    skos:definition "Une génération précédente dans la lignée"@fr ;
+    rdfs:subClassOf gen:Organism ;
+    .
+
+gen:Lineage a owl:Class ;
+    rdfs:label "Lineage"@en ;
+    rdfs:label "Lignée"@fr ;
+    rdfs:label "Taranaka"@mg ;
+    skos:definition "Direct line of descent"@en ;
+    skos:definition "Ligne directe de descendance"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+gen:GenealogicalRecord a owl:Class ;
+    rdfs:label "Genealogical Record"@en ;
+    rdfs:label "Registre Généalogique"@fr ;
+    skos:definition "Documented genealogical information"@en ;
+    skos:definition "Information généalogique documentée"@fr ;
+    rdfs:subClassOf crm:E31_Document ;
+    .
+
+# ============================================================
+# CORE GENEALOGICAL OBJECT PROPERTIES
+# ============================================================
+
+# ---------- Primary Genealogical Relations ----------
+
+# hasParent - Direct parent relationship
+gen:hasParent a owl:ObjectProperty ;
+    rdfs:label "has parent"@en ;
+    rdfs:label "a un parent"@fr ;
+    rdfs:label "manao reny/ray"@mg ;
+    skos:definition "Direct parent in genealogical lineage"@en ;
+    skos:definition "Parent direct dans la lignée généalogique"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:inverseOf gen:hasOffspring ;
+    rdfs:subPropertyOf crm:P98_brings_into_life ;
+    .
+
+# hasOffspring - Direct child relationship
+gen:hasOffspring a owl:ObjectProperty ;
+    rdfs:label "has offspring"@en ;
+    rdfs:label "a une progéniture"@fr ;
+    rdfs:label "manao zanaka"@mg ;
+    skos:definition "Direct child in genealogical lineage"@en ;
+    skos:definition "Enfant direct dans la lignée généalogique"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    rdfs:subPropertyOf crm:P152_has_parent ;
+    .
+
+# isHybridOf - Parent relationship for hybrids
+gen:isHybridOf a owl:ObjectProperty ;
+    rdfs:label "is hybrid of"@en ;
+    rdfs:label "est hybride de"@fr ;
+    rdfs:label "hibridy avy amin' ny"@mg ;
+    skos:definition "Specifies parentage for hybrid organisms"@en ;
+    skos:definition "Spécifie la parenté pour les organismes hybrides"@fr ;
+    rdfs:domain gen:Hybrid ;
+    rdfs:range gen:Organism ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+# descendsFrom - Ancestral lineage (transitive)
+gen:descendsFrom a owl:ObjectProperty ;
+    rdfs:label "descends from"@en ;
+    rdfs:label "descend de"@fr ;
+    rdfs:label "avina avy amin' ny"@mg ;
+    skos:definition "Ancestral relationship through generations"@en ;
+    skos:definition "Relation ancestrale à travers les générations"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:propertyChainAxiom ( gen:hasParent gen:hasParent ) ;
+    a owl:TransitiveProperty ;
+    owl:inverseOf gen:ancestorOf ;
+    rdfs:subPropertyOf crm:P11_had_participant ;
+    .
+
+# ancestorOf - Descendant relationship (inverse of descendsFrom)
+gen:ancestorOf a owl:ObjectProperty ;
+    rdfs:label "is ancestor of"@en ;
+    rdfs:label "est l'ancêtre de"@fr ;
+    rdfs:label "razambe ho an' ny"@mg ;
+    skos:definition "Is ancestor of another organism"@en ;
+    skos:definition "Est l'ancêtre d'un autre organisme"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:inverseOf gen:descendsFrom ;
+    .
+
+# ---------- Secondary Genealogical Relations ----------
+
+# hasFather - Male parent
+gen:hasFather a owl:ObjectProperty ;
+    rdfs:label "has father"@en ;
+    rdfs:label "a un père"@fr ;
+    rdfs:label "manao ray"@mg ;
+    skos:definition "Male parent relationship"@en ;
+    skos:definition "Relation parentale mâle"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    rdfs:subPropertyOf gen:hasParent ;
+    owl:propertyDisjointWith gen:hasMother ;
+    .
+
+# hasMother - Female parent
+gen:hasMother a owl:ObjectProperty ;
+    rdfs:label "has mother"@en ;
+    rdfs:label "a une mère"@fr ;
+    rdfs:label "manao reny"@mg ;
+    skos:definition "Female parent relationship"@en ;
+    skos:definition "Relation parentale femelle"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    rdfs:subPropertyOf gen:hasParent ;
+    .
+
+# hasSibling - Sibling relationship
+gen:hasSibling a owl:ObjectProperty ;
+    rdfs:label "has sibling"@en ;
+    rdfs:label "a un frère/sœur"@fr ;
+    rdfs:label "manao rahavavy/tompo"@mg ;
+    skos:definition "Shares at least one parent"@en ;
+    skos:definition "Partage au moins un parent"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range gen:Organism ;
+    owl:propertyChainAxiom ( gen:hasParent gen:hasParent ) ;
+    .
+
+# ---------- Breeding and Cultivation Relations ----------
+
+# bredBy - organism was bred/cultivated by an agent
+gen:bredBy a owl:ObjectProperty ;
+    rdfs:label "bred by"@en ;
+    rdfs:label "élevé par"@fr ;
+    rdfs:label "nosahiana nidina"@mg ;
+    skos:definition "Organism bred or cultivated by an agent"@en ;
+    skos:definition "Organisme élevé ou cultivé par un agent"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range foaf:Agent ;
+    rdfs:subPropertyOf crm:P14_carried_out_by ;
+    .
+
+# developedIn - cultivar/breed developed in a region
+gen:developedIn a owl:ObjectProperty ;
+    rdfs:label "developed in"@en ;
+    rdfs:label "développé dans"@fr ;
+    skos:definition "Cultivar or breed developed in a region"@en ;
+    skos:definition "Cultivar ou race développé dans une région"@fr ;
+    rdfs:domain gen:Variety ;
+    rdfs:range <http://www.geonames.org/> ;
+    .
+
+# registeredIn - official registration
+gen:registeredIn a owl:ObjectProperty ;
+    rdfs:label "registered in"@en ;
+    rdfs:label "enregistré dans"@fr ;
+    skos:definition "Officially registered in a registry"@en ;
+    skos:definition "Enregistré officiellement dans un registre"@fr ;
+    rdfs:domain gen:Variety ;
+    rdfs:range gen:GenealogicalRecord ;
+    .
+
+# hasGenerationNumber - which generation in lineage
+gen:hasGenerationNumber a owl:DatatypeProperty ;
+    rdfs:label "has generation number"@en ;
+    rdfs:label "a un numéro de génération"@fr ;
+    skos:definition "Position in generational sequence"@en ;
+    skos:definition "Position dans la séquence générationnelle"@fr ;
+    rdfs:domain gen:Organism ;
+    rdfs:range xsd:integer ;
+    .
+
+# hasRegistrationDate
+gen:hasRegistrationDate a owl:DatatypeProperty ;
+    rdfs:label "has registration date"@en ;
+    rdfs:label "a une date d'enregistrement"@fr ;
+    skos:definition "Date of official registration"@en ;
+    skos:definition "Date d'enregistrement officiel"@fr ;
+    rdfs:domain gen:Variety ;
+    rdfs:range xsd:date ;
+    .
+
+# hasPedigreeCode
+gen:hasPedigreeCode a owl:DatatypeProperty ;
+    rdfs:label "has pedigree code"@en ;
+    rdfs:label "a un code de pedigree"@fr ;
+    skos:definition "Unique identifier in breeding records"@en ;
+    skos:definition "Identifiant unique dans les registres d'élevage"@fr ;
+    rdfs:domain gen:Variety ;
+    rdfs:range xsd:string ;
+    .
+
+# ============================================================
+# COMPLEX GENEALOGICAL RESTRICTIONS
+# ============================================================
+
+# Hybrid must have at least two parents
+gen:Hybrid rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty gen:hasParent ;
+    owl:minQualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+    owl:onClass gen:Organism ;
+] .
+
+# Cultivar is developed through breeding
+gen:Cultivar rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty gen:bredBy ;
+    owl:someValuesFrom foaf:Agent ;
+] .
+

@@ -1,0 +1,121 @@
+# ============================================================
+# AGRI-GENEALOGY ONTOLOGY - Core Module
+# Ontology for Madagascar Agriculture with Genealogical Integration
+# Version: 1.0
+# Date: 2026-04-10
+# ============================================================
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+
+# Agricultural namespace
+@prefix agri:  <http://example.org/agri/> .
+@prefix agri0: <http://example.org/agri/0.1/> .
+
+# Genealogical namespace
+@prefix gen:   <http://example.org/gen/> .
+@prefix gen0:  <http://example.org/gen/0.1/> .
+
+# External vocabulary imports
+@prefix agrovoc: <http://aims.fao.org/aos/agrovoc/> .
+@prefix dbpedia:  <http://dbpedia.org/ontology/> .
+@prefix wikidata: <http://www.wikidata.org/entity/> .
+
+# ============================================================
+# ONTOLOGY DECLARATION
+# ============================================================
+
+<http://example.org/ontology/agriculture-genealogy> 
+    a owl:Ontology ;
+    rdfs:label "Agriculture and Genealogy Ontology for Madagascar"@en ;
+    rdfs:label "Ontologie de l'Agriculture et de la Généalogie pour Madagascar"@fr ;
+    dcterms:creator "Ontology Engineering Team" ;
+    dcterms:created "2026-04-10"^^xsd:date ;
+    dcterms:description "A modular OWL ontology integrating agricultural concepts with genealogical relations for tracking crop varieties and livestock pedigrees in Madagascar agriculture."@en ;
+    dcterms:description "Une ontologie OWL modulaire intégrant les concepts agricoles avec les relations généalogiques pour le suivi des variétés de cultures et des pedigrees du bétail dans l'agriculture malgache."@fr ;
+    owl:versionInfo "1.0" ;
+    owl:imports <http://aims.fao.org/aos/agrovoc/agrovoc.owl> ;
+    owl:imports <http://xmlns.com/foaf/0.1/> ;
+    owl:imports <http://www.cidoc-crm.org/cidoc-crm/E39_Actor> ;
+    .
+
+# ============================================================
+# BRIDGE AXIOMS - Connecting Agricultural and Genealogical Modules
+# ============================================================
+
+# Crops are organisms in the genealogical sense
+agri:Crop rdfs:subClassOf gen:Organism .
+
+# Livestock are also organisms
+agri:Livestock rdfs:subClassOf gen:Organism .
+
+# Agricultural practices are events in genealogical/historical context
+agri:AgriculturalPractice rdfs:subClassOf crm:E7_Activity .
+
+# Resources can be linked to locations
+agri:Resource rdfs:subClassOf crm:E19_Physical_Object .
+
+# Outputs are products derived from organisms or activities
+agri:AgriculturalOutput rdfs:subClassOf crm:E84_Information_Appellation .
+
+# ============================================================
+# TOP-LEVEL CLASSES - English/French Bilingual Labels
+# ============================================================
+
+# ---------- Crops (Cultures) ----------
+agri:Crop a owl:Class ;
+    rdfs:label "Crop"@en ;
+    rdfs:label "Culture"@fr ;
+    rdfs:label "Famboly"@mg ;
+    skos:definition "Cultivated plants grown for agricultural production"@en ;
+    skos:definition "Plantes cultivées destinées à la production agricole"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+# ---------- Agricultural Practices (Pratiques Agricoles) ----------
+agri:AgriculturalPractice a owl:Class ;
+    rdfs:label "Agricultural Practice"@en ;
+    rdfs:label "Pratique Agricole"@fr ;
+    rdfs:label "Fampiharana Fambolena"@mg ;
+    skos:definition "Human activities involved in agricultural production"@en ;
+    skos:definition "Activités humaines impliquées dans la production agricole"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+# ---------- Resources (Ressources) ----------
+agri:Resource a owl:Class ;
+    rdfs:label "Agricultural Resource"@en ;
+    rdfs:label "Ressource Agricole"@fr ;
+    rdfs:label "Harena Fambolena"@mg ;
+    skos:definition "Natural or artificial resources used in agriculture"@en ;
+    skos:definition "Ressources naturelles ou artificielles utilisées en agriculture"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+# ---------- Outputs (Productions) ----------
+agri:AgriculturalOutput a owl:Class ;
+    rdfs:label "Agricultural Output"@en ;
+    rdfs:label "Production Agricole"@fr ;
+    rdfs:label "Vokatra Fambolena"@mg ;
+    skos:definition "Products derived from agricultural activities"@en ;
+    skos:definition "Produits dérivés des activités agricoles"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
+# ---------- Livestock ----------
+agri:Livestock a owl:Class ;
+    rdfs:label "Livestock"@en ;
+    rdfs:label "Bétail"@fr ;
+    rdfs:label "Omby"@mg ;
+    skos:definition "Domesticated animals raised for agricultural purposes"@en ;
+    skos:definition "Animaux domestiqués élevés à des fins agricoles"@fr ;
+    rdfs:subClassOf owl:Thing ;
+    .
+
