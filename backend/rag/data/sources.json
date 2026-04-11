@@ -32,9 +32,9 @@
     "topics": ["soil_health", "varieties"]
   },
   {
-    "id": "cornell_sri",
-    "title": "Cornell University — SRI International Network",
-    "url": "https://sri.ciifad.cornell.edu",
+    "id": "FOFIFA",
+    "title": "Livre-Riz-2025-2026_VM-2 — Système de Riziculture Intensive à Madagascar",
+    "url": "https://www.fofifa.mg/wp-content/uploads/2025/01/Livre-Riz-2025-2026_VM-2.pdf",
     "type": "research",
     "language": "en",
     "topics": ["yield_prediction", "water_management", "varieties"]
