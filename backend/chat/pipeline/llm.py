@@ -1,37 +1,27 @@
 """
-Étienne 4 du pipeline : appel au LLM Qwen2 local.
-
-TOUT EST EN LOCAL - Pas d'API externe.
+Étape 4 du pipeline : appel au LLM hébergé sur Google Colab via HTTP (FastAPI + ngrok).
 """
 
 import logging
 import time
 import os
-import gc
-from pathlib import Path
+
+import requests
 
 logger = logging.getLogger(__name__)
 
-# ─── Configuration ───────────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-MODEL_PATH = BASE_DIR / "models"
+# ─── Configuration ────────────────────────────────────────────────────────────
 
-# Inference config
-MAX_NEW_TOKENS = 512  # Reduit pour test plus rapide
+COLAB_LLM_URL = os.environ.get("COLAB_LLM_URL", "").rstrip("/")
+
+MAX_NEW_TOKENS = 512
 TEMPERATURE = 0.7
 TOP_P = 0.9
 TOP_K = 50
 REPETITION_PENALTY = 1.1
-DEVICE = "cuda"  # GPU acceleration
 
-# Model charge une seule fois
-_qwen2_model = None
-_qwen2_tokenizer = None
-_load_attempted = False
-
-# ─── Imports ───────────────────────────────────────────────────────────────────
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+# Timeout HTTP (le modèle Colab peut être lent à répondre)
+REQUEST_TIMEOUT = 120  # secondes
 
 SYSTEM_PROMPT = """Tu es CropGPT, un assistant agricole expert specialise en agriculture malgache.
 Tu reponds UNIQUEMENT aux questions agricoles (cultures, sols, maladies, rendements, irrigation, varietes, meteo, prix agricoles).
@@ -114,7 +104,6 @@ Les principales variétés cultivées à Madagascar sont adaptées aux différen
 > **Note :** Ces rendements sont obtenus avec la méthode SRI et une bonne gestion de l'eau. (Source : FOFIFA 2022)
 """
 
-# Sequences qui indiquent la fin de la generation (le modele simule un nouveau tour)
 _STOP_SEQUENCES = [
     "<|user|>", "<|end|>", "<|assistant|>",
     "\nHuman:", "\nUser:", "\nUtilisateur:",
@@ -123,109 +112,107 @@ _STOP_SEQUENCES = [
 ]
 
 
-# ─── Chargement du modele ───────────────────────────────────────────────────
+# ─── Appel HTTP vers Colab ────────────────────────────────────────────────────
 
 
-def load_qwen2_model():
-    """Charge le modele Qwen2 une seule fois."""
-    global _qwen2_model, _qwen2_tokenizer, _load_attempted
+def _parse_sse_line(line: str):
+    """
+    Parse une ligne SSE du Colab au format pipe-délimité.
+    Formats possibles :
+      data: start|0|0
+      data: token:TEXT|ELAPSED|PROGRESS
+      data: thinking:TEXT|ELAPSED|PROGRESS
+      data: end|ELAPSED|100
+      data: offtopic:MESSAGE|ELAPSED|100
+      data: error|0|0|MESSAGE
+    Retourne (type, text, progress) ou None si ligne ignorable.
+    """
+    if not line.startswith("data:"):
+        return None
+    payload = line[5:].strip()
 
-    if _load_attempted and _qwen2_model is not None:
-        return _qwen2_tokenizer, _qwen2_model
+    # end
+    if payload.startswith("end|"):
+        return ("end", "", 100)
 
-    _load_attempted = True
+    # start
+    if payload.startswith("start|"):
+        return ("start", "", 0)
 
-    try:
-        model_path_str = str(MODEL_PATH)
+    # error
+    if payload.startswith("error|"):
+        parts = payload.split("|", 3)
+        msg = parts[3] if len(parts) > 3 else "Erreur inconnue"
+        return ("error", msg, 100)
 
-        if not MODEL_PATH.exists():
-            logger.error("Modele non trouve: %s", MODEL_PATH)
-            raise FileNotFoundError(f"Dossier modele introuvable: {MODEL_PATH}")
+    # offtopic
+    if payload.startswith("offtopic:"):
+        rest = payload[len("offtopic:"):]
+        parts = rest.rsplit("|", 2)
+        return ("offtopic", parts[0], 100)
 
-        logger.info("Chargement du modele depuis: %s", model_path_str)
+    # token: ou thinking:
+    for prefix in ("token:", "thinking:"):
+        if payload.startswith(prefix):
+            rest = payload[len(prefix):]
+            # Séparer TEXT|ELAPSED|PROGRESS — le texte peut contenir des |
+            parts = rest.rsplit("|", 2)
+            text = parts[0] if parts else rest
+            progress = int(parts[2]) if len(parts) == 3 and parts[2].isdigit() else 0
+            kind = "token" if prefix == "token:" else "thinking"
+            return (kind, text, progress)
 
-        # Chargement du tokenizer
-        _qwen2_tokenizer = AutoTokenizer.from_pretrained(
-            model_path_str, trust_remote_code=True
-        )
-
-        # Verification que le tokenizer a le bos_token_id
-        if _qwen2_tokenizer.pad_token is None:
-            _qwen2_tokenizer.pad_token = _qwen2_tokenizer.eos_token
-
-        # Chargement du modele sur GPU avec FP16 pour acceleration
-        _qwen2_model = AutoModelForCausalLM.from_pretrained(
-            model_path_str,
-            low_cpu_mem_usage=True,
-            trust_remote_code=True,
-        )
-        # Deplacer sur GPU
-        _qwen2_model = _qwen2_model.to(DEVICE)
-
-        _qwen2_model.eval()  # Mode evaluation
-
-        _qwen2_model.eval()  # Mode evaluation
-
-        logger.info("Modele charge avec succes!")
-
-        # Info memoire
-        try:
-            import torch
-
-            mem_params = sum(
-                p.numel() * p.element_size() for p in _qwen2_model.parameters()
-            ) / (1024**2)
-            logger.info("Memoire modele: %.1f MB", mem_params)
-        except Exception:
-            pass
-
-        return _qwen2_tokenizer, _qwen2_model
-
-    except Exception as e:
-        logger.error("Erreur chargement modele: %s", e)
-        raise
+    return None
 
 
-def get_model_info():
-    """Retourne les infos sur le modele."""
-    try:
-        tokenizer, model = load_qwen2_model()
-        import torch
+def _call_colab_blocking(prompt: str) -> str:
+    """
+    Appelle /generate/stream et collecte tous les tokens → texte complet.
+    Utilisé par generate() pour un appel non-streaming.
+    """
+    if not COLAB_LLM_URL:
+        raise ValueError("COLAB_LLM_URL non défini. Ajoutez-le dans le fichier .env.")
 
-        num_params = sum(p.numel() for p in model.parameters())
-        mem_params = sum(p.numel() * p.element_size() for p in model.parameters()) / (
-            1024**2
-        )
+    payload = {
+        "prompt": prompt,
+        "max_new_tokens": MAX_NEW_TOKENS,
+        "temperature": TEMPERATURE,
+    }
 
-        return {
-            "model_type": model.config.model_type if model.config else "unknown",
-            "num_parameters": num_params,
-            "memory_mb": round(mem_params, 1),
-            "device": str(next(model.parameters()).device),
-        }
-    except Exception as e:
-        return {"error": str(e)}
+    full_text = []
+    with requests.post(
+        f"{COLAB_LLM_URL}/generate/stream",
+        json=payload,
+        timeout=REQUEST_TIMEOUT,
+        stream=True,
+    ) as resp:
+        resp.raise_for_status()
+        for raw_line in resp.iter_lines():
+            if not raw_line:
+                continue
+            line = raw_line.decode("utf-8") if isinstance(raw_line, bytes) else raw_line
+            parsed = _parse_sse_line(line)
+            if parsed is None:
+                continue
+            kind, text, progress = parsed
+            if kind == "token" and text:
+                full_text.append(text)
+            elif kind in ("end", "error"):
+                break
 
+    return "".join(full_text)
 
-# ─── Streaming Inference ────────────────────────────────────────────
 
 
 def _post_process(text: str) -> str:
-    """
-    Nettoie la reponse generee :
-    - Coupe au premier marqueur de faux dialogue
-    - Supprime les prefixes de role
-    - Supprime les caracteres non-latin parasites
-    """
+    """Nettoie la réponse : coupe aux stop sequences et retire les artefacts."""
     import re
 
-    # Couper des la premiere sequence de stop
     for seq in _STOP_SEQUENCES:
         idx = text.find(seq)
         if idx > 0:
             text = text[:idx]
 
-    # Supprimer les lignes qui ressemblent a des marqueurs de role
     lines = []
     for line in text.splitlines():
         stripped = line.strip()
@@ -239,171 +226,152 @@ def _post_process(text: str) -> str:
             lines.append(line)
     text = "\n".join(lines)
 
-    # Supprimer les blocs de caracteres CJK (chinois/japonais/coreen parasites)
+    # Supprimer les blocs de caractères CJK parasites
     text = re.sub(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]+', '', text)
 
     return text.strip()
 
 
+# ─── Interface publique ───────────────────────────────────────────────────────
+
+
+def get_model_info() -> dict:
+    """Retourne les infos sur le modèle Colab (appel GET /info si disponible)."""
+    if not COLAB_LLM_URL:
+        return {"error": "COLAB_LLM_URL non défini"}
+    try:
+        resp = requests.get(f"{COLAB_LLM_URL}/info", timeout=10)
+        if resp.ok:
+            return resp.json()
+    except Exception:
+        pass
+    return {
+        "provider": "colab-ngrok",
+        "endpoint": COLAB_LLM_URL,
+        "status": "remote",
+    }
+
+
 def stream_generate(prompt: str):
-    """Generator qui yield chaque token pour streaming avec detection des stop sequences."""
-    import torch
+    """
+    Generator qui yield chaque token via /generate/stream (SSE) du Colab.
+    Format SSE Colab : data: token:TEXT|ELAPSED|PROGRESS
+    """
+    if not COLAB_LLM_URL:
+        yield {"token": "COLAB_LLM_URL non défini dans .env", "done": True, "progress": 100}
+        return
 
-    tokenizer, model = load_qwen2_model()
+    payload = {
+        "prompt": prompt,
+        "max_new_tokens": MAX_NEW_TOKENS,
+        "temperature": TEMPERATURE,
+    }
 
-    input_ids = tokenizer(prompt, return_tensors="pt")["input_ids"].to(model.device)
-    attention_mask = torch.ones_like(input_ids)
+    try:
+        with requests.post(
+            f"{COLAB_LLM_URL}/generate/stream",
+            json=payload,
+            timeout=REQUEST_TIMEOUT,
+            stream=True,
+        ) as resp:
+            resp.raise_for_status()
+            for raw_line in resp.iter_lines():
+                if not raw_line:
+                    continue
+                line = raw_line.decode("utf-8") if isinstance(raw_line, bytes) else raw_line
+                parsed = _parse_sse_line(line)
+                if parsed is None:
+                    continue
+                kind, text, progress = parsed
+                if kind == "token":
+                    yield {"token": text, "done": False, "progress": progress}
+                elif kind == "end":
+                    yield {"token": "", "done": True, "progress": 100}
+                    return
+                elif kind == "error":
+                    yield {"token": f"Erreur Colab : {text}", "done": True, "progress": 100}
+                    return
+                # "start" et "thinking" ignorés (le frontend Django gère ses propres étapes)
 
-    max_tokens = MAX_NEW_TOKENS
-    accumulated = ""  # Texte accumule pour detecter les stop sequences multi-tokens
-
-    for token_idx in range(max_tokens):
-        with torch.no_grad():
-            outputs = model.generate(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                max_new_tokens=1,
-                temperature=TEMPERATURE,
-                top_p=TOP_P,
-                top_k=TOP_K,
-                repetition_penalty=REPETITION_PENALTY,
-                do_sample=True,
-                pad_token_id=tokenizer.pad_token_id,
-                eos_token_id=tokenizer.eos_token_id,
-                use_cache=True,
-            )
-
-        if outputs.shape[1] <= input_ids.shape[1]:
-            break
-
-        new_token_id = outputs[0, -1].item()
-        token_text = tokenizer.decode([new_token_id], skip_special_tokens=False)
-
-        # Detecter EOS ou tokens speciaux de fin
-        if new_token_id == tokenizer.eos_token_id:
-            yield {"token": "", "done": True, "progress": 100}
-            break
-
-        # Decoder sans tokens speciaux pour le texte visible
-        clean_token = tokenizer.decode([new_token_id], skip_special_tokens=True)
-
-        # Update pour la prochaine iteration
-        input_ids = outputs
-        attention_mask = torch.ones_like(outputs)
-
-        # Accumuler et verifier les stop sequences
-        accumulated += clean_token
-        stop_hit = False
-        for seq in _STOP_SEQUENCES:
-            if seq in accumulated:
-                # Couper et arreter
-                cut_idx = accumulated.find(seq)
-                # Si on a du texte avant, on l'a deja envoye token par token
-                stop_hit = True
-                break
-
-        if stop_hit:
-            yield {"token": "", "done": True, "progress": 100}
-            break
-
-        if clean_token:
-            progress = min(int(((token_idx + 1) / max_tokens) * 100), 99)
-            yield {"token": clean_token, "done": False, "progress": progress}
+    except Exception as e:
+        logger.error("Erreur stream Colab: %s", e)
+        yield {"token": f"Erreur de connexion au modèle : {e}", "done": True, "progress": 100}
+        return
 
     yield {"token": "", "done": True, "progress": 100}
 
 
-# ─── Inference Qwen2 ────────────────────────────────────────────────────────
+def generate(pipeline_data: dict, history: list = None) -> dict:
+    """Génère une réponse via le LLM Colab. Retourne reply, tokens, latence."""
+    if history is None:
+        history = []
 
-
-def call_qwen2(prompt: str) -> dict:
-    """Genere une reponse avec Qwen2 local."""
     t0 = time.time()
 
-    tokenizer, model = load_qwen2_model()
-
-    # Tokenization
-    inputs = tokenizer(
-        prompt,
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=2048,
-    )
-
-    # Deplacer sur device
-    inputs = {k: v.to(model.device) for k, v in inputs.items()}
-
-    # Generation
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=MAX_NEW_TOKENS,
-            temperature=TEMPERATURE,
-            top_p=TOP_P,
-            top_k=TOP_K,
-            repetition_penalty=REPETITION_PENALTY,
-            do_sample=True,
-            pad_token_id=tokenizer.pad_token_id,
-            eos_token_id=tokenizer.eos_token_id,
-            use_cache=True,
+    try:
+        full_prompt = build_prompt(
+            user_message=pipeline_data["enriched_text"],
+            rag_context=pipeline_data.get("rag_context", ""),
+            history=history,
+            confidence_level=pipeline_data.get("confidence_level", "none"),
         )
 
-    # Decoder seulement la nouvelle partie (pas le prompt)
-    input_len = inputs["input_ids"].shape[1]
-    generated_tokens = outputs[0][input_len:]
-    response = tokenizer.decode(generated_tokens, skip_special_tokens=True)
-    response = _post_process(response)
+        raw_reply = _call_colab_blocking(full_prompt)
+        reply = _post_process(raw_reply)
+        latency = round((time.time() - t0) * 1000)
 
-    latency = round((time.time() - t0) * 1000)
+        input_tokens = 0
+        output_tokens = len(reply.split())
 
-    # Compter les tokens
-    input_tokens = inputs["input_ids"].shape[1]
-    output_tokens = len(generated_tokens)
+        return {
+            "reply": reply,
+            "thinking": "",
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "latency_ms": latency,
+            "tokens_per_second": round(output_tokens / (latency / 1000), 1) if latency > 0 else 0,
+            "provider": "colab-ngrok",
+            "model": data.get("model", "colab-llm"),
+            "max_tokens": MAX_NEW_TOKENS,
+            "temperature": TEMPERATURE,
+        }
 
-    # Tokens par seconde
-    tps = round(output_tokens / (latency / 1000), 1) if latency > 0 else 0
+    except Exception as e:
+        logger.error("Erreur LLM Colab: %s", e)
+        return {
+            "reply": "Désolé, le modèle Colab est injoignable. Vérifiez que le notebook est actif et que l'URL ngrok est à jour.",
+            "thinking": "",
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "latency_ms": round((time.time() - t0) * 1000),
+            "error": str(e),
+        }
 
-    return {
-        "reply": response,
-        "thinking": "",  # Pas de thinking mode en local (memoire limitee)
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "latency_ms": latency,
-        "tokens_per_second": tps,
-    }
 
-
-# ─── Prompt builder ───────────────────────────────────────────────────────────
+# ─── Prompt builder (inchangé) ────────────────────────────────────────────────
 
 
 def build_prompt(
     user_message: str, rag_context: str, history: list, confidence_level: str = "high"
 ) -> str:
-    """Construit le prompt pour Qwen2."""
+    """Construit le prompt pour le LLM."""
 
-    # System prompt
     full_prompt = f"<|system|>\n{SYSTEM_PROMPT}\n<|end|>\n"
 
-    # Historique (max 10 echanges)
     for msg in history[-20:]:
         if msg["role"] == "user":
             full_prompt += f"<|user|>\n{msg['content']}\n<|end|>\n"
         else:
             full_prompt += f"<|assistant|>\n{msg['content']}\n<|end|>\n"
 
-    # Instructions de confiance
     confidence_instructions = {
         "high": "Tu disposes de donnees fiables ci-dessous. Base ta reponse sur ces donnees et cite tes sources.",
         "medium": "Les donnees disponibles sont partielles. Utilise-les mais signale les limites.",
         "low": "Donnees generales disponibles. Recommande de consulter un expert local (MAEP/FOFIFA).",
         "none": "IMPORTANT : Pas de donnees specifiques. Ne pas inventer de chiffres. Consulter MAEP/FOFIFA.",
     }
-    instruction = confidence_instructions.get(
-        confidence_level, confidence_instructions["none"]
-    )
+    instruction = confidence_instructions.get(confidence_level, confidence_instructions["none"])
 
-    # Contexte RAG
     if rag_context:
         user_content = (
             f"{user_message}\n\n---\n"
@@ -419,74 +387,14 @@ def build_prompt(
     return full_prompt
 
 
-# ─── Point d'entree principal ─────────────────────────────────────────────────
-
-
-def generate(pipeline_data: dict, history: list = None) -> dict:
-    """Retourne un dict { reply, thinking, input_tokens, output_tokens, latency_ms }."""
-
-    if history is None:
-        history = []
-
-    try:
-        # Construire le prompt
-        full_prompt = build_prompt(
-            user_message=pipeline_data["enriched_text"],
-            rag_context=pipeline_data.get("rag_context", ""),
-            history=history,
-            confidence_level=pipeline_data.get("confidence_level", "none"),
-        )
-
-        # Generation
-        result = call_qwen2(full_prompt)
-
-        # Ajouter infos supplementaires
-        result["provider"] = "qwen2-local"
-        result["model"] = "Qwen2-0.5B-Instruct"
-        result["max_tokens"] = MAX_NEW_TOKENS
-        result["temperature"] = TEMPERATURE
-
-        return result
-
-    except Exception as e:
-        logger.error("Erreur Qwen2 local: %s", e)
-        return {
-            "reply": "Desole, probleme technique avec le modele local. Redemarrage du serveur peut etre necessaire.",
-            "thinking": "",
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "latency_ms": 0,
-            "error": str(e),
-        }
-
-
-# ─── Utilities ────────────────────────────────────────────────────────
+# ─── Stubs (plus nécessaires, conservés pour compatibilité) ──────────────────
 
 
 def clear_cache():
-    """Libere la memoire GPU/CPU."""
-    global _qwen2_model, _qwen2_tokenizer
-
-    try:
-        import torch
-
-        torch.cuda.empty_cache() if torch.cuda.is_available() else None
-    except Exception:
-        pass
-
-    gc.collect()
-    logger.info("Cache libere")
+    """No-op : le modèle tourne sur Colab, pas en local."""
+    pass
 
 
 def reload_model():
-    """Recharge le modele (pour mise a jour)."""
-    global _qwen2_model, _qwen2_tokenizer, _load_attempted
-
-    _qwen2_model = None
-    _qwen2_tokenizer = None
-    _load_attempted = False
-
-    clear_cache()
-    load_qwen2_model()
-
-    return {"status": "Modele recharge"}
+    """No-op : le modèle tourne sur Colab, pas en local."""
+    return {"status": "Modèle hébergé sur Colab — pas de rechargement local possible."}

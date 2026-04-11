@@ -22,6 +22,7 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+venv*/
 
 # Modèle LLM local — trop lourd pour Git (télécharger manuellement)
 backend/models/
