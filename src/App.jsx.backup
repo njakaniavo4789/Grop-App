@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import gsap from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, TrendingDown, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck, Brain, Mic, MicOff, Wifi, WifiOff, ChevronDown, ChevronRight, Copy, Check, Sparkles, FlaskConical, BookOpen, FileText, RefreshCw, PanelLeftClose, PanelLeftOpen, LogOut, Sun, Moon, MapPin, Activity, X } from 'lucide-react';
 import { MADAGASCAR_GEOJSON } from './data/madagascarGeoJSON';
@@ -158,15 +157,6 @@ function MainLayout() {
       }))
       .catch(() => {});
   }, []);
-
-  // Apply/remove .light-mode class on <html> when darkMode changes
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.remove('light-mode');
-    } else {
-      document.documentElement.classList.add('light-mode');
-    }
-  }, [darkMode]);
 
   const handleLogout = () => {
     clearTokens();
@@ -388,13 +378,11 @@ function MainLayout() {
       }}>
         {/* Logo */}
         <div style={{ padding: collapsed ? 16 : 24, display: 'flex', alignItems: 'center', gap: 12 }}>
-          {messages.length === 0 && (
-            <img
-              src="/logo.png"
-              alt="CropGPT"
-              style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
-            />
-          )}
+          <img 
+            src="/logo.png" 
+            alt="CropGPT" 
+            style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} 
+          />
           {!collapsed && (
             <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
               <h1 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
@@ -597,31 +585,14 @@ function SettingsPage() {
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
   const [nameLoading, setNameLoading] = useState(false);
   const [pwdLoading, setPwdLoading] = useState(false);
-  const [nameMsg, setNameMsg] = useState(null);
+  const [nameMsg, setNameMsg] = useState(null); // { type: 'success'|'error', text }
   const [pwdMsg, setPwdMsg] = useState(null);
-  const containerRef = useRef(null);
 
   useEffect(() => {
     const token = getAccessToken();
     authAPI.getProfile(token)
       .then(res => { setName(res.data.name); setEmail(res.data.email); })
       .catch(() => {});
-  }, []);
-
-  // GSAP entrance animations
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
-
-    const sections = containerRef.current.querySelectorAll('.settings-section');
-    const fields = containerRef.current.querySelectorAll('.settings-field');
-    const header = containerRef.current.querySelector('.settings-header');
-
-    gsap.set([sections, fields, header], { opacity: 0, y: 24 });
-    gsap.to(header, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
-    gsap.to(sections, { opacity: 1, y: 0, duration: 0.55, stagger: 0.18, ease: 'power2.out', delay: 0.15 });
-    gsap.to(fields, { opacity: 1, y: 0, duration: 0.4, stagger: 0.07, ease: 'power2.out', delay: 0.3 });
   }, []);
 
   const handleNameSubmit = async (e) => {
@@ -657,38 +628,36 @@ function SettingsPage() {
     }
   };
 
-  return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto" style={{ background: 'transparent', position: 'relative' }}>
-      <FluidBackground />
 
+  return (
+    <div className="flex-1 overflow-y-auto" style={{ background: 'transparent', position: 'relative' }}>
+      <FluidBackground />
       {/* Header */}
-      <div className="settings-header" style={{ background: 'transparent', padding: '32px 40px 16px', position: 'relative', zIndex: 1 }}>
-        <h2 style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', letterSpacing: '-0.5px' }}>
-          Paramètres
-        </h2>
-        <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>
-          Gérez les informations de votre compte
-        </p>
+      <div style={{ background: 'transparent', padding: '24px 32px', position: 'relative', zIndex: 1 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 600, color: '#FFFFFF', fontFamily: 'var(--font-display)' }}>Paramètres</h2>
+        <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>Gérez les informations de votre compte</p>
       </div>
 
-      <div style={{ padding: '0 40px 48px', maxWidth: 640, position: 'relative', zIndex: 1 }}>
+      <div style={{ padding: '0 32px 32px', maxWidth: 720, position: 'relative', zIndex: 1 }}>
 
-        {/* ─── Section : Informations du profil ─── */}
-        <div className="settings-section" style={{ marginBottom: 48 }}>
-          <div style={{ marginBottom: 24, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-              Informations du profil
-            </h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
-              Modifiez votre nom d'affichage
-            </p>
+        {/* Section : Informations du profil */}
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden', marginBottom: 24,
+        }}>
+          <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <User size={18} style={{ color: 'white' }} />
+            </div>
+            <div>
+              <h3 style={{ fontWeight: 600, color: '#FFFFFF' }}>Informations du profil</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Modifiez votre nom d'affichage</p>
+            </div>
           </div>
 
-          <form onSubmit={handleNameSubmit}>
-            <div className="settings-field" style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                Adresse email
-              </label>
+          <form onSubmit={handleNameSubmit} style={{ padding: '0 24px 24px' }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Adresse email</label>
               <input
                 type="email"
                 value={email}
@@ -696,18 +665,14 @@ function SettingsPage() {
                 style={{
                   width: '100%', padding: '12px 16px', borderRadius: 12,
                   background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-                  color: 'var(--text-muted)', cursor: 'not-allowed', outline: 'none', boxSizing: 'border-box',
+                  color: 'var(--text-muted)', cursor: 'not-allowed', outline: 'none',
                 }}
               />
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                L'adresse email ne peut pas être modifiée.
-              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>L'adresse email ne peut pas être modifiée.</p>
             </div>
 
-            <div className="settings-field" style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                Nom complet
-              </label>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Nom complet</label>
               <input
                 type="text"
                 value={name}
@@ -717,77 +682,84 @@ function SettingsPage() {
                 style={{
                   width: '100%', padding: '12px 16px', borderRadius: 12,
                   background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
-                  transition: 'border-color 0.2s',
+                  color: 'var(--text-primary)', outline: 'none',
                 }}
               />
             </div>
 
             <SettingsAlert msg={nameMsg} />
 
-            <div className="settings-field">
-              <button
-                type="submit"
-                disabled={nameLoading}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
-                  background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
-                  fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
-                  opacity: nameLoading ? 0.6 : 1, transition: 'opacity 0.2s',
-                }}
-              >
-                <Save size={16} />
-                {nameLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={nameLoading}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
+                fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
+                opacity: nameLoading ? 0.6 : 1,
+              }}
+            >
+              <Save size={16} />
+              {nameLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+            </button>
           </form>
         </div>
 
-        {/* ─── Divider ─── */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 48 }} />
-
-        {/* ─── Section : Sécurité ─── */}
-        <div className="settings-section">
-          <div style={{ marginBottom: 24, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-              Changer le mot de passe
-            </h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
-              Minimum 8 caractères
-            </p>
+        {/* Section : Sécurité */}
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden',
+        }}>
+          <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Lock size={18} style={{ color: 'white' }} />
+            </div>
+            <div>
+              <h3 style={{ fontWeight: 600, color: '#FFFFFF' }}>Changer le mot de passe</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Minimum 8 caractères</p>
+            </div>
           </div>
 
-          <form onSubmit={handlePwdSubmit}>
-            <div className="settings-field">
-              <PwdField label="Mot de passe actuel" value={currentPwd} onChange={setCurrentPwd} show={showCurrentPwd} setShow={setShowCurrentPwd} />
-            </div>
-            <div className="settings-field">
-              <PwdField label="Nouveau mot de passe" value={newPwd} onChange={setNewPwd} show={showNewPwd} setShow={setShowNewPwd} />
-            </div>
-            <div className="settings-field">
-              <PwdField label="Confirmer le nouveau mot de passe" value={confirmPwd} onChange={setConfirmPwd} show={showConfirmPwd} setShow={setShowConfirmPwd} />
-            </div>
+          <form onSubmit={handlePwdSubmit} style={{ padding: '0 24px 24px' }}>
+            <PwdField
+              label="Mot de passe actuel"
+              value={currentPwd}
+              onChange={setCurrentPwd}
+              show={showCurrentPwd}
+              setShow={setShowCurrentPwd}
+            />
+            <PwdField
+              label="Nouveau mot de passe"
+              value={newPwd}
+              onChange={setNewPwd}
+              show={showNewPwd}
+              setShow={setShowNewPwd}
+            />
+            <PwdField
+              label="Confirmer le nouveau mot de passe"
+              value={confirmPwd}
+              onChange={setConfirmPwd}
+              show={showConfirmPwd}
+              setShow={setShowConfirmPwd}
+            />
 
             <SettingsAlert msg={pwdMsg} />
 
-            <div className="settings-field">
-              <button
-                type="submit"
-                disabled={pwdLoading}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
-                  background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
-                  fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
-                  opacity: pwdLoading ? 0.6 : 1, transition: 'opacity 0.2s',
-                }}
-              >
-                <Lock size={16} />
-                {pwdLoading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={pwdLoading}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
+                fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
+                opacity: pwdLoading ? 0.6 : 1,
+              }}
+            >
+              <Lock size={16} />
+              {pwdLoading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
+            </button>
           </form>
         </div>
-
       </div>
     </div>
   );

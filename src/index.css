@@ -67,6 +67,28 @@
   --radius-full: 9999px;
 }
 
+/* === LIGHT MODE === */
+.light-mode {
+  --bg-deep: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.9);
+  
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.15);
+  --border-accent: rgba(16, 185, 129, 0.3);
+  
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+}
+
+.light-mode body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
 /* === BASE STYLES === */
 body {
   font-family: var(--font-body);
@@ -493,10 +515,15 @@ body {
 
 /* === SIDEBAR GLASS === */
 .sidebar-glass {
-  background: rgba(10, 10, 15, 0.6);
+  background: var(--bg-glass, rgba(10, 10, 15, 0.6));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.light-mode .sidebar-glass {
+  background: rgba(255, 255, 255, 0.75);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-item {
