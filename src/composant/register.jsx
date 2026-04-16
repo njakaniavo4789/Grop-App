@@ -159,15 +159,13 @@ export default function AgricultureAISignup() {
               {/* Logo Section */}
               <div className="mb-3 animate-fade-in-down">
                 <div className="flex items-center gap-2.5 mb-1">
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 animate-float-slow">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                  <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 animate-float-slow overflow-hidden">
+                    <img src="/logo.png" alt="CropGPT" className="w-full h-full object-cover rounded-xl" />
                     <div className="absolute inset-0 bg-green-400/20 rounded-xl animate-ping-slow" />
                   </div>
                   <div>
                     <h1 className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent font-['Syne',serif]">
-                      Grok App
+                      CropGPT
                     </h1>
                     <p className="text-[10px] text-green-400/60 tracking-wider">SMART FARMING PLATFORM</p>
                   </div>

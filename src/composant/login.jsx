@@ -172,15 +172,13 @@ export default function FuturisticAgriLogin() {
               {/* Logo Section */}
               <div className="mb-8 animate-fade-in-down">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="relative w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 animate-float-slow">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                  <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 animate-float-slow overflow-hidden">
+                    <img src="/logo.png" alt="CropGPT" className="w-full h-full object-cover rounded-2xl" />
                     <div className="absolute inset-0 bg-green-400/20 rounded-2xl animate-ping-slow" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent font-['Syne',serif]">
-                      Grok App
+                      CropGPT
                     </h1>
                     <p className="text-xs text-green-400/60 tracking-wider">PLATEFORME AGRICOLE IA</p>
                   </div>

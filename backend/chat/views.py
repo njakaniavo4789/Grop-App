@@ -59,6 +59,29 @@ def stream_chat(request):
             except Exception:
                 rag_result = {"retrieved_docs": [], "rag_context": "", "confidence_level": "none"}
 
+            # ── Étape 3.5 : Émission du RAG score et sources ─────────────
+            confidence = rag_result.get("confidence_level", "none")
+            # Calcul du score (mock pour l'instant)
+            if confidence == "high":
+                rag_score = 85
+            elif confidence == "medium":
+                rag_score = 60
+            elif confidence == "low":
+                rag_score = 35
+            else:
+                rag_score = 0
+            
+            sources = rag_result.get("retrieved_docs", [])
+            print(f"[DEBUG BACKEND] RAG Score: {rag_score}, Sources count: {len(sources)}")
+            print(f"[DEBUG BACKEND] Sources: {sources}")
+            yield f"data: rag_score:{rag_score}|{len(sources)}\n\n"
+            
+            for src in sources:
+                src_name = src.get("title", src.get("url", "Source")).split("/")[-1][:30]
+                src_conf = 95 if src.get("source") == "ontology" else 80
+                print(f"[DEBUG BACKEND] Emitting source: {src_name} conf:{src_conf}")
+                yield f"data: source:{src_name}|{src.get('url', '')}|{src_conf}\n\n"
+
             # ── Étape 4 : Construction du prompt ──────────────────────────────
             yield "data: thinking:Génération de la réponse...|0|45\n\n"
             full_prompt = llm.build_prompt(

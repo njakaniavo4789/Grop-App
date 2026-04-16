@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck } from 'lucide-react';
+import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck, Brain, Mic, MicOff, Wifi, WifiOff, ChevronDown, ChevronRight, Copy, Check, Sparkles, FlaskConical, BookOpen, FileText, RefreshCw, PanelLeftClose, PanelLeftOpen, LogOut, Sun, Moon } from 'lucide-react';
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -8,43 +8,101 @@ import Login from "./composant/login";
 import Register from "./composant/register";
 import cartographie from "./composant/cartographie";
 import { getAccessToken, clearTokens, authAPI } from "./api/auth";
-import { MADAGASCAR_GEOJSON } from "./data/madagascarGeoJSON";
+import { AgriculturalChat } from './components/chat';
+import { FluidBackground } from './components/ui/FluidBackground';
 
 function MarkdownMessage({ content }) {
   return (
-    <div className="prose-chat">
+    <div className="prose-chat" style={{ 
+      color: '#E2E8F0', 
+      lineHeight: 1.8, 
+      fontSize: 15,
+      fontFamily: 'var(--font-body)'
+    }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({children}) => <h1 style={{fontSize:'1.25rem',fontWeight:700,margin:'1rem 0 0.5rem',color:'#111827',lineHeight:1.3}}>{children}</h1>,
-          h2: ({children}) => <h2 style={{fontSize:'1.1rem',fontWeight:600,margin:'0.9rem 0 0.4rem',color:'#1f2937',lineHeight:1.3}}>{children}</h2>,
-          h3: ({children}) => <h3 style={{fontSize:'1rem',fontWeight:600,margin:'0.75rem 0 0.35rem',color:'#374151',lineHeight:1.3}}>{children}</h3>,
-          p: ({children}) => <p style={{margin:'0 0 0.75rem',color:'#374151',lineHeight:1.7,fontSize:'0.9375rem'}}>{children}</p>,
-          ul: ({children}) => <ul style={{margin:'0.25rem 0 0.75rem',paddingLeft:'1.5rem',listStyleType:'disc',color:'#374151'}}>{children}</ul>,
-          ol: ({children}) => <ol style={{margin:'0.25rem 0 0.75rem',paddingLeft:'1.5rem',listStyleType:'decimal',color:'#374151'}}>{children}</ol>,
-          li: ({children}) => <li style={{margin:'0.25rem 0',lineHeight:1.65,fontSize:'0.9375rem'}}>{children}</li>,
-          strong: ({children}) => <strong style={{fontWeight:600,color:'#111827'}}>{children}</strong>,
-          em: ({children}) => <em style={{fontStyle:'italic',color:'#4b5563'}}>{children}</em>,
+          h1: ({children}) => <h1 style={{
+            fontSize: '1.35rem', fontWeight: 700, margin: '1.25rem 0 0.75rem',
+            color: '#FFFFFF', lineHeight: 1.3, fontFamily: 'var(--font-display)'
+          }}>{children}</h1>,
+          h2: ({children}) => <h2 style={{
+            fontSize: '1.15rem', fontWeight: 600, margin: '1rem 0 0.5rem',
+            color: '#F1F5F9', lineHeight: 1.3, fontFamily: 'var(--font-display)'
+          }}>{children}</h2>,
+          h3: ({children}) => <h3 style={{
+            fontSize: '1.05rem', fontWeight: 600, margin: '0.85rem 0 0.4rem',
+            color: '#E2E8F0', lineHeight: 1.3
+          }}>{children}</h3>,
+          p: ({children}) => <p style={{
+            margin: '0 0 0.85rem', color: '#CBD5E1', lineHeight: 1.8, fontSize: '0.95rem'
+          }}>{children}</p>,
+          ul: ({children}) => <ul style={{
+            margin: '0.5rem 0 1rem 1.5rem', paddingLeft: '0.5rem',
+            color: '#CBD5E1', listStyleType: 'disc'
+          }}>{children}</ul>,
+          ol: ({children}) => <ol style={{
+            margin: '0.5rem 0 1rem 1.5rem', paddingLeft: '0.5rem',
+            color: '#CBD5E1', listStyleType: 'decimal'
+          }}>{children}</ol>,
+          li: ({children, ...props}) => <li style={{
+            margin: '0.4rem 0', lineHeight: 1.75, fontSize: '0.95rem',
+            color: '#CBD5E1', paddingLeft: '0.25rem'
+          }} {...props}>{children}</li>,
+          strong: ({children}) => <strong style={{
+            fontWeight: 700, color: '#FFFFFF', background: 'rgba(16,185,129,0.15)',
+            padding: '0.1rem 0.4rem', borderRadius: '0.25rem'
+          }}>{children}</strong>,
+          em: ({children}) => <em style={{
+            fontStyle: 'italic', color: '#94A3B8'
+          }}>{children}</em>,
           code: ({className, children, ...props}) => {
             const isBlock = className?.startsWith('language-');
             if (isBlock) {
-              return <code style={{display:'block',background:'#1e293b',color:'#e2e8f0',padding:'1rem',borderRadius:'0.5rem',overflowX:'auto',fontSize:'0.8125rem',fontFamily:'ui-monospace,monospace',lineHeight:1.6}} {...props}>{children}</code>;
+              return <code style={{
+                display: 'block', background: '#0F0F14', color: '#22D3EE',
+                padding: '1rem', borderRadius: '0.5rem', overflowX: 'auto',
+                fontSize: '0.8125rem', fontFamily: 'var(--font-mono)', lineHeight: 1.6,
+                border: '1px solid #1E293B', margin: '0.75rem 0'
+              }} {...props}>{children}</code>;
             }
-            return <code style={{background:'#f1f5f9',color:'#16a34a',padding:'0.15rem 0.35rem',borderRadius:'0.25rem',fontSize:'0.8125rem',fontFamily:'ui-monospace,monospace'}} {...props}>{children}</code>;
+            return <code style={{
+              background: 'rgba(16,185,129,0.15)', color: '#34D399',
+              padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
+              fontSize: '0.8125rem', fontFamily: 'var(--font-mono)',
+              fontWeight: 500
+            }} {...props}>{children}</code>;
           },
-          pre: ({children}) => <pre style={{background:'#1e293b',borderRadius:'0.5rem',overflow:'hidden',margin:'0.75rem 0'}}>{children}</pre>,
+          pre: ({children}) => <pre style={{
+            background: '#0F0F14', borderRadius: '0.5rem', overflow: 'hidden',
+            margin: '0.75rem 0', border: '1px solid #1E293B'
+          }}>{children}</pre>,
           table: ({children}) => (
-            <div style={{overflowX:'auto',margin:'0.75rem 0'}}>
-              <table style={{width:'100%',borderCollapse:'collapse',fontSize:'0.875rem'}}>{children}</table>
+            <div style={{overflowX: 'auto', margin: '0.75rem 0', borderRadius: 8, border: '1px solid #1E293B'}}>
+              <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem'}}>{children}</table>
             </div>
           ),
-          thead: ({children}) => <thead style={{background:'#f8fafc'}}>{children}</thead>,
-          th: ({children}) => <th style={{border:'1px solid #e2e8f0',padding:'0.5rem 0.75rem',textAlign:'left',fontWeight:600,color:'#374151',fontSize:'0.8125rem'}}>{children}</th>,
-          td: ({children}) => <td style={{border:'1px solid #e2e8f0',padding:'0.5rem 0.75rem',color:'#4b5563',fontSize:'0.875rem'}}>{children}</td>,
-          tr: ({children}) => <tr style={{borderBottom:'1px solid #f1f5f9'}}>{children}</tr>,
-          blockquote: ({children}) => <blockquote style={{borderLeft:'3px solid #16a34a',paddingLeft:'1rem',margin:'0.75rem 0',color:'#6b7280',fontStyle:'italic'}}>{children}</blockquote>,
-          a: ({href, children}) => <a href={href} style={{color:'#16a34a',textDecoration:'underline'}} target="_blank" rel="noopener noreferrer">{children}</a>,
-          hr: () => <hr style={{border:'none',borderTop:'1px solid #e5e7eb',margin:'1rem 0'}} />,
+          thead: ({children}) => <thead style={{background: '#0F0F14'}}>{children}</thead>,
+          th: ({children}) => <th style={{
+            border: '1px solid #1E293B', padding: '0.65rem 0.75rem', textAlign: 'left',
+            fontWeight: 600, color: '#FFFFFF', fontSize: '0.8125rem', background: '#0A0A0F'
+          }}>{children}</th>,
+          td: ({children}) => <td style={{
+            border: '1px solid #1E293B', padding: '0.5rem 0.75rem',
+            color: '#CBD5E1', fontSize: '0.875rem'
+          }}>{children}</td>,
+          tr: ({children}) => <tr style={{borderBottom: '1px solid #1E293B'}}>{children}</tr>,
+          blockquote: ({children}) => <blockquote style={{
+            borderLeft: '3px solid #8B5CF6', paddingLeft: '1rem', margin: '0.75rem 0',
+            color: '#A78BFA', fontStyle: 'italic', background: 'rgba(139,92,246,0.1)',
+            padding: '12px 16px', borderRadius: '0 8px 8px 0'
+          }}>{children}</blockquote>,
+          a: ({href, children}) => <a href={href} style={{
+            color: '#22D3EE', textDecoration: 'underline', fontWeight: 500
+          }} target="_blank" rel="noopener noreferrer">{children}</a>,
+          hr: () => <hr style={{
+            border: 'none', borderTop: '1px solid #1E293B', margin: '1.25rem 0'
+          }} />,
         }}
       >
         {content}
@@ -75,9 +133,12 @@ function PrivateRoute({ children }) {
 function MainLayout() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState('chat');
+  const [collapsed, setCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [userInfo, setUserInfo] = useState({ name: 'Agriculteur', email: '', isAdmin: false });
+  const [userMode, setUserMode] = useState('expert'); // 'expert' ou 'paysan'
   
   // Streaming state
   const [isStreaming, setIsStreaming] = useState(false);
@@ -199,6 +260,27 @@ function MainLayout() {
                   streamingProgress: parseInt(parts[2]) || 0,
                 } : m
               ));
+            } else if (parts[0].startsWith('rag_score:')) {
+              const scoreParts = parts[0].split(':');
+              const ragScoreVal = parseInt(scoreParts[1]) || 0;
+              console.log('[DEBUG] RAG Score:', ragScoreVal, 'from:', data);
+              setMessages(prev => prev.map(m =>
+                m.messageId === messageId ? {
+                  ...m,
+                  ragScore: ragScoreVal,
+                } : m
+              ));
+            } else if (parts[0].startsWith('source:')) {
+              const sourceName = parts[0].replace('source:', '');
+              const sourceUrl = parts[1] || '';
+              const sourceConf = parseInt(parts[2]) || 80;
+              console.log('[DEBUG] Source:', sourceName, 'conf:', sourceConf, 'url:', sourceUrl);
+              setMessages(prev => prev.map(m =>
+                m.messageId === messageId ? {
+                  ...m,
+                  sources: [...(m.sources || []), { name: sourceName, url: sourceUrl, confidence: sourceConf }],
+                } : m
+              ));
             } else if (parts[0].startsWith('offtopic:')) {
               const rejectText = parts[0].replace('offtopic:', '');
               fullText = rejectText;
@@ -278,76 +360,144 @@ function MainLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-lime-50">
-      {/* Navbar */}
-      <nav className="w-64 bg-white/80 backdrop-blur-sm shadow-lg flex flex-col">
-        <div className="p-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl flex items-center justify-center mb-6">
-            <div className="text-white text-xl font-bold">🌾</div>
-          </div>
-          <h1 className="text-xl font-semibold text-gray-800">Grok App</h1>
-          <p className="text-sm text-gray-500 mt-1">Agriculture Madagascar</p>
+    <div className="flex h-screen relative" style={{ background: 'var(--bg-deep)' }}>
+      <FluidBackground />
+      
+      {/* Sidebar Glassmorphism */}
+      <nav className="sidebar-glass" style={{
+        width: collapsed ? 68 : 220,
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
+        position: 'relative',
+        zIndex: 10,
+        flexShrink: 0,
+      }}>
+        {/* Logo */}
+        <div style={{ padding: collapsed ? 16 : 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img 
+            src="/logo.png" 
+            alt="CropGPT" 
+            style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} 
+          />
+          {!collapsed && (
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <h1 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                CropGPT
+              </h1>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Agriculture Madagascar</p>
+            </div>
+          )}
         </div>
 
-        <div className="flex-1 px-4">
-          <div className="space-y-2">
-            <NavItem
-              icon={<Home size={20} />}
-              label="Dashboard"
-              active={currentPage === 'dashboard'}
-              onClick={() => setCurrentPage('dashboard')}
-            />
-            <NavItem
-              icon={<MessageSquare size={20} />}
-              label="Chat"
-              active={currentPage === 'chat'}
-              onClick={() => setCurrentPage('chat')}
-            />
-            <NavItem
-              icon={<Settings size={20} />}
-              label="Paramètres"
-              active={currentPage === 'settings'}
-              onClick={() => setCurrentPage('settings')}
-            />
-            {userInfo.isAdmin && (
-              <NavItem
-                icon={<Users size={20} />}
-                label="Utilisateurs"
-                active={currentPage === 'users'}
-                onClick={() => setCurrentPage('users')}
-              />
-            )}
-          </div>
+        {/* Nav Items */}
+        <div style={{ flex: 1, padding: collapsed ? 8 : 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <SidebarItem icon={<Home size={20} strokeWidth={1.5} />} label="Dashboard" collapsed={collapsed} active={currentPage === 'dashboard'} onClick={() => setCurrentPage('dashboard')} />
+          <SidebarItem icon={<MessageSquare size={20} strokeWidth={1.5} />} label="Chat" collapsed={collapsed} active={currentPage === 'chat'} onClick={() => setCurrentPage('chat')} />
+          <SidebarItem icon={<Settings size={20} strokeWidth={1.5} />} label="Paramètres" collapsed={collapsed} active={currentPage === 'settings'} onClick={() => setCurrentPage('settings')} />
+          {userInfo.isAdmin && (
+            <SidebarItem icon={<Users size={20} strokeWidth={1.5} />} label="Utilisateurs" collapsed={collapsed} active={currentPage === 'users'} onClick={() => setCurrentPage('users')} />
+          )}
         </div>
 
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-              <User size={20} className="text-white" />
+        {/* User info */}
+        <div style={{ padding: collapsed ? 8 : 16 }}>
+          {/* Theme toggle */}
+          {!collapsed && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '8px 12px', marginBottom: 12, borderRadius: 12,
+              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+            }}>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Thème</span>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer',
+                  background: darkMode ? 'linear-gradient(135deg, #1E293B, #0F172A)' : 'linear-gradient(135deg, #FCD34D, #F59E0B)',
+                  position: 'relative', transition: 'background 0.3s',
+                }}
+              >
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  background: 'white',
+                  position: 'absolute',
+                  left: darkMode ? 2 : 18,
+                  transition: 'left 0.3s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {darkMode ? <Moon size={10} style={{ color: '#6366F1' }} /> : <Sun size={10} style={{ color: '#F59E0B' }} />}
+                </div>
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">{userInfo.name}</p>
-              <p className="text-xs text-gray-500">{userInfo.isAdmin ? '⭐ Admin' : 'Connecté'}</p>
+          )}
+          {collapsed && (
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              title={darkMode ? 'Mode clair' : 'Mode sombre'}
+              style={{
+                padding: 8, borderRadius: 8,
+                background: 'transparent', border: 'none',
+                color: 'var(--text-muted)', cursor: 'pointer',
+                transition: 'all 0.2s', marginBottom: 8,
+                display: 'flex', justifyContent: 'center', width: '100%',
+              }}
+            >
+              {darkMode ? <Moon size={18} strokeWidth={1.5} /> : <Sun size={18} strokeWidth={1.5} />}
+            </button>
+          )}
+          {!collapsed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, marginBottom: 8, borderRadius: 12 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10B981, #059669)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <User size={16} style={{ color: 'white' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userInfo.name}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{userInfo.isAdmin ? 'Admin' : 'Connecté'}</p>
+              </div>
             </div>
+          )}
+          
+          {/* Actions row */}
+          <div style={{ display: 'flex', gap: 4, justifyContent: collapsed ? 'center' : 'flex-end' }}>
             <button
               onClick={handleLogout}
               title="Déconnexion"
-              className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              style={{
+                padding: 8, borderRadius: 8,
+                background: 'transparent', border: 'none',
+                color: 'var(--text-muted)', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
+              <LogOut size={18} strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              title={collapsed ? 'Étendre' : 'Réduire'}
+              style={{
+                padding: 8, borderRadius: 8,
+                background: 'transparent', border: 'none',
+                color: 'var(--text-muted)', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              {collapsed ? <PanelLeftOpen size={18} strokeWidth={1.5} /> : <PanelLeftClose size={18} strokeWidth={1.5} />}
             </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
         {currentPage === 'chat'
-          ? <ChatPage messages={messages} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={handleSendMessage} handleStopStreaming={handleStopStreaming} />
+          ? <AgriculturalChat />
           : currentPage === 'dashboard'
             ? <DashboardPage />
             : currentPage === 'settings'
@@ -383,18 +533,22 @@ export default function App() {
 // Défini en dehors de SettingsPage pour éviter la perte de focus à chaque frappe
 function PwdField({ label, value, onChange, show, setShow }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="relative">
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>{label}</label>
+      <div style={{ position: 'relative' }}>
         <input
           type={show ? 'text' : 'password'}
           value={value}
           onChange={e => onChange(e.target.value)}
           required
-          className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-800 transition-all"
+          style={{
+            width: '100%', padding: '12px 44px 12px 16px', borderRadius: 12,
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+            color: 'var(--text-primary)', outline: 'none',
+          }}
         />
         <button type="button" onClick={() => setShow(!show)}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+          style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           {show ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
@@ -405,11 +559,13 @@ function PwdField({ label, value, onChange, show, setShow }) {
 function SettingsAlert({ msg }) {
   if (!msg) return null;
   return (
-    <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm ${
-      msg.type === 'success'
-        ? 'bg-green-50 border border-green-200 text-green-700'
-        : 'bg-red-50 border border-red-200 text-red-700'
-    }`}>
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderRadius: 12,
+      fontSize: 13, marginBottom: 16,
+      background: msg.type === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+      border: msg.type === 'success' ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(239,68,68,0.2)',
+      color: msg.type === 'success' ? '#34D399' : '#F87171',
+    }}>
       {msg.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
       {msg.text}
     </div>
@@ -472,48 +628,60 @@ function SettingsPage() {
 
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto" style={{ background: 'transparent', position: 'relative' }}>
+      <FluidBackground />
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-6 border-b border-gray-200">
-        <h2 className="text-3xl font-semibold text-gray-800">Paramètres</h2>
-        <p className="text-gray-500 mt-1">Gérez les informations de votre compte</p>
+      <div style={{ background: 'transparent', padding: '24px 32px', position: 'relative', zIndex: 1 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 600, color: '#FFFFFF', fontFamily: 'var(--font-display)' }}>Paramètres</h2>
+        <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>Gérez les informations de votre compte</p>
       </div>
 
-      <div className="p-8 max-w-2xl space-y-8">
+      <div style={{ padding: '0 32px 32px', maxWidth: 720, position: 'relative', zIndex: 1 }}>
 
         {/* Section : Informations du profil */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-              <User size={18} className="text-white" />
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden', marginBottom: 24,
+        }}>
+          <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <User size={18} style={{ color: 'white' }} />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">Informations du profil</h3>
-              <p className="text-xs text-gray-500">Modifiez votre nom d'affichage</p>
+              <h3 style={{ fontWeight: 600, color: '#FFFFFF' }}>Informations du profil</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Modifiez votre nom d'affichage</p>
             </div>
           </div>
 
-          <form onSubmit={handleNameSubmit} className="px-6 py-5 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
+          <form onSubmit={handleNameSubmit} style={{ padding: '0 24px 24px' }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Adresse email</label>
               <input
                 type="email"
                 value={email}
                 disabled
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-400 cursor-not-allowed"
+                style={{
+                  width: '100%', padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'var(--text-muted)', cursor: 'not-allowed', outline: 'none',
+                }}
               />
-              <p className="text-xs text-gray-400 mt-1">L'adresse email ne peut pas être modifiée.</p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>L'adresse email ne peut pas être modifiée.</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nom complet</label>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Nom complet</label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
                 placeholder="Votre nom"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-800 transition-all"
+                style={{
+                  width: '100%', padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'var(--text-primary)', outline: 'none',
+                }}
               />
             </div>
 
@@ -522,7 +690,12 @@ function SettingsPage() {
             <button
               type="submit"
               disabled={nameLoading}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
+                fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
+                opacity: nameLoading ? 0.6 : 1,
+              }}
             >
               <Save size={16} />
               {nameLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
@@ -531,18 +704,21 @@ function SettingsPage() {
         </div>
 
         {/* Section : Sécurité */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-              <Lock size={18} className="text-white" />
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden',
+        }}>
+          <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Lock size={18} style={{ color: 'white' }} />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">Changer le mot de passe</h3>
-              <p className="text-xs text-gray-500">Minimum 8 caractères</p>
+              <h3 style={{ fontWeight: 600, color: '#FFFFFF' }}>Changer le mot de passe</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Minimum 8 caractères</p>
             </div>
           </div>
 
-          <form onSubmit={handlePwdSubmit} className="px-6 py-5 space-y-4">
+          <form onSubmit={handlePwdSubmit} style={{ padding: '0 24px 24px' }}>
             <PwdField
               label="Mot de passe actuel"
               value={currentPwd}
@@ -570,7 +746,12 @@ function SettingsPage() {
             <button
               type="submit"
               disabled={pwdLoading}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
+                background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white',
+                fontWeight: 500, borderRadius: 12, border: 'none', cursor: 'pointer',
+                opacity: pwdLoading ? 0.6 : 1,
+              }}
             >
               <Lock size={16} />
               {pwdLoading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
@@ -594,6 +775,43 @@ function NavItem({ icon, label, active, onClick }) {
     >
       {icon}
       <span className="font-medium">{label}</span>
+    </button>
+  );
+}
+
+function SidebarItem({ icon, label, collapsed, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`sidebar-item ${active ? 'active' : ''}`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        gap: 12,
+        padding: collapsed ? '12px' : '12px 16px',
+        borderRadius: 12,
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+        background: active ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+        color: active ? '#10B981' : 'var(--text-secondary)',
+        border: active ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid transparent',
+        width: '100%',
+        marginBottom: 4,
+      }}
+    >
+      <span style={{ flexShrink: 0 }}>{icon}</span>
+      {!collapsed && (
+        <span style={{
+          fontSize: 14,
+          fontWeight: 500,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}>
+          {label}
+        </span>
+      )}
     </button>
   );
 }
@@ -648,102 +866,118 @@ function UsersPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto" style={{ background: 'transparent', position: 'relative' }}>
+      <FluidBackground />
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-6 border-b border-gray-200">
-        <h2 className="text-3xl font-semibold text-gray-800">Gestion des Utilisateurs</h2>
-        <p className="text-gray-500 mt-1">{total} utilisateur{total !== 1 ? 's' : ''} inscrit{total !== 1 ? 's' : ''}</p>
+      <div style={{ background: 'transparent', padding: '24px 32px', position: 'relative', zIndex: 1 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 600, color: '#FFFFFF', fontFamily: 'var(--font-display)' }}>Gestion des Utilisateurs</h2>
+        <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>{total} utilisateur{total !== 1 ? 's' : ''} inscrit{total !== 1 ? 's' : ''}</p>
       </div>
 
-      <div className="p-8 space-y-6">
+      <div style={{ padding: '0 32px 32px', position: 'relative', zIndex: 1 }}>
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-5">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 24 }}>
           {[
-            { label: 'Total utilisateurs', value: total,  icon: <Users size={22} className="text-blue-600" />,  color: 'from-blue-400 to-indigo-500'   },
-            { label: 'Administrateurs',    value: admins, icon: <Shield size={22} className="text-violet-600" />, color: 'from-violet-400 to-purple-500' },
-            { label: 'Comptes actifs',     value: actifs, icon: <UserCheck size={22} className="text-emerald-600" />, color: 'from-emerald-400 to-teal-500' },
+            { label: 'Total utilisateurs', value: total,  icon: <Users size={22} style={{ color: 'white' }} />,  color: '#3B82F6'   },
+            { label: 'Administrateurs',    value: admins, icon: <Shield size={22} style={{ color: 'white' }} />, color: '#8B5CF6' },
+            { label: 'Comptes actifs',     value: actifs, icon: <UserCheck size={22} style={{ color: 'white' }} />, color: '#10B981' },
           ].map((s, i) => (
-            <div key={i} className="bg-white/70 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 flex items-center gap-4 hover:shadow-lg transition-all">
-              <div className={`w-14 h-14 bg-gradient-to-br ${s.color} rounded-xl flex items-center justify-center shadow-md`}>
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 20,
+              display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.3s',
+            }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 14, background: s.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: `0 4px 12px ${s.color}40`,
+              }}>
                 {s.icon}
               </div>
               <div>
-                <p className="text-sm text-gray-500">{s.label}</p>
-                <p className="text-3xl font-bold text-gray-800">{s.value}</p>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{s.label}</p>
+                <p style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF' }}>{s.value}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Table card */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden',
+        }}>
           {/* Search bar */}
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-            <div className="relative flex-1 max-w-xs">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ position: 'relative', flex: 1, maxWidth: 280 }}>
+              <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 placeholder="Rechercher par nom ou email..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                style={{
+                  width: '100%', paddingLeft: 36, paddingRight: 16, paddingTop: 8, paddingBottom: 8,
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 12, color: 'var(--text-primary)', fontSize: 13, outline: 'none',
+                }}
               />
             </div>
-            <span className="text-sm text-gray-400 ml-auto">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 'auto' }}>{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</span>
           </div>
 
           {/* Table */}
           {loading ? (
-            <div className="py-16 text-center text-gray-400">Chargement...</div>
+            <div style={{ padding: 64, textAlign: 'center', color: 'var(--text-muted)' }}>Chargement...</div>
           ) : error ? (
-            <div className="py-16 text-center text-red-500">{error}</div>
+            <div style={{ padding: 64, textAlign: 'center', color: '#EF4444' }}>{error}</div>
           ) : filtered.length === 0 ? (
-            <div className="py-16 text-center text-gray-400">Aucun utilisateur trouvé.</div>
+            <div style={{ padding: 64, textAlign: 'center', color: 'var(--text-muted)' }}>Aucun utilisateur trouvé.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%' }}>
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Utilisateur</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rôle</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Inscrit le</th>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utilisateur</th>
+                    <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</th>
+                    <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rôle</th>
+                    <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Statut</th>
+                    <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inscrit le</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {filtered.map(user => (
-                    <tr key={user.id} className="hover:bg-green-50/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                    <tr key={user.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.2s' }}>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           <UserAvatar name={user.name} isAdmin={user.is_staff} />
-                          <span className="font-medium text-gray-800">{user.name}</span>
+                          <span style={{ fontWeight: 500, color: '#FFFFFF' }}>{user.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4">
+                      <td style={{ padding: '16px 24px', fontSize: 13, color: 'var(--text-secondary)' }}>{user.email}</td>
+                      <td style={{ padding: '16px 24px' }}>
                         {user.is_staff ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700">
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(139,92,246,0.15)', color: '#A78BFA' }}>
                             <Shield size={11} /> Admin
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(16,185,129,0.15)', color: '#34D399' }}>
                             <User size={11} /> Utilisateur
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td style={{ padding: '16px 24px' }}>
                         {user.is_active ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Actif
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(16,185,129,0.15)', color: '#34D399' }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }}></span> Actif
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                            <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Inactif
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6B7280', display: 'inline-block' }}></span> Inactif
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{formatDate(user.created_at)}</td>
+                      <td style={{ padding: '16px 24px', fontSize: 13, color: 'var(--text-muted)' }}>{formatDate(user.created_at)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -770,47 +1004,238 @@ function ThinkingIndicator() {
   );
 }
 
+// ============================================
+// COMPOSANTS CHAT AGRI-NEXUS
+// ============================================
+
+function RAGScoreGauge({ score, totalSources }) {
+  const getScoreClass = (s) => {
+    if (s >= 80) return 'high';
+    if (s >= 50) return 'medium';
+    return 'low';
+  };
+  
+  return (
+    <div className="score-gauge" style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: '#A78BFA', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Brain size={14} />
+        <span>RAG</span>
+      </div>
+      <div className="score-gauge-bar">
+        <div 
+          className={`score-gauge-fill ${getScoreClass(score)}`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+      <span style={{ fontSize: 12, fontWeight: 600, color: getScoreClass(score) === 'high' ? '#34D399' : getScoreClass(score) === 'medium' ? '#F59E0B' : '#EF4444' }}>
+        {score}%
+      </span>
+    </div>
+  );
+}
+
+function SourcesPanel({ sources }) {
+  const [expanded, setExpanded] = useState(false);
+  
+  const getScoreClass = (s) => {
+    if (s >= 80) return 'high';
+    if (s >= 50) return 'medium';
+    return 'low';
+  };
+  
+  if (!sources || sources.length === 0) return null;
+  
+  return (
+    <div className="sources-panel" style={{ marginTop: 12 }}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          padding: '8px 12px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          color: '#94A3B8',
+          fontSize: 12,
+          fontWeight: 500
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          Sources ({sources.length})
+        </span>
+        {expanded ? <span style={{ color: '#64748B' }}>Masquer</span> : null}
+      </button>
+      
+      {expanded && (
+        <div style={{ padding: '0 8px 8px' }}>
+          {sources.map((source, i) => (
+            <div key={i} className="source-item">
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#F1F5F9' }}>
+                <FileText size={12} />
+                {source.name}
+              </span>
+              <span className={`source-badge ${getScoreClass(source.confidence)}`}>
+                {source.confidence}%
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TerminalThinking({ steps }) {
+  const getStepIcon = (step, isLast) => {
+    if (step.toLowerCase().includes('erreur')) {
+      return <AlertCircle size={12} style={{ color: '#EF4444' }} />;
+    }
+    if (isLast) {
+      return <div className="terminal-spinner" />;
+    }
+    return <CheckCircle size={12} style={{ color: '#10B981' }} />;
+  };
+  
+  const getStepClass = (step) => {
+    if (step.toLowerCase().includes('erreur')) return 'terminal-error';
+    if (step.toLowerCase().includes('en cours') || step.toLowerCase().includes('loading')) return 'terminal-process';
+    if (step.toLowerCase().includes('termin') || step.toLowerCase().includes('trouve')) return 'terminal-success';
+    return 'terminal-command';
+  };
+  
+  return (
+    <div className="terminal-thinking" style={{ marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, color: '#8B5CF6', fontSize: 12, fontWeight: 600 }}>
+        <FlaskConical size={14} />
+        <span>ANALYSE</span>
+      </div>
+      {steps.map((step, i) => (
+        <div key={i} className="terminal-line">
+          {getStepIcon(step, i === steps.length - 1)}
+          <span className={getStepClass(step)}>{step}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ModeToggle({ mode, setMode }) {
+  return (
+    <div className="mode-toggle">
+      <button
+        className={`mode-toggle-btn ${mode === 'paysan' ? 'active' : ''}`}
+        onClick={() => setMode('paysan')}
+      >
+        <Sprout size={14} />
+        Paysan
+      </button>
+      <button
+        className={`mode-toggle-btn ${mode === 'expert' ? 'active' : ''}`}
+        onClick={() => setMode('expert')}
+      >
+        <FlaskConical size={14} />
+        Expert
+      </button>
+    </div>
+  );
+}
+
+// ============================================
+// PAGE DE CHAT PRINCIPALE
+// ============================================
+
 function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, handleStopStreaming }) {
+  const [userMode, setUserMode] = useState('expert');
+  
   const suggestedPrompts = [
-    { icon: "🌱", title: "Meilleures cultures pour Madagascar", subtitle: "Conseils de plantation" },
-    { icon: "☁️", title: "Prévisions météo agricoles", subtitle: "Climat & Saisons" },
-    { icon: "🌾", title: "Techniques de culture durable", subtitle: "Agriculture bio" }
+    { icon: <Sprout size={20} />, title: "Meilleures cultures pour Madagascar", subtitle: "Conseils de plantation" },
+    { icon: <CloudRain size={20} />, title: "Prévisions météo agricoles", subtitle: "Climat & Saisons" },
+    { icon: <Leaf size={20} />, title: "Techniques de culture durable", subtitle: "Agriculture bio" }
   ];
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'var(--bg-deep)' }}>
       {/* Chat Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-4 border-b border-gray-200">
-        <h2 className="text-2xl font-semibold text-gray-800">Assistant Agricole IA</h2>
-        <p className="text-sm text-gray-500 mt-1">Votre guide pour l'agriculture à Madagascar</p>
+      <div style={{ 
+        background: 'var(--bg-surface)', 
+        borderBottom: '1px solid var(--border-subtle)',
+        padding: '16px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div>
+          <h2 style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+            Assistant Agricole IA
+          </h2>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
+            Votre guide pour l'agriculture à Madagascar
+          </p>
+        </div>
+        <ModeToggle mode={userMode} setMode={setUserMode} />
       </div>
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto px-8 py-6">
         {messages.length === 0 ? (
-          <div className="max-w-3xl mx-auto text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-white text-2xl">🌾</span>
+          <div className="welcome-screen">
+            {/* Welcome Avatar avec Glow */}
+            <div style={{
+              width: 80,
+              height: 80,
+              borderRadius: 24,
+              background: 'linear-gradient(135deg, #10B981, #059669)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 24,
+              position: 'relative',
+              boxShadow: '0 0 40px rgba(16, 185, 129, 0.4)'
+            }}>
+              <Sprout size={36} style={{ color: 'white' }} />
+              <div style={{
+                position: 'absolute',
+                inset: -3,
+                borderRadius: 27,
+                background: 'linear-gradient(135deg, #22D3EE, #A78BFA)',
+                zIndex: -1,
+                opacity: 0.6
+              }} />
             </div>
-            <h1 className="text-3xl font-semibold text-gray-700 mb-3">Bonjour, Agriculteur</h1>
-            <h2 className="text-2xl text-gray-600 mb-2">Comment puis-je vous aider?</h2>
-            <p className="text-gray-500 mb-12">
-              Prêt à vous assister dans vos activités agricoles, de la plantation<br />
+            
+            <h1 className="welcome-title">Bonjour, Agriculteur</h1>
+            <h2 className="welcome-subtitle">Comment puis-je vous aider?</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 32, maxWidth: 400 }}>
+              Prêt à vous assister dans vos activités agricoles, de la plantation
               à la récolte. Commençons ensemble!
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 600, marginTop: 16 }}>
               {suggestedPrompts.map((prompt, index) => (
                 <button
                   key={index}
                   onClick={() => setInputValue(prompt.title)}
-                  className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-left hover:shadow-xl hover:scale-105 transition-all border border-gray-200"
+                  className="suggestion-card"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl flex items-center justify-center mb-4">
-                    <span className="text-xl">{prompt.icon}</span>
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 16,
+                    color: 'white'
+                  }}>
+                    {prompt.icon}
                   </div>
-                  <h3 className="font-semibold text-gray-800 mb-1">{prompt.title}</h3>
-                  <p className="text-sm text-gray-500">{prompt.subtitle}</p>
+                  <h3 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{prompt.title}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{prompt.subtitle}</p>
                 </button>
               ))}
             </div>
@@ -843,78 +1268,69 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
 
               /* ── Message IA ── */
               return (
-                <div key={index} style={{display:'flex',alignItems:'flex-start',gap:12,padding:'16px 0',borderBottom:'1px solid #f3f4f6'}}>
-                  {/* Avatar CropGPT */}
+                <div key={index} style={{
+                  display:'flex',
+                  alignItems:'flex-start',
+                  gap:12,
+                  padding:'16px 0',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  animation: 'fade-in-up 0.3s ease-out'
+                }}>
+                  {/* Avatar CropGPT avec Glow */}
                   <div style={{
-                    width:34,height:34,flexShrink:0,
-                    background:'linear-gradient(135deg,#16a34a,#059669)',
-                    borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',
-                    fontSize:16,marginTop:2,boxShadow:'0 1px 3px rgba(0,0,0,0.15)',
+                    width:40,
+                    height:40,
+                    flexShrink:0,
+                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                    borderRadius: 12,
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    position: 'relative',
+                    boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
                   }}>
-                    🌾
+                    <Sprout size={18} style={{ color: 'white' }} />
+                    <div style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: 14,
+                      background: 'linear-gradient(135deg, #22D3EE, #A78BFA)',
+                      zIndex: -1,
+                      opacity: 0.5
+                    }} />
                   </div>
 
                   {/* Contenu */}
                   <div style={{flex:1,minWidth:0}}>
 
-                    {/* Étiquette nom */}
-                    <div style={{fontSize:'0.8125rem',fontWeight:600,color:'#16a34a',marginBottom:6,letterSpacing:'0.01em'}}>
-                      CropGPT
+                    {/* Header: Nom + RAG Badge */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginBottom: 8
+                    }}>
+                      <span style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: '#10B981',
+                        letterSpacing: '0.01em'
+                      }}>
+                        CropGPT
+                      </span>
+                      {message.ragScore && (
+                        <div className="rag-badge">
+                          <Brain size={10} />
+                          RAG {message.ragScore}%
+                        </div>
+                      )}
                     </div>
 
                     {isStreaming ? (
                       <div>
-                        {/* ── Bloc thinking pipeline (style Claude) ── */}
+                        {/* ── Bloc Terminal Thinking (Nouveau Style Futuriste) ── */}
                         {message.thinkingSteps?.length > 0 && (
-                          <details open style={{marginBottom:10}}>
-                            <summary style={{
-                              cursor:'pointer',
-                              display:'flex',alignItems:'center',gap:6,
-                              fontSize:'0.8125rem',color:'#7c3aed',fontWeight:500,
-                              userSelect:'none',listStyle:'none',outline:'none',
-                              padding:'6px 10px',
-                              background:'#f5f3ff',borderRadius:8,
-                              border:'1px solid #ede9fe',
-                              width:'fit-content',
-                            }}>
-                              {/* Spinner animé pendant la génération */}
-                              <svg style={{width:14,height:14,animation:'spin 1s linear infinite',flexShrink:0}} viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="#c4b5fd" strokeWidth="3"/>
-                                <path d="M12 2a10 10 0 0 1 10 10" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round"/>
-                              </svg>
-                              Analyse en cours
-                            </summary>
-                            <div style={{
-                              marginTop:6,padding:'10px 12px',
-                              background:'#faf9ff',border:'1px solid #ede9fe',
-                              borderRadius:8,display:'flex',flexDirection:'column',gap:6,
-                            }}>
-                              {message.thinkingSteps.map((step, i) => {
-                                const isLast = i === message.thinkingSteps.length - 1;
-                                return (
-                                  <div key={i} style={{display:'flex',alignItems:'center',gap:8,fontSize:'0.8125rem'}}>
-                                    {isLast ? (
-                                      <svg style={{width:14,height:14,animation:'spin 1s linear infinite',color:'#7c3aed',flexShrink:0}} viewBox="0 0 24 24" fill="none">
-                                        <circle cx="12" cy="12" r="10" stroke="#ddd6fe" strokeWidth="3"/>
-                                        <path d="M12 2a10 10 0 0 1 10 10" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round"/>
-                                      </svg>
-                                    ) : (
-                                      <svg style={{width:14,height:14,color:'#16a34a',flexShrink:0}} viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5">
-                                        <polyline points="20 6 9 17 4 12"/>
-                                      </svg>
-                                    )}
-                                    <span style={{
-                                      color: isLast ? '#6d28d9' : '#9ca3af',
-                                      fontWeight: isLast ? 500 : 400,
-                                      textDecoration: isLast ? 'none' : 'none',
-                                    }}>
-                                      {step}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </details>
+                          <TerminalThinking steps={message.thinkingSteps} />
                         )}
 
                         {/* Texte en cours de génération */}
@@ -932,17 +1348,27 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
                         ) : null}
 
                         {/* Timer discret */}
-                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8}}>
-                          <span style={{fontSize:'0.75rem',color:'#d1d5db',fontFamily:'ui-monospace,monospace'}}>
-                            {(message.streamingTime || 0).toFixed(1)}s
-                          </span>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: 12,
+                          fontSize: 12,
+                          color: 'var(--text-muted)',
+                          fontFamily: 'var(--font-mono)'
+                        }}>
+                          <span>{(message.streamingTime || 0).toFixed(1)}s</span>
                           {message.isStreaming && (
                             <button
                               onClick={handleStopStreaming}
                               style={{
-                                fontSize:'0.75rem',padding:'3px 10px',
-                                background:'#fef2f2',color:'#dc2626',
-                                border:'1px solid #fecaca',borderRadius:6,cursor:'pointer',
+                                fontSize: 11,
+                                padding: '4px 10px',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                color: '#EF4444',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                borderRadius: 6,
+                                cursor: 'pointer',
                               }}
                             >
                               Arrêter
@@ -952,18 +1378,22 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
                       </div>
                     ) : message.isOffTopic ? (
                       /* ── Message hors-sujet ── */
-                      <div style={{
-                        display:'flex',alignItems:'flex-start',gap:10,
-                        padding:'12px 14px',
-                        background:'#fffbeb',border:'1px solid #fde68a',
-                        borderRadius:10,color:'#92400e',fontSize:'0.9375rem',lineHeight:1.6,
+                      <div className="off-topic-alert" style={{
+                        padding: 12,
                       }}>
-                        <span style={{fontSize:18,flexShrink:0,marginTop:1}}>⚠️</span>
+                        <AlertCircle size={18} />
                         <span>{message.text}</span>
                       </div>
                     ) : (
                       /* ── Réponse complète ── */
-                      <MarkdownMessage content={message.text || ''} />
+                      <div>
+                        <MarkdownMessage content={message.text || ''} />
+                        
+                        {/* Sources Panel */}
+                        {message.sources && message.sources.length > 0 && (
+                          <SourcesPanel sources={message.sources} />
+                        )}
+                      </div>
                     )}
 
                     {/* Méta-données (tokens) — discret sous la réponse */}
@@ -982,11 +1412,28 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
         )}
       </div>
 
-      {/* Chat Input */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 px-8 py-6">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <button className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-            <span className="text-white text-xl">📎</span>
+      {/* Chat Input - Style Futuriste */}
+      <div style={{
+        background: 'var(--bg-surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        padding: '16px 32px'
+      }}>
+        <div className="chat-input-container" style={{ maxWidth: 720, margin: '0 auto' }}>
+          <button 
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              background: 'var(--bg-glass)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <Mic size={18} />
           </button>
           <input
             type="text"
@@ -994,13 +1441,13 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Posez votre question agricole..."
-            className="flex-1 px-6 py-3 bg-white/70 backdrop-blur-sm rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-800 placeholder-gray-400"
+            className="chat-input"
           />
           <button
             onClick={handleSendMessage}
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2 font-medium"
+            className="chat-send-btn"
+            disabled={!inputValue.trim()}
           >
-            Envoyer
             <Send size={18} />
           </button>
         </div>
@@ -1322,74 +1769,156 @@ function DashboardPage() {
 
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm px-8 py-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
+    <div className="flex-1 overflow-y-auto" style={{ background: 'transparent', position: 'relative' }}>
+      <FluidBackground />
+      {/* Header */}
+      <div style={{ 
+        background: 'transparent',
+        padding: '24px 32px',
+        position: 'relative', zIndex: 1
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h2 className="text-3xl font-semibold text-gray-800">Tableau de Bord Agricole</h2>
-            <p className="text-gray-500 mt-1">Vue d'ensemble de l'agriculture à Madagascar - Mise à jour en temps réel</p>
+            <h2 style={{ 
+              fontSize: 28, 
+              fontWeight: 600, 
+              color: '#FFFFFF',
+              fontFamily: 'var(--font-display)' 
+            }}>Tableau de Bord Agricole</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 14 }}>
+              Vue d'ensemble de l'agriculture à Madagascar
+            </p>
           </div>
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl">
-            <div className="text-xs opacity-90">Saison Actuelle</div>
-            <div className="text-lg font-bold">Été Austral 2026</div>
+          <div style={{ 
+            background: 'rgba(255,255,255,0.05)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'white', 
+            padding: '12px 20px', 
+            borderRadius: 16,
+            boxShadow: '0 0 20px rgba(16, 185, 129, 0.15)'
+          }}>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Saison Actuelle</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>Été Austral 2026</div>
           </div>
         </div>
       </div>
 
-      <div className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div style={{ padding: 32, position: 'relative', zIndex: 1 }}>
+        {/* Stats Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginBottom: 32 }}>
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-all hover:-translate-y-1">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-14 h-14 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center shadow-lg`}>
+            <div key={index} style={{
+              background: 'rgba(255,255,255,0.03)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 16,
+              padding: 20,
+              transition: 'all 0.3s',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  background: stat.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                }}>
                   {stat.icon}
                 </div>
-                <span className="text-sm font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full">{stat.change}</span>
+                <span style={{ 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  color: '#10B981', 
+                  background: 'rgba(16,185,129,0.15)', 
+                  padding: '4px 12px', 
+                  borderRadius: 20 
+                }}>{stat.change}</span>
               </div>
-              <p className="text-gray-500 text-sm mb-1">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-800 mb-1">{stat.value}</p>
-              <p className="text-xs text-gray-400">{stat.subtext}</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 4 }}>{stat.label}</p>
+              <p style={{ color: '#FFFFFF', fontSize: 32, fontWeight: 700, marginBottom: 4 }}>{stat.value}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{stat.subtext}</p>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-          <div className="lg:col-span-4 bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">Carte de Madagascar</h3>
-              <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Cliquez sur une région pour les détails</div>
+        {/* Map Section */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 20, marginBottom: 24 }}>
+          <div style={{ gridColumn: 'span 4', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#FFFFFF', fontFamily: 'var(--font-display)' }}>Carte de Madagascar</h3>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: 20 }}>
+                Cliquez sur une région
+              </span>
             </div>
             <div
               ref={mapRef}
-              className="w-full rounded-xl overflow-hidden shadow-lg border border-gray-300"
-              style={{ zIndex: 1, height: '720px' }}
+              style={{ 
+                width: '100%', 
+                borderRadius: 12, 
+                overflow: 'hidden', 
+                height: 600,
+                border: '1px solid rgba(255,255,255,0.05)'
+              }}
             ></div>
           </div>
 
           {/* Panel météo temps réel */}
-          <div className="lg:col-span-1 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col" style={{ minHeight: '720px' }}>
+          <div style={{ 
+            background: 'rgba(255,255,255,0.03)', 
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255,255,255,0.08)', 
+            borderRadius: 16, 
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 600
+          }}>
             {!selectedCity ? (
               /* Invite de sélection */
-              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-5">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl flex items-center justify-center text-4xl shadow-inner">
-                  🗺️
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: 24,
+                gap: 20
+              }}>
+                <div style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 24,
+                  background: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(6, 182, 212, 0.3)'
+                }}>
+                  <CloudRain size={36} style={{ color: 'white' }} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Météo en temps réel</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">
+                  <h3 style={{ fontWeight: 600, color: '#FFFFFF', marginBottom: 8 }}>Météo en temps réel</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                     Cliquez sur une région de la carte pour afficher sa météo en direct
                   </p>
                 </div>
-                <div className="w-full border-t border-gray-100 pt-4">
-                  <p className="text-xs text-gray-300">Source : Open-Meteo • Sans clé API</p>
+                <div style={{ width: '100%', paddingTop: 16 }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Source : Open-Meteo • Sans clé API</p>
                 </div>
               </div>
             ) : weatherLoading ? (
               /* Chargement */
               <div className="flex-1 flex flex-col items-center justify-center gap-4">
                 <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin"></div>
-                <p className="text-sm text-gray-400">Récupération météo…</p>
-                <p className="text-xs text-gray-300">{selectedCity.name}</p>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Récupération météo…</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{selectedCity.name}</p>
               </div>
             ) : weather && weather.current ? (
               /* Données météo */
@@ -1408,40 +1937,40 @@ function DashboardPage() {
                 </div>
 
                 {/* 4 métriques courantes */}
-                <div className="grid grid-cols-2 gap-2 p-4 border-b border-gray-100 flex-shrink-0">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 16 }}>
                   {[
                     { icon: '🌡️', label: 'Ressenti',  value: `${Math.round(weather.current.apparent_temperature)}°C` },
                     { icon: '💧', label: 'Humidité',  value: `${weather.current.relative_humidity_2m}%`            },
                     { icon: '💨', label: 'Vent',       value: `${Math.round(weather.current.wind_speed_10m)} km/h`  },
                     { icon: '🌧️', label: 'Précip.',   value: `${weather.current.precipitation} mm`                 },
                   ].map((d, i) => (
-                    <div key={i} className="bg-gray-50 rounded-xl p-2.5 text-center">
-                      <div className="text-xl mb-0.5">{d.icon}</div>
-                      <div className="text-sm font-bold text-gray-800">{d.value}</div>
-                      <div className="text-xs text-gray-400">{d.label}</div>
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 10, textAlign: 'center' }}>
+                      <div style={{ fontSize: 18, marginBottom: 2 }}>{d.icon}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{d.value}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{d.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Prévisions 5 jours */}
-                <div className="p-4 flex-1">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Prévisions 5 jours</p>
-                  <div className="space-y-1">
+                <div style={{ padding: 16, flex: 1 }}>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Prévisions 5 jours</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {weather.daily.time.map((date, i) => {
                       const info = wmoInfo(weather.daily.weather_code[i]);
                       const dayName = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short' });
                       return (
-                        <div key={i} className="flex items-center justify-between py-2 px-3 rounded-xl hover:bg-gray-50 transition-colors">
-                          <span className="text-sm font-medium text-gray-600 w-10 capitalize">{dayName}</span>
-                          <span className="text-xl mx-1">{info.icon}</span>
-                          <span className="text-xs text-blue-500 w-10 text-center">
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 12, transition: 'background 0.2s' }}>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', width: 40, textTransform: 'capitalize' }}>{dayName}</span>
+                          <span style={{ fontSize: 20 }}>{info.icon}</span>
+                          <span style={{ fontSize: 12, color: '#3B82F6', width: 40, textAlign: 'center' }}>
                             💧{weather.daily.precipitation_probability_max[i]}%
                           </span>
-                          <div className="text-right">
-                            <span className="text-sm font-bold text-gray-800">
+                          <div style={{ textAlign: 'right' }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>
                               {Math.round(weather.daily.temperature_2m_max[i])}°
                             </span>
-                            <span className="text-xs text-gray-400 ml-1">
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 4 }}>
                               {Math.round(weather.daily.temperature_2m_min[i])}°
                             </span>
                           </div>
@@ -1452,48 +1981,58 @@ function DashboardPage() {
                 </div>
 
                 {/* Pied de page */}
-                <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
-                  <p className="text-xs text-gray-300 text-center">
+                <div style={{ padding: '12px 16px' }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>
                     Open-Meteo · Mis à jour à l'instant
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center p-6 text-sm text-red-400">
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontSize: 14, color: '#EF4444' }}>
                 Impossible de charger la météo.
               </div>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Production par Région</h3>
-            <div className="space-y-3">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, marginBottom: 24 }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 600, color: '#FFFFFF', marginBottom: 16, fontFamily: 'var(--font-display)' }}>Production par Région</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {regions.map((region, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-md transition-all cursor-pointer border border-green-100"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: 16,
+                    borderRadius: 12,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
                   onMouseEnter={() => setSelectedRegion(region.id)}
                   onMouseLeave={() => setSelectedRegion(null)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full shadow-md" style={{ backgroundColor: region.color }}></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: '50%', background: region.color, boxShadow: `0 0 8px ${region.color}40` }}></div>
                     <div>
-                      <span className="font-semibold text-gray-800">{region.name}</span>
-                      <p className="text-xs text-gray-500 mt-0.5">{region.crop}</p>
+                      <span style={{ fontWeight: 600, color: '#FFFFFF', fontSize: 14 }}>{region.name}</span>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{region.crop}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">{region.farmers} agriculteurs</p>
-                      <p className="text-xs text-gray-400">{region.area}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{region.farmers} agriculteurs</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{region.area}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-28 h-3 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${region.production}%`, backgroundColor: region.color }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 80, height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', borderRadius: 20, width: `${region.production}%`, background: region.color, transition: 'width 0.3s' }}></div>
                       </div>
-                      <span className="text-sm font-bold text-gray-700 w-10">{region.production}%</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', width: 36 }}>{region.production}%</span>
                     </div>
                   </div>
                 </div>
@@ -1501,9 +2040,9 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Performance des Cultures</h3>
-            <div className="space-y-4">
+          <div style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 600, color: '#FFFFFF', marginBottom: 16, fontFamily: 'var(--font-display)' }}>Performance des Cultures</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
                 { name: "Riz Paddy", yield: "4.2T/ha", status: "Excellent", trend: "+12%", icon: "🌾", color: "from-green-400 to-emerald-500" },
                 { name: "Vanille", yield: "2.8kg/ha", status: "Très Bon", trend: "+18%", icon: "🌿", color: "from-emerald-400 to-lime-500" },
@@ -1511,24 +2050,41 @@ function DashboardPage() {
                 { name: "Girofle", yield: "850kg/ha", status: "Excellent", trend: "+15%", icon: "🌸", color: "from-green-500 to-emerald-600" },
                 { name: "Cacao", yield: "1.2T/ha", status: "Bon", trend: "+10%", icon: "🍫", color: "from-emerald-500 to-lime-600" }
               ].map((crop, index) => (
-                <div key={index} className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 hover:shadow-lg transition-all">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${crop.color} rounded-xl flex items-center justify-center text-2xl shadow-md`}>
+                <div key={index} style={{
+                  padding: 16,
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  transition: 'all 0.2s',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 12,
+                        background: `linear-gradient(135deg, ${crop.color.includes('green-400') ? '#4ade80' : crop.color.includes('emerald-400') ? '#34d399' : crop.color.includes('lime-400') ? '#a3e635' : crop.color.includes('green-500') ? '#22c55e' : '#10b981'}, ${crop.color.includes('lime') ? '#84cc16' : '#059669'})`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 22,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                      }}>
                         {crop.icon}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-800">{crop.name}</h4>
-                        <p className="text-xs text-gray-500">Rendement: {crop.yield}</p>
+                        <h4 style={{ fontWeight: 600, color: '#FFFFFF', fontSize: 14 }}>{crop.name}</h4>
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Rendement: {crop.yield}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">{crop.trend}</span>
-                      <p className="text-xs text-gray-500 mt-1">{crop.status}</p>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#10B981', background: 'rgba(16,185,129,0.15)', padding: '4px 10px', borderRadius: 20 }}>{crop.trend}</span>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{crop.status}</p>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className={`bg-gradient-to-r ${crop.color} h-2 rounded-full`} style={{ width: `${70 + index * 5}%` }}></div>
+                  <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 20, height: 6, overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 20,
+                      background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                      width: `${70 + index * 5}%`,
+                      transition: 'width 0.3s',
+                    }}></div>
                   </div>
                 </div>
               ))}
@@ -1546,67 +2102,71 @@ function DashboardPage() {
             u.email.toLowerCase().includes(userSearch.toLowerCase())
           );
           return (
-            <div className="mt-6 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div style={{ marginTop: 24, background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden' }}>
               {/* En-tête */}
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                    <Users size={20} className="text-white" />
+              <div style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Users size={20} style={{ color: 'white' }} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Utilisateurs inscrits</h3>
-                    <p className="text-xs text-gray-400">
+                    <h3 style={{ fontSize: 18, fontWeight: 600, color: '#FFFFFF' }}>Utilisateurs inscrits</h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                       {userList.length} compte{userList.length > 1 ? 's' : ''} — {userList.filter(u => u.is_staff).length} admin{userList.filter(u => u.is_staff).length > 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
-                <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <div style={{ position: 'relative' }}>
+                  <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
                     type="text"
                     placeholder="Rechercher nom ou email…"
                     value={userSearch}
                     onChange={e => setUserSearch(e.target.value)}
-                    className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white w-56"
+                    style={{
+                      paddingLeft: 36, paddingRight: 16, paddingTop: 8, paddingBottom: 8, fontSize: 13,
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: 12, color: 'var(--text-primary)', outline: 'none', width: 224,
+                    }}
                   />
                 </div>
               </div>
 
               {/* Tableau */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%' }}>
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      <th className="text-left px-6 py-3">Utilisateur</th>
-                      <th className="text-left px-6 py-3">Email</th>
-                      <th className="text-left px-6 py-3">Rôle</th>
-                      <th className="text-left px-6 py-3">Statut</th>
-                      <th className="text-left px-6 py-3">Inscrit le</th>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utilisateur</th>
+                      <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</th>
+                      <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rôle</th>
+                      <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Statut</th>
+                      <th style={{ textAlign: 'left', padding: '12px 24px', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inscrit le</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {filtered.length === 0
-                      ? <tr><td colSpan={5} className="text-center py-10 text-gray-400 text-sm">Aucun résultat.</td></tr>
+                      ? <tr><td colSpan={5} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)', fontSize: 14 }}>Aucun résultat.</td></tr>
                       : filtered.map(u => (
-                        <tr key={u.id} className="hover:bg-violet-50/40 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
+                        <tr key={u.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.2s' }}>
+                          <td style={{ padding: '16px 24px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                               <UserAvatar name={u.name} />
-                              <span className="font-semibold text-gray-800">{u.name}</span>
+                              <span style={{ fontWeight: 600, color: '#FFFFFF' }}>{u.name}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{u.email}</td>
-                          <td className="px-6 py-4">
+                          <td style={{ padding: '16px 24px', fontSize: 13, color: 'var(--text-secondary)' }}>{u.email}</td>
+                          <td style={{ padding: '16px 24px' }}>
                             {u.is_staff
-                              ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700"><Shield size={11} /> Admin</span>
-                              : <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"><User size={11} /> Utilisateur</span>}
+                              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(139,92,246,0.15)', color: '#A78BFA' }}><Shield size={11} /> Admin</span>
+                              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(16,185,129,0.15)', color: '#34D399' }}><User size={11} /> Utilisateur</span>}
                           </td>
-                          <td className="px-6 py-4">
+                          <td style={{ padding: '16px 24px' }}>
                             {u.is_active
-                              ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Actif</span>
-                              : <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" /> Inactif</span>}
+                              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(16,185,129,0.15)', color: '#34D399' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} /> Actif</span>
+                              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6B7280', display: 'inline-block' }} /> Inactif</span>}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{fmt(u.created_at)}</td>
+                          <td style={{ padding: '16px 24px', fontSize: 13, color: 'var(--text-muted)' }}>{fmt(u.created_at)}</td>
                         </tr>
                       ))
                     }
