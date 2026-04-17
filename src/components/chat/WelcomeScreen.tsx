@@ -65,18 +65,19 @@ export function WelcomeScreen({ suggestions, onSelect }: WelcomeScreenProps) {
     }}>
       <h1 style={{
         fontSize: 32, fontWeight: 600, fontFamily: 'var(--font-display)',
-        background: 'linear-gradient(135deg, white, var(--cyan-400))',
-        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        marginBottom: 8,
+        background: 'linear-gradient(135deg, #ffffff, #22d3ee)',
+        WebkitBackgroundClip: 'text', backgroundClip: 'text',
+        WebkitTextFillColor: 'transparent', color: 'transparent',
+        marginBottom: 36, marginTop: -32,
         animation: 'fade-in-up 0.6s ease-out',
       }}>
-        Bonjour, Agriculteur
+        Assistant Agricole IA
       </h1>
 
       <h2 style={{
         fontSize: 18,
         color: 'var(--text-secondary)',
-        marginBottom: 16,
+        marginBottom: 48,
         minHeight: 28,
         fontFamily: 'var(--font-display)',
       }}>
@@ -91,8 +92,15 @@ export function WelcomeScreen({ suggestions, onSelect }: WelcomeScreenProps) {
         </span>
       </h2>
 
-      <p style={{ color: 'var(--text-muted)', maxWidth: 400, lineHeight: 1.6, marginBottom: 48 }}>
-        Prêt à vous assister dans vos activités agricoles, de la plantation à la récolte.
+      <p style={{
+        color: 'var(--text-muted)',
+        fontSize: 14,
+        lineHeight: 1.6,
+        maxWidth: 400,
+        marginBottom: 32,
+      }}>
+        Prêt à vous assister dans vos activités agricoles, de la plantation
+        à la récolte. Commençons ensemble!
       </p>
 
       {/* Suggestion Cards */}

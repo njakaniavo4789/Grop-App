@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, TrendingDown, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck, Brain, Mic, MicOff, Wifi, WifiOff, ChevronDown, ChevronRight, Copy, Check, Sparkles, FlaskConical, BookOpen, FileText, RefreshCw, PanelLeftClose, PanelLeftOpen, LogOut, Sun, Moon, MapPin, Activity, X } from 'lucide-react';
+import { Send, Home, MessageSquare, Settings, User, Users, TrendingUp, TrendingDown, Sprout, Leaf, CloudRain, Save, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Search, Shield, UserCheck, Brain, Mic, MicOff, Wifi, WifiOff, ChevronDown, ChevronRight, ChevronLeft, Copy, Check, Sparkles, FlaskConical, BookOpen, FileText, RefreshCw, PanelLeftClose, PanelLeftOpen, LogOut, Sun, Moon, MapPin, Activity, X } from 'lucide-react';
 import { MADAGASCAR_GEOJSON } from './data/madagascarGeoJSON';
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
@@ -13,6 +13,8 @@ import GlobeAnalysis from "./composant/GlobeAnalysis";
 import { getAccessToken, clearTokens, authAPI } from "./api/auth";
 import { AgriculturalChat } from './components/chat';
 import { FluidBackground } from './components/ui/FluidBackground';
+import { ForecastPage } from './pages/ForecastPage';
+import { ForceGraphDashboard } from './components/dashboard/ForceGraphDashboard';
 
 function MarkdownMessage({ content }) {
   return (
@@ -149,7 +151,7 @@ function MainLayout() {
   const [streamingProgress, setStreamingProgress] = useState(0);
   const [abortController, setAbortController] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
     authAPI.getProfile(getAccessToken())
       .then(res => setUserInfo({
         name: res.data.name,
@@ -159,12 +161,11 @@ function MainLayout() {
       .catch(() => {});
   }, []);
 
-  // Apply/remove .light-mode class on <html> when darkMode changes
   useEffect(() => {
     if (darkMode) {
-      document.documentElement.classList.remove('light-mode');
+      document.body.classList.remove('light-mode');
     } else {
-      document.documentElement.classList.add('light-mode');
+      document.body.classList.add('light-mode');
     }
   }, [darkMode]);
 
@@ -375,7 +376,8 @@ function MainLayout() {
     <div className="flex h-screen relative" style={{ background: 'var(--bg-deep)' }}>
       <FluidBackground />
       
-      {/* Sidebar Glassmorphism */}
+      {/* Sidebar wrapper — overflow visible so the edge toggle button isn't clipped */}
+      <div style={{ position: 'relative', zIndex: 10, flexShrink: 0 }}>
       <nav className="sidebar-glass" style={{
         width: collapsed ? 68 : 220,
         display: 'flex',
@@ -383,8 +385,7 @@ function MainLayout() {
         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
         position: 'relative',
-        zIndex: 10,
-        flexShrink: 0,
+        height: '100%',
       }}>
         {/* Logo */}
         <div style={{ padding: collapsed ? 16 : 24, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -409,6 +410,7 @@ function MainLayout() {
         <div style={{ flex: 1, padding: collapsed ? 8 : 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <SidebarItem icon={<Home size={20} strokeWidth={1.5} />} label="Dashboard" collapsed={collapsed} active={currentPage === 'dashboard'} onClick={() => setCurrentPage('dashboard')} />
           <SidebarItem icon={<MessageSquare size={20} strokeWidth={1.5} />} label="Chat" collapsed={collapsed} active={currentPage === 'chat'} onClick={() => setCurrentPage('chat')} />
+          <SidebarItem icon={<CloudRain size={20} strokeWidth={1.5} />} label="Prévisions" collapsed={collapsed} active={currentPage === 'forecast'} onClick={() => setCurrentPage('forecast')} />
           <SidebarItem icon={<Settings size={20} strokeWidth={1.5} />} label="Paramètres" collapsed={collapsed} active={currentPage === 'settings'} onClick={() => setCurrentPage('settings')} />
           {userInfo.isAdmin && (
             <SidebarItem icon={<Users size={20} strokeWidth={1.5} />} label="Utilisateurs" collapsed={collapsed} active={currentPage === 'users'} onClick={() => setCurrentPage('users')} />
@@ -492,21 +494,43 @@ function MainLayout() {
             >
               <LogOut size={18} strokeWidth={1.5} />
             </button>
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              title={collapsed ? 'Étendre' : 'Réduire'}
-              style={{
-                padding: 8, borderRadius: 8,
-                background: 'transparent', border: 'none',
-                color: 'var(--text-muted)', cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {collapsed ? <PanelLeftOpen size={18} strokeWidth={1.5} /> : <PanelLeftClose size={18} strokeWidth={1.5} />}
-            </button>
           </div>
         </div>
       </nav>
+
+      {/* Toggle Button — outside nav so overflow:hidden doesn't clip it */}
+      <motion.button
+        onClick={() => setCollapsed(!collapsed)}
+        title={collapsed ? 'Étendre' : 'Réduire'}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          position: 'absolute', right: -12, top: 80,
+          width: 24, height: 24, borderRadius: '50%',
+          background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)',
+          color: 'var(--text-primary)', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 30, backdropFilter: 'blur(8px)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(16,185,129,0.6)';
+          e.currentTarget.style.boxShadow = '0 0 12px rgba(16,185,129,0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'var(--border-subtle)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        }}
+      >
+        <motion.span
+          animate={{ rotate: collapsed ? 0 : 180 }}
+          transition={{ duration: 0.3 }}
+          style={{ display: 'inline-flex' }}
+        >
+          <ChevronRight size={14} strokeWidth={1.5} />
+        </motion.span>
+      </motion.button>
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
@@ -514,9 +538,11 @@ function MainLayout() {
           ? <AgriculturalChat />
           : currentPage === 'dashboard'
             ? <DashboardPage />
-            : currentPage === 'settings'
-              ? <SettingsPage />
-              : <UsersPage />
+            : currentPage === 'forecast'
+              ? <ForecastPage />
+              : currentPage === 'settings'
+                ? <SettingsPage />
+                : <UsersPage />
         }
       </main>
     </div>
@@ -813,7 +839,7 @@ function SidebarItem({ icon, label, collapsed, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`sidebar-item ${active ? 'active' : ''}`}
+      className={`sidebar-item${active ? ' active' : ''}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -821,24 +847,18 @@ function SidebarItem({ icon, label, collapsed, active, onClick }) {
         gap: 12,
         padding: collapsed ? '12px' : '12px 16px',
         borderRadius: 12,
-        transition: 'all 0.2s ease',
         cursor: 'pointer',
-        background: active ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+        background: active ? 'rgba(16,185,129,0.15)' : 'transparent',
         color: active ? '#10B981' : 'var(--text-secondary)',
-        border: active ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid transparent',
+        border: active ? '1px solid rgba(16,185,129,0.3)' : '1px solid transparent',
         width: '100%',
         marginBottom: 4,
+        transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
       }}
     >
-      <span style={{ flexShrink: 0 }}>{icon}</span>
+      <span style={{ flexShrink: 0, display: 'inline-flex' }}>{icon}</span>
       {!collapsed && (
-        <span style={{
-          fontSize: 14,
-          fontWeight: 500,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}>
+        <span style={{ fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {label}
         </span>
       )}
@@ -1486,25 +1506,12 @@ function ChatPage({ messages, inputValue, setInputValue, handleSendMessage, hand
   );
 }
 
-/* ─── Couleurs biomes pour la carte géographique ─── */
-const BIOME_COLORS = {
-  rainforest: '#1e4d2b',   // vert forêt profond (est/nord-est)
-  tropical:   '#2e6b3a',   // vert tropical (nord)
-  transition: '#5a7a42',   // vert-brun intermédiaire
-  humid:      '#3d6b52',   // vert-bleu côte est
-  highland:   '#7a6b46',   // brun hauts plateaux
-  arid:       '#b8914a',   // ocre/sable (sud)
-  default:    '#2e5a35',
-};
-const getBiomeColor = (biome) => BIOME_COLORS[biome] ?? BIOME_COLORS.default;
+/* ─── DashboardPage uses ForceGraphDashboard ─── */
 
 /* ═══════════════════════════════════════════════════════════════════
-   DONNÉES DES 22 RÉGIONS — mock data
-
-/* ═══════════════════════════════════════════════════════════════════
-   DONNÉES — 22 régions de Madagascar
+   DASHBOARD — force graph (data lives in madagascarGraphData.js)
 ═══════════════════════════════════════════════════════════════════ */
-const REGIONS_STATS = {
+const REGIONS_STATS_UNUSED = {
   "Diana":               { capital:"Antsiranana",           pop:"696 K",   growth:"+3.8%", positive:true,  surface:"13 124 km²", sparkline:[38,40,42,44,43,46,48], note:"Porte d'entrée nord. Tourisme balnéaire et zone franche industrielle en développement rapide.", crops:"Cacao · Vanille · Café", accent:"#3b82f6" },
   "Sava":                { capital:"Sambava",                pop:"1.1 M",   growth:"+4.5%", positive:true,  surface:"25 518 km²", sparkline:[50,52,55,53,58,60,63], note:"Capital mondial de la vanille. Exportations en forte croissance depuis 2022.", crops:"Vanille · Girofle · Letchi", accent:"#8e24aa" },
   "Analanjirofo":        { capital:"Fenoarivo-Atsinanana",  pop:"1.0 M",   growth:"+3.2%", positive:true,  surface:"21 930 km²", sparkline:[42,44,43,46,45,48,50], note:"Région côtière est, biodiversité exceptionnelle. Pêche artisanale en expansion.", crops:"Girofle · Café · Letchi", accent:"#f4511e" },
@@ -1565,390 +1572,6 @@ function AnimVal({ v }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   DASHBOARD
-═══════════════════════════════════════════════════════════════════ */
 function DashboardPage() {
-  const [selectedRegion, setSelectedRegion] = useState(null);   // null = nothing selected
-  const [hoveredRegion,  setHoveredRegion]  = useState(null);
-  const [svgPaths,       setSvgPaths]       = useState([]);
-  const [tooltip,        setTooltip]        = useState({ visible:false, x:0, y:0, name:'', capital:'' });
-  const mapContainerRef = useRef(null);
-
-  const prefersReduced = typeof window !== 'undefined'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ── Compute SVG paths from GeoJSON ── */
-  useEffect(() => {
-    import('d3').then((d3) => {
-      // fitExtent adds 16px padding on each side so no region is clipped
-      const proj = d3.geoMercator().fitExtent([[16, 12], [404, 708]], MADAGASCAR_GEOJSON);
-      const gen  = d3.geoPath().projection(proj);
-      setSvgPaths(MADAGASCAR_GEOJSON.features.map((f) => ({
-        name:     f.properties.name,
-        capital:  f.properties.capital,
-        color:    f.properties.color,
-        biome:    f.properties.biome,
-        d:        gen(f),
-        centroid: gen.centroid(f),
-      })));
-    });
-  }, []);
-
-  const region      = selectedRegion ? REGIONS_STATS[selectedRegion] : null;
-  const accentColor = region?.accent ?? '#10b981';
-
-  const glass = (extra = {}) => ({
-    background: 'rgba(255,255,255,0.04)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: 20,
-    ...extra,
-  });
-
-  /* ── Card variants (respect prefers-reduced-motion) ── */
-  const springT = prefersReduced ? { duration:0 } : { type:'spring', stiffness:200, damping:22 };
-  const cardV = {
-    hidden:  { opacity:0, x: prefersReduced ? 0 : 60, scale: prefersReduced ? 1 : 0.96 },
-    visible: { opacity:1, x:0, scale:1, transition:{ ...springT, staggerChildren:0.07 } },
-    exit:    { opacity:0, x: prefersReduced ? 0 : 60, scale: prefersReduced ? 1 : 0.94, transition:{ duration: prefersReduced ? 0 : 0.2 } },
-  };
-  const blockV = {
-    hidden:  { opacity:0, y: prefersReduced ? 0 : 18 },
-    visible: { opacity:1, y:0, transition: prefersReduced ? { duration:0 } : { type:'spring', stiffness:260, damping:22 } },
-  };
-
-  return (
-    <div
-      className="flex-1 overflow-hidden flex flex-col"
-      style={{ position:'relative', height:'100%', fontFamily:'var(--font-body, DM Sans, sans-serif)' }}
-    >
-      {/* ── Same background as chat ── */}
-      <FluidBackground />
-
-      {/* ── Content (above background) ── */}
-      <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', height:'100%' }}>
-
-        {/* Header */}
-        <div style={{ padding:'20px 28px 12px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <div>
-            <h2 style={{ fontSize:20, fontWeight:700, color:'#fff', letterSpacing:'-0.02em', margin:0 }}>
-              Tableau de bord — Madagascar
-            </h2>
-            <p style={{ fontSize:12, color:'rgba(255,255,255,0.35)', marginTop:3, margin:0 }}>
-              {selectedRegion
-                ? `Région sélectionnée : ${selectedRegion}`
-                : 'Sélectionnez une région pour voir les statistiques'}
-            </p>
-          </div>
-          <div style={{ ...glass(), padding:'7px 16px', display:'flex', alignItems:'center', gap:7 }}>
-            <span style={{ width:7, height:7, borderRadius:'50%', background:'#00e676', boxShadow:'0 0 6px #00e676', display:'inline-block' }} />
-            <span style={{ fontSize:12, color:'rgba(255,255,255,0.6)', fontWeight:500 }}>22 régions · Live</span>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div style={{ flex:1, display:'flex', overflow:'hidden', padding:'16px', gap:'14px', minHeight:0 }}>
-
-          {/* ════ LEFT — Map ════ */}
-          <motion.div
-            layout
-            transition={{ type:'spring', stiffness:180, damping:24 }}
-            style={{
-              ...glass(),
-              flex: selectedRegion ? '0 0 44%' : '1 1 100%',
-              display:'flex', flexDirection:'column', overflow:'hidden',
-            }}
-          >
-            {/* Map title */}
-            <div style={{ padding:'12px 18px 8px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', alignItems:'center', gap:8 }}>
-              <MapPin size={13} style={{ color: selectedRegion ? accentColor : '#10b981' }} />
-              <span style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.7)', letterSpacing:'0.03em' }}>
-                Carte des 22 régions
-              </span>
-              {!selectedRegion && (
-                <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.25)' }}>
-                  ← Cliquez sur une région
-                </span>
-              )}
-            </div>
-
-            {/* SVG */}
-            <div
-              ref={mapContainerRef}
-              style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'10px 8px', position:'relative', overflow:'hidden' }}
-              onMouseLeave={() => { setHoveredRegion(null); setTooltip({ visible:false }); }}
-            >
-              {svgPaths.length === 0 ? (
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16, opacity:0.4 }}>
-                  <div style={{ width:120, height:200, background:'rgba(255,255,255,0.06)', borderRadius:60, animation:'pulse 1.5s ease-in-out infinite' }} />
-                  <div style={{ width:80, height:10, background:'rgba(255,255,255,0.05)', borderRadius:6, animation:'pulse 1.5s ease-in-out infinite 0.3s' }} />
-                </div>
-              ) : (
-                <svg viewBox="0 0 420 720" style={{ width:'100%', maxHeight:'100%', overflow:'visible' }}>
-                  <defs>
-                    <filter id="region-glow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="4" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                    {/* Ocean gradient — plein fond */}
-                    <radialGradient id="ocean-deep" cx="50%" cy="45%" r="65%">
-                      <stop offset="0%"   stopColor="#0d2a42" stopOpacity="0.85"/>
-                      <stop offset="60%"  stopColor="#071929" stopOpacity="0.9"/>
-                      <stop offset="100%" stopColor="#020810" stopOpacity="1"/>
-                    </radialGradient>
-                    {/* Shimmer on selected region */}
-                    <filter id="sel-glow" x="-30%" y="-30%" width="160%" height="160%">
-                      <feGaussianBlur stdDeviation="6" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                  </defs>
-
-                  {/* Ocean full background */}
-                  <rect width="420" height="720" fill="url(#ocean-deep)" />
-                  {/* Subtle grid lines for geographic feel */}
-                  {[120,240,360,480,600].map(y => (
-                    <line key={y} x1="0" y1={y} x2="420" y2={y} stroke="rgba(255,255,255,0.025)" strokeWidth="0.5" strokeDasharray="4,6" />
-                  ))}
-                  {[84,168,252,336].map(x => (
-                    <line key={x} x1={x} y1="0" x2={x} y2="720" stroke="rgba(255,255,255,0.025)" strokeWidth="0.5" strokeDasharray="4,6" />
-                  ))}
-
-                  {svgPaths.map((p) => {
-                    const isSel = p.name === selectedRegion;
-                    const isHov = p.name === hoveredRegion;
-                    const biomeColor = getBiomeColor(p.biome);
-                    const fillColor = isSel
-                      ? (REGIONS_STATS[p.name]?.accent ?? accentColor)
-                      : isHov
-                        ? biomeColor + 'cc'   // biome color at 80% opacity on hover
-                        : biomeColor + '99';  // biome color at 60% opacity by default
-
-                    const selAccent = REGIONS_STATS[p.name]?.accent ?? accentColor;
-                    return (
-                      <g key={p.name} filter={isSel ? 'url(#sel-glow)' : undefined}>
-                        <path
-                          d={p.d}
-                          fill={fillColor}
-                          stroke={isSel ? selAccent : isHov ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.14)'}
-                          strokeWidth={isSel ? 2 : isHov ? 1.2 : 0.6}
-                          style={{
-                            cursor:'pointer',
-                            transition: prefersReduced ? 'none' : 'fill 0.2s, stroke 0.2s, filter 0.2s',
-                            filter: isSel
-                              ? `drop-shadow(0 0 12px ${selAccent}bb)`
-                              : isHov
-                                ? `drop-shadow(0 0 4px rgba(255,255,255,0.3))`
-                                : 'none',
-                          }}
-                          onClick={() => setSelectedRegion(p.name === selectedRegion ? null : p.name)}
-                          onMouseEnter={(e) => {
-                            setHoveredRegion(p.name);
-                            const rect = e.currentTarget.closest('svg').getBoundingClientRect();
-                            const scaleX = 420 / rect.width;
-                            const scaleY = 720 / rect.height;
-                            setTooltip({
-                              visible: true,
-                              x: (e.clientX - rect.left) / rect.width * 100,
-                              y: (e.clientY - rect.top)  / rect.height * 100,
-                              name: p.name,
-                              capital: p.capital,
-                            });
-                          }}
-                          onMouseMove={(e) => {
-                            const rect = e.currentTarget.closest('svg').getBoundingClientRect();
-                            setTooltip(t => ({
-                              ...t,
-                              x: (e.clientX - rect.left) / rect.width * 100,
-                              y: (e.clientY - rect.top)  / rect.height * 100,
-                            }));
-                          }}
-                          onMouseLeave={() => { setHoveredRegion(null); setTooltip({ visible:false }); }}
-                        />
-                        {/* Label on selected */}
-                        {isSel && p.centroid && (
-                          <text x={p.centroid[0]} y={p.centroid[1]}
-                            textAnchor="middle" dominantBaseline="middle"
-                            style={{ fontSize:7, fill:'#fff', fontWeight:700, pointerEvents:'none', letterSpacing:'0.05em', textShadow:'0 1px 3px #000' }}>
-                            {p.name.length > 12 ? p.name.split('-')[0] : p.name}
-                          </text>
-                        )}
-                      </g>
-                    );
-                  })}
-                </svg>
-              )}
-
-              {/* Tooltip */}
-              {tooltip.visible && (
-                <div style={{
-                  position:'absolute',
-                  left:`${tooltip.x}%`, top:`${tooltip.y}%`,
-                  transform:'translateX(-50%)',
-                  background:'rgba(5,5,20,0.92)',
-                  border:'1px solid rgba(255,255,255,0.12)',
-                  borderRadius:10, padding:'6px 12px',
-                  pointerEvents:'none', zIndex:20,
-                  backdropFilter:'blur(16px)',
-                  whiteSpace:'nowrap',
-                }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>{tooltip.name}</div>
-                  <div style={{ fontSize:10, color:'rgba(255,255,255,0.45)', marginTop:1 }}>{tooltip.capital}</div>
-                </div>
-              )}
-            </div>
-
-            {/* Region pill nav */}
-            <div style={{ padding:'8px 12px', borderTop:'1px solid rgba(255,255,255,0.05)', display:'flex', flexWrap:'wrap', gap:4, maxHeight:72, overflowY:'auto' }}>
-              {Object.keys(REGIONS_STATS).map((name) => (
-                <button key={name} onClick={() => setSelectedRegion(name === selectedRegion ? null : name)}
-                  style={{
-                    fontSize:10, fontWeight:600, padding:'3px 8px', borderRadius:20, cursor:'pointer',
-                    border:'none', outline:'none',
-                    background: name === selectedRegion
-                      ? (REGIONS_STATS[name]?.accent ?? '#10b981')
-                      : 'rgba(255,255,255,0.05)',
-                    color: name === selectedRegion ? '#fff' : 'rgba(255,255,255,0.4)',
-                    transition:'all 0.18s',
-                    boxShadow: name === selectedRegion
-                      ? `0 0 8px ${REGIONS_STATS[name]?.accent ?? '#10b981'}66`
-                      : 'none',
-                  }}>
-                  {name}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* ════ RIGHT — Bento Card (only when region selected) ════ */}
-          <AnimatePresence>
-            {region && (
-              <motion.div
-                key={selectedRegion}
-                variants={cardV}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                style={{ flex:'0 0 54%', display:'flex', flexDirection:'column', gap:12, overflow:'auto', minWidth:0 }}
-              >
-                {/* ── Card Header ── */}
-                <motion.div variants={blockV} style={{
-                  ...glass({ borderLeft:`3px solid ${accentColor}` }),
-                  padding:'16px 20px',
-                  display:'flex', alignItems:'center', justifyContent:'space-between',
-                }}>
-                  <div style={{ minWidth:0 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
-                      <span style={{ fontSize:10, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Région</span>
-                      <span style={{ fontSize:10, fontWeight:700, color:accentColor, background:`${accentColor}22`, padding:'2px 8px', borderRadius:20, border:`1px solid ${accentColor}44` }}>
-                        Madagascar
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize:22, fontWeight:800, color:'#fff', margin:0, letterSpacing:'-0.02em' }}>
-                      <AnimVal v={selectedRegion} />
-                    </h3>
-                    <div style={{ display:'flex', alignItems:'center', flexWrap:'wrap', gap:5, marginTop:5 }}>
-                      <MapPin size={10} style={{ color:accentColor }} />
-                      <span style={{ fontSize:12, color:'rgba(255,255,255,0.55)' }}>{region.capital}</span>
-                      <span style={{ color:'rgba(255,255,255,0.18)' }}>·</span>
-                      <span style={{ fontSize:12, color:'rgba(255,255,255,0.3)' }}>{region.surface}</span>
-                    </div>
-                  </div>
-                  {/* Close button */}
-                  <button
-                    aria-label="Fermer la fiche région"
-                    onClick={() => setSelectedRegion(null)}
-                    style={{
-                      width:32, height:32, borderRadius:10,
-                      background:'rgba(255,255,255,0.06)',
-                      border:'1px solid rgba(255,255,255,0.1)',
-                      color:'rgba(255,255,255,0.5)',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      cursor:'pointer', flexShrink:0,
-                      transition:'all 0.18s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background='rgba(255,71,87,0.15)'; e.currentTarget.style.color='#ff4757'; e.currentTarget.style.borderColor='rgba(255,71,87,0.3)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.06)'; e.currentTarget.style.color='rgba(255,255,255,0.5)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'; }}
-                  >
-                    <X size={13} />
-                  </button>
-                </motion.div>
-
-                {/* ── Stats Row ── */}
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <motion.div variants={blockV} style={{ ...glass(), padding:'14px 16px' }}>
-                    <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:8, display:'flex', alignItems:'center', gap:4 }}>
-                      <Users size={10} /> Population
-                    </div>
-                    <div style={{ fontSize:26, fontWeight:800, color:'#fff', lineHeight:1 }}>
-                      <AnimVal v={region.pop} />
-                    </div>
-                    <div style={{ marginTop:7, display:'flex', alignItems:'center', gap:4 }}>
-                      {region.positive
-                        ? <TrendingUp size={11} style={{ color:'#00e676' }} />
-                        : <TrendingDown size={11} style={{ color:'#ff4757' }} />}
-                      <span style={{ fontSize:12, fontWeight:700, color: region.positive ? '#00e676' : '#ff4757' }}>
-                        <AnimVal v={region.growth} />
-                      </span>
-                      <span style={{ fontSize:11, color:'rgba(255,255,255,0.25)', marginLeft:2 }}>/ an</span>
-                    </div>
-                  </motion.div>
-
-                  <motion.div variants={blockV} style={{ ...glass(), padding:'14px 16px' }}>
-                    <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:8, display:'flex', alignItems:'center', gap:4 }}>
-                      <Leaf size={10} /> Cultures
-                    </div>
-                    <div style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.8)', lineHeight:1.7 }}>
-                      <AnimVal v={region.crops} />
-                    </div>
-                    <div style={{ marginTop:8, height:3, background:'rgba(255,255,255,0.06)', borderRadius:10, overflow:'hidden' }}>
-                      <motion.div initial={{ width:0 }} animate={{ width:'72%' }}
-                        transition={{ duration:0.85, ease:[0.22,1,0.36,1] }}
-                        style={{ height:'100%', borderRadius:10, background:`linear-gradient(90deg,${accentColor},${accentColor}55)` }}
-                      />
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* ── Sparkline ── */}
-                <motion.div variants={blockV} style={{ ...glass(), padding:'14px 16px' }}>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-                    <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', letterSpacing:'0.09em', display:'flex', alignItems:'center', gap:4 }}>
-                      <Activity size={10} /> Indice de développement (fictif)
-                    </div>
-                    <span style={{ fontSize:11, color:accentColor, fontWeight:700 }}>
-                      {region.sparkline[region.sparkline.length - 1]}/100
-                    </span>
-                  </div>
-                  <Sparkline data={region.sparkline} color={accentColor} height={52} />
-                  <div style={{ display:'flex', justifyContent:'space-between', marginTop:3 }}>
-                    <span style={{ fontSize:10, color:'rgba(255,255,255,0.18)' }}>2018</span>
-                    <span style={{ fontSize:10, color:'rgba(255,255,255,0.18)' }}>2024</span>
-                  </div>
-                </motion.div>
-
-                {/* ── Note Obsidian ── */}
-                <motion.div variants={blockV} style={{ ...glass({ flex:1 }), padding:'14px 16px' }}>
-                  <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:8, display:'flex', alignItems:'center', gap:4 }}>
-                    <BookOpen size={10} /> Note d'analyse
-                  </div>
-                  <div style={{ fontSize:13, color:'rgba(255,255,255,0.72)', lineHeight:1.75, borderLeft:`2px solid ${accentColor}44`, paddingLeft:12 }}>
-                    <AnimVal v={region.note} />
-                  </div>
-                  <div style={{ marginTop:12, display:'flex', gap:5, flexWrap:'wrap' }}>
-                    {['Prototype','Données fictives','2026'].map(t => (
-                      <span key={t} style={{ fontSize:10, color:'rgba(255,255,255,0.3)', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', padding:'2px 8px', borderRadius:20 }}>{t}</span>
-                    ))}
-                  </div>
-                </motion.div>
-
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }

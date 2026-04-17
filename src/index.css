@@ -82,6 +82,10 @@
   --text-primary: #0F172A;
   --text-secondary: #334155;
   --text-muted: #64748B;
+  
+  /* Particles - emerald green for light mode */
+  --particle-color: #10B981;
+  --particle-glow: rgba(16, 185, 129, 0.4);
 }
 
 .light-mode body {

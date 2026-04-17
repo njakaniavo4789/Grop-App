@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI, saveTokens } from '../api/auth';
+import { ImageMarquee } from '../components/ui/ImageMarquee';
+import { TextScramble } from '../components/ui/TextScramble';
+import img1 from '../assets/marquee/2148761816.jpg';
+import img2 from '../assets/marquee/2149711095.jpg';
+import img3 from '../assets/marquee/pexels-safari-consoler-3290243-11196645.jpg';
+import img4 from '../assets/marquee/pexels-ateeq-photos-2152808415-32409512.jpg';
+import img5 from '../assets/marquee/644.jpg';
+import img6 from '../assets/marquee/campagne-litchi-madagascar.jpg';
+import img7 from '../assets/marquee/BAOBAB-2-1290x540.jpg';
+
+const MARQUEE_IMAGES = [img1, img2, img3, img4, img5, img6, img7];
 
 export default function FuturisticAgriLogin() {
   const navigate = useNavigate();
@@ -9,9 +20,9 @@ export default function FuturisticAgriLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
+  const [scrambleKey, setScrambleKey] = useState(0);
 
   // Initialize particles
   useEffect(() => {
@@ -41,6 +52,12 @@ export default function FuturisticAgriLogin() {
     return () => clearInterval(interval);
   }, []);
 
+  // Re-trigger TextScramble every 15s
+  useEffect(() => {
+    const interval = setInterval(() => setScrambleKey(k => k + 1), 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Mouse parallax
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -50,14 +67,6 @@ export default function FuturisticAgriLogin() {
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Testimonial rotation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % 3);
-    }, 6000);
-    return () => clearInterval(interval);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -85,49 +94,42 @@ export default function FuturisticAgriLogin() {
     }
   };
 
-  const testimonials = [
-    {
-      text: "Les prévisions de cultures basées sur l'IA ont augmenté notre rendement de 47% tout en réduisant la consommation d'eau de 35%. Cette plateforme est l'avenir de l'agriculture.",
-      name: "Dr. Elena Martinez",
-      role: "Agronome en chef • TerraVerde Farms",
-      initial: "EM",
-      metric: "+47% Rendement"
-    },
-    {
-      text: "La surveillance par satellite et l'analyse des sols en temps réel ont transformé notre exploitation. Nous prenons maintenant des décisions basées sur les données instantanément.",
-      name: "Marcus Chen",
-      role: "Directeur des opérations • GreenHorizon",
-      initial: "MC",
-      metric: "2K Hectares"
-    },
-    {
-      text: "Les analyses prédictives nous ont sauvés d'une mauvaise récolte lors de conditions météo imprévisibles. L'agriculture intelligente n'est plus une option, c'est une nécessité.",
-      name: "Amara Okafor",
-      role: "Responsable Agriculture Durable • BioFields",
-      initial: "AO",
-      metric: "98% Précision"
-    }
-  ];
-
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0a0f0d] font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* Animated Gradient Background */}
-      <div className="fixed inset-0 opacity-60">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1f14] via-[#0d1411] to-[#0a1520] animate-gradient-shift" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(34,197,94,0.08)_0%,transparent_50%)] animate-pulse-slow" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(22,163,74,0.06)_0%,transparent_50%)] animate-pulse-slower" />
+    <div className="relative min-h-screen overflow-hidden bg-black font-['Plus_Jakarta_Sans',sans-serif]">
+
+      {/* ── Layer 0 : Image Marquee — full-viewport background ── */}
+      <div className="fixed inset-0" style={{ zIndex: 0 }}>
+        <ImageMarquee speed={30} tileSize={280} imagesTop={MARQUEE_IMAGES} imagesBottom={MARQUEE_IMAGES} />
       </div>
 
-      {/* Noise Texture Overlay */}
-      <div 
+
+      {/* ── Layer 2 : Green ambient gradient (reduced, just a tint) ── */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 2, opacity: 0.35 }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(34,197,94,0.12)_0%,transparent_50%)] animate-pulse-slow" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(22,163,74,0.08)_0%,transparent_50%)] animate-pulse-slower" />
+      </div>
+
+      {/* ── Layer 3 : Noise texture ── */}
+      <div
         className="fixed inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
         style={{
+          zIndex: 3,
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Floating Particles */}
-      <div className="fixed inset-0 pointer-events-none">
+      {/* ── Layer 4 : Field pattern ── */}
+      <div
+        className="fixed inset-0 opacity-5 pointer-events-none"
+        style={{
+          zIndex: 4,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 Q25,30 50,50 T100,50' stroke='%2322c55e' stroke-width='0.5' fill='none'/%3E%3Cpath d='M0,60 Q25,80 50,60 T100,60' stroke='%2316a34a' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '100px 100px',
+        }}
+      />
+
+      {/* ── Layer 5 : Floating Particles (above marquee, feel part of bg) ── */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
         {particles.map((particle) => (
           <div
             key={particle.id}
@@ -142,17 +144,8 @@ export default function FuturisticAgriLogin() {
         ))}
       </div>
 
-      {/* Organic Field Pattern Background */}
-      <div 
-        className="fixed inset-0 opacity-5"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 Q25,30 50,50 T100,50' stroke='%2322c55e' stroke-width='0.5' fill='none'/%3E%3Cpath d='M0,60 Q25,80 50,60 T100,60' stroke='%2316a34a' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")`,
-          backgroundSize: '100px 100px',
-        }}
-      />
-
       {/* Main Container */}
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative flex min-h-screen" style={{ zIndex: 10 }}>
         {/* Left Panel - Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative">
           {/* Glow Effect Background */}
@@ -165,10 +158,7 @@ export default function FuturisticAgriLogin() {
 
           {/* Glass Card */}
           <div className="relative w-full max-w-md">
-            {/* Gradient Border Animation */}
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-green-500/20 rounded-3xl blur-sm animate-gradient-rotate" />
-            
-            <div className="relative bg-[#0d1612]/40 backdrop-blur-2xl border border-green-500/10 rounded-3xl p-8 md:p-10 shadow-2xl shadow-green-500/5">
+            <div className="relative bg-[#0d1612]/40 backdrop-blur-2xl border border-green-500/10 rounded-3xl p-8 md:p-12 py-16 md:py-20 shadow-2xl shadow-green-500/5">
               {/* Logo Section */}
               <div className="mb-8 animate-fade-in-down">
                 <div className="flex items-center gap-3 mb-2">
@@ -177,19 +167,40 @@ export default function FuturisticAgriLogin() {
                     <div className="absolute inset-0 bg-green-400/20 rounded-2xl animate-ping-slow" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent font-['Syne',serif]">
+                    <TextScramble
+                      key={`cropgpt-${scrambleKey}`}
+                      as="h1"
+                      className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent font-['Syne',serif]"
+                      duration={0.9}
+                      speed={0.04}
+                    >
                       CropGPT
-                    </h1>
-                    <p className="text-xs text-green-400/60 tracking-wider">PLATEFORME AGRICOLE IA</p>
+                    </TextScramble>
+                    <TextScramble
+                      key={`platform-${scrambleKey}`}
+                      as="p"
+                      className="text-xs text-green-400/60 tracking-wider"
+                      duration={1.4}
+                      speed={0.04}
+                      characterSet="ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+                    >
+                      PLATEFORME AGRICOLE IA
+                    </TextScramble>
                   </div>
                 </div>
               </div>
 
               {/* Texte de bienvenue */}
               <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 font-['Syne',serif]">
+                <TextScramble
+                  key={`welcome-${scrambleKey}`}
+                  as="h2"
+                  className="text-3xl md:text-4xl font-bold text-white mb-2 font-['Syne',serif]"
+                  duration={1.1}
+                  speed={0.045}
+                >
                   Bon Retour
-                </h2>
+                </TextScramble>
                 <p className="text-green-400/60 text-sm">
                   Accédez à votre tableau de bord agricole intelligent
                 </p>
@@ -300,95 +311,8 @@ export default function FuturisticAgriLogin() {
           </div>
         </div>
 
-        {/* Right Panel - Showcase */}
-        <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative">
-          {/* Parallax Glow */}
-          <div 
-            className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[150px]"
-            style={{
-              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
-            }}
-          />
-
-          <div className="relative w-full max-w-xl animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              {[
-                { label: 'Fermes Actives', value: '2 847', icon: '🌾', trend: '+23%' },
-                { label: 'Rendement', value: '+47%', icon: '📈', trend: 'An/An' },
-                { label: 'Précision IA', value: '98,4%', icon: '🎯', trend: 'Temps réel' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="bg-green-950/20 backdrop-blur-xl border border-green-500/10 rounded-2xl p-4 hover:border-green-500/30 transition-all duration-300 group"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{stat.icon}</div>
-                  <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-xs text-green-400/60">{stat.label}</div>
-                  <div className="text-xs text-emerald-400 mt-1">{stat.trend}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Main Testimonial Card */}
-            <div className="relative">
-              <div className="absolute -inset-[1px] bg-gradient-to-br from-green-500/30 via-emerald-500/30 to-green-500/30 rounded-3xl blur-md" />
-              <div className="relative bg-[#0d1612]/60 backdrop-blur-2xl border border-green-500/20 rounded-3xl p-8 shadow-2xl">
-                {/* Decorative Corner */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-3xl blur-2xl" />
-                
-                {/* Metric Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-green-400 text-xs font-bold tracking-wider">
-                    {testimonials[currentTestimonial].metric}
-                  </span>
-                </div>
-
-                <p className="text-lg leading-relaxed text-green-50/90 mb-8 font-light">
-                  "{testimonials[currentTestimonial].text}"
-                </p>
-
-                <div className="flex items-center gap-4">
-                  <div className="relative w-14 h-14">
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl animate-pulse-slow" />
-                    <div className="relative w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-green-500/30">
-                      {testimonials[currentTestimonial].initial}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-semibold mb-1">
-                      {testimonials[currentTestimonial].name}
-                    </h4>
-                    <p className="text-green-400/70 text-sm">
-                      {testimonials[currentTestimonial].role}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation Dots */}
-            <div className="flex justify-center gap-2 mt-8">
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentTestimonial(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentTestimonial === i
-                      ? 'w-8 bg-gradient-to-r from-green-500 to-emerald-500'
-                      : 'w-1.5 bg-green-500/20 hover:bg-green-500/40'
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Floating Tech Elements */}
-            <div className="absolute -top-10 -right-10 w-20 h-20 border border-green-500/20 rounded-2xl rotate-12 animate-float-slow" />
-            <div className="absolute -bottom-10 -left-10 w-16 h-16 border border-emerald-500/20 rounded-xl -rotate-12 animate-float-slower" />
-          </div>
-        </div>
+        {/* Right half — marquee is the global fixed background */}
+        <div className="hidden lg:block lg:w-1/2" />
       </div>
 
       <style>{`

@@ -91,12 +91,7 @@ export function AgriculturalChat() {
         padding: '16px 32px',
       }}>
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-            Assistant Agricole IA
-          </h2>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-            Votre guide pour l'agriculture à Madagascar
-          </p>
+
         </div>
         <ModeToggle mode={userMode} setMode={setUserMode} />
       </div>
