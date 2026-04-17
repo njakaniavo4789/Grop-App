@@ -1,0 +1,618 @@
+# Graph Report - .  (2026-04-17)
+
+## Corpus Check
+- 127 files · ~239,014 words
+- Verdict: corpus is large enough that graph structure adds value.
+
+## Summary
+- 562 nodes · 765 edges · 90 communities detected
+- Extraction: 70% EXTRACTED · 30% INFERRED · 0% AMBIGUOUS · INFERRED: 231 edges (avg confidence: 0.67)
+- Token cost: 0 input · 0 output
+
+## Community Hubs (Navigation)
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+
+## God Nodes (most connected - your core abstractions)
+1. `retrieve()` - 20 edges
+2. `Crop` - 18 edges
+3. `Farm` - 16 edges
+4. `Meta` - 12 edges
+5. `UserSerializer` - 12 edges
+6. `MLModelVersion` - 11 edges
+7. `Prediction` - 11 edges
+8. `TestOntologyGraph` - 11 edges
+9. `validate_and_enrich()` - 11 edges
+10. `predict()` - 10 edges
+
+## Surprising Connections (you probably didn't know these)
+- `predict()` --calls--> `predict_yield()`  [INFERRED]
+  backend/predictions/views.py → backend/predictions/ml/yield_model.py
+- `Meta` --uses--> `Conversation`  [INFERRED]
+  backend/users/serializers.py → backend/chat/models.py
+- `Meta` --uses--> `Message`  [INFERRED]
+  backend/users/serializers.py → backend/chat/models.py
+- `Meta` --uses--> `User`  [INFERRED]
+  backend/users/serializers.py → backend/users/models.py
+- `chat()` --calls--> `normalize()`  [INFERRED]
+  backend/chat/views.py → backend/chat/pipeline/normalizer.py
+
+## Communities
+
+### Community 0 - "Community 0"
+Cohesion: 0.05
+Nodes (37): getConversation(), getConversations(), getCrops(), getFarm(), getFarms(), getSoilData(), get_model_info(), Retourne les infos sur le modèle Colab (appel GET /info si disponible). (+29 more)
+
+### Community 1 - "Community 1"
+Cohesion: 0.12
+Nodes (23): Crop, Farm, Meta, MLModelVersion, Prediction, Données d'analyse de sol associées à une parcelle., Résultat d'une prédiction ML pour une culture donnée., Registre des versions de modèles ML déployés. (+15 more)
+
+### Community 2 - "Community 2"
+Cohesion: 0.08
+Nodes (30): _find_individual(), get_class_tag(), get_domain_keywords(), get_facts_block(), get_graph(), get_pedigree(), get_related_concepts(), _load_graph() (+22 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.07
+Nodes (29): _build_result(), _distance_to_score(), _empty_result(), _expand_query(), _fallback_static(), _format_context(), _load_vector_store(), _no_data_result() (+21 more)
+
+### Community 4 - "Community 4"
+Cohesion: 0.09
+Nodes (30): build_prompt(), _call_colab_blocking(), clear_cache(), generate(), _parse_sse_line(), _post_process(), Étape 4 du pipeline : appel au LLM hébergé sur Google Colab via HTTP (FastAPI +, Parse une ligne SSE du Colab au format pipe-délimité.     Formats possibles : (+22 more)
+
+### Community 5 - "Community 5"
+Cohesion: 0.08
+Nodes (18): handleSend(), sendMessage(), createCrop(), createFarm(), createSoilData(), access_token(), Smoke tests — exécutés contre l'environnement staging après déploiement.  Ces te, Un nouveau chat doit créer une conversation avec un ID. (+10 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.07
+Nodes (4): PrivateRoute(), getAccessToken(), handleNameSubmit(), handlePwdSubmit()
+
+### Community 7 - "Community 7"
+Cohesion: 0.18
+Nodes (14): AbstractBaseUser, APIView, updateCrop(), updateFarm(), User, PermissionsMixin, LoginSerializer, RegisterSerializer (+6 more)
+
+### Community 8 - "Community 8"
+Cohesion: 0.14
+Nodes (9): _generate_recommendations(), predict(), Modèle de prédiction de rendement pour la riziculture malgache.  Features d'entr, Retourne une prédiction de rendement riz basée sur des règles expertes.     À re, TestRiceModel, TestYieldModelDispatch, predict_yield(), Interface générique pour les modèles de prédiction de rendement. Dispatch vers l (+1 more)
+
+### Community 9 - "Community 9"
+Cohesion: 0.17
+Nodes (16): get_view(), handle_dice(), handle_reset(), handle_rollup(), handle_slice(), on_annee(), on_culture(), on_metrique() (+8 more)
+
+### Community 10 - "Community 10"
+Cohesion: 0.19
+Nodes (11): _detect_tags_from_ontology(), _get_ontology_facts(), _get_ontology_keywords(), Étape 2 du pipeline : validation ontologique et enrichissement du contexte.  - V, Verifie que `keyword` apparait comme mot entier dans `text_lower`.     Evite les, Retourne les keywords du graphe rdflib, avec fallback sur le dict local., Détecte les context_tags en deux passes :     1. Via les classes OWL des entités, Récupère les faits ontologiques pour les entités nommées trouvées dans le texte. (+3 more)
+
+### Community 11 - "Community 11"
+Cohesion: 0.18
+Nodes (6): BaseUserManager, UserManager, TestFarmModel, user(), user(), TextScramble()
+
+### Community 12 - "Community 12"
+Cohesion: 0.25
+Nodes (5): detect_language(), normalize(), Étape 1 du pipeline : nettoyage et normalisation du prompt utilisateur.  Input, Tests unitaires du pipeline chat (ne nécessitent pas de DB)., TestNormalizer
+
+### Community 13 - "Community 13"
+Cohesion: 0.29
+Nodes (9): get_current_view(), handle_dice(), handle_drill(), handle_reset(), handle_rollup(), handle_slice(), SLICE : Isole une tranche unique sur l'axe sélectionné., DICE : Filtre strictement selon toutes les cases cochées. (+1 more)
+
+### Community 14 - "Community 14"
+Cohesion: 0.22
+Nodes (5): AppConfig, ChatConfig, CropsConfig, PredictionsConfig, UsersConfig
+
+### Community 15 - "Community 15"
+Cohesion: 0.32
+Nodes (7): extract_text_from_pdf(), extract_text_from_txt(), import_file(), Importe un fichier PDF ou TXT local dans la knowledge base RAG. Utile pour les d, Extrait le texte d'un PDF local avec pdfplumber., Lit un fichier texte brut., Importe un fichier local dans la knowledge base.     Retourne True si succès.
+
+### Community 16 - "Community 16"
+Cohesion: 0.33
+Nodes (2): formatPop(), TilePopulation()
+
+### Community 17 - "Community 17"
+Cohesion: 0.33
+Nodes (3): get_memory_usage(), Test CropGPT - Qwen2 Local Model Lancer: python test_cropgpt.py  Affiche: memoir, Retourne l'utilisation memoire en MB.
+
+### Community 18 - "Community 18"
+Cohesion: 0.33
+Nodes (3): Base settings — partagées entre tous les environnements., Settings de développement — DEBUG activé, SQLite, CORS large., Settings de production — DEBUG=False, PostgreSQL, HTTPS. Toutes les valeurs sens
+
+### Community 19 - "Community 19"
+Cohesion: 0.4
+Nodes (5): build_index(), chunk_text(), Génération des embeddings et construction du vector store FAISS.  Usage CLI :, Découpe un texte en chunks avec chevauchement., Construit le vector store FAISS à partir des documents.      Args:         docum
+
+### Community 20 - "Community 20"
+Cohesion: 0.33
+Nodes (0): 
+
+### Community 21 - "Community 21"
+Cohesion: 0.33
+Nodes (0): 
+
+### Community 22 - "Community 22"
+Cohesion: 0.4
+Nodes (1): Migration
+
+### Community 23 - "Community 23"
+Cohesion: 0.5
+Nodes (0): 
+
+### Community 24 - "Community 24"
+Cohesion: 0.5
+Nodes (0): 
+
+### Community 25 - "Community 25"
+Cohesion: 0.5
+Nodes (0): 
+
+### Community 26 - "Community 26"
+Cohesion: 0.67
+Nodes (1): Test du chargeur d'ontologie CropGPT. Lancer depuis backend/ :     python test_o
+
+### Community 27 - "Community 27"
+Cohesion: 0.67
+Nodes (2): main(), Run administrative tasks.
+
+### Community 28 - "Community 28"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 29 - "Community 29"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 30 - "Community 30"
+Cohesion: 1.0
+Nodes (2): glass(), RegionSidebar()
+
+### Community 31 - "Community 31"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 32 - "Community 32"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 33 - "Community 33"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 34 - "Community 34"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 35 - "Community 35"
+Cohesion: 0.67
+Nodes (0): 
+
+### Community 36 - "Community 36"
+Cohesion: 1.0
+Nodes (1): Quick test Qwen2 - sans details memoire
+
+### Community 37 - "Community 37"
+Cohesion: 1.0
+Nodes (1): Minimal test Qwen2 -tres rapide
+
+### Community 38 - "Community 38"
+Cohesion: 1.0
+Nodes (1): Export Qwen2 to ONNX using optimum.
+
+### Community 39 - "Community 39"
+Cohesion: 1.0
+Nodes (1): Django settings for config project.  Generated by 'django-admin startproject' us
+
+### Community 40 - "Community 40"
+Cohesion: 1.0
+Nodes (1): WSGI config for config project.  It exposes the WSGI callable as a module-level
+
+### Community 41 - "Community 41"
+Cohesion: 1.0
+Nodes (1): ASGI config for config project.  It exposes the ASGI callable as a module-level
+
+### Community 42 - "Community 42"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 43 - "Community 43"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 44 - "Community 44"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 45 - "Community 45"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 46 - "Community 46"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 47 - "Community 47"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 48 - "Community 48"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 49 - "Community 49"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 50 - "Community 50"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 51 - "Community 51"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 52 - "Community 52"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 53 - "Community 53"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 54 - "Community 54"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 55 - "Community 55"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 56 - "Community 56"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 57 - "Community 57"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 58 - "Community 58"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 59 - "Community 59"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 60 - "Community 60"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 61 - "Community 61"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 62 - "Community 62"
+Cohesion: 1.0
+Nodes (1): Des mots agricoles fondamentaux doivent apparaître dans les keywords FR.
+
+### Community 63 - "Community 63"
+Cohesion: 1.0
+Nodes (1): Les classes variétales doivent être mappées au tag 'varieties'.
+
+### Community 64 - "Community 64"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 65 - "Community 65"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 66 - "Community 66"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 67 - "Community 67"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 68 - "Community 68"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 69 - "Community 69"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 70 - "Community 70"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 71 - "Community 71"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 72 - "Community 72"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 73 - "Community 73"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 74 - "Community 74"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 75 - "Community 75"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 76 - "Community 76"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 77 - "Community 77"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 78 - "Community 78"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 79 - "Community 79"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 80 - "Community 80"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 81 - "Community 81"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 82 - "Community 82"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 83 - "Community 83"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 84 - "Community 84"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 85 - "Community 85"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 86 - "Community 86"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 87 - "Community 87"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 88 - "Community 88"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 89 - "Community 89"
+Cohesion: 1.0
+Nodes (0): 
+
+## Knowledge Gaps
+- **114 isolated node(s):** `Test du chargeur d'ontologie CropGPT. Lancer depuis backend/ :     python test_o`, `Run administrative tasks.`, `Test CropGPT - Qwen2 Local Model Lancer: python test_cropgpt.py  Affiche: memoir`, `Retourne l'utilisation memoire en MB.`, `Quick test Qwen2 - sans details memoire` (+109 more)
+  These have ≤1 connection - possible missing edges or undocumented components.
+- **Thin community `Community 36`** (2 nodes): `quick_test.py`, `Quick test Qwen2 - sans details memoire`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 37`** (2 nodes): `minimal_test.py`, `Minimal test Qwen2 -tres rapide`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 38`** (2 nodes): `convert_to_onnx.py`, `Export Qwen2 to ONNX using optimum.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 39`** (2 nodes): `settings.py`, `Django settings for config project.  Generated by 'django-admin startproject' us`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 40`** (2 nodes): `wsgi.py`, `WSGI config for config project.  It exposes the WSGI callable as a module-level`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 41`** (2 nodes): `ASGI config for config project.  It exposes the ASGI callable as a module-level`, `asgi.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 42`** (2 nodes): `test.jsx`, `Dashboard()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 43`** (2 nodes): `RAGConfidenceBadge()`, `RAGConfidenceBadge.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 44`** (2 nodes): `useChatStream.ts`, `useChatStream()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 45`** (2 nodes): `ScrollButton()`, `scroll-button.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 46`** (2 nodes): `ChainOfThoughtItem()`, `chain-of-thought.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 47`** (2 nodes): `system-message.tsx`, `SystemMessage()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 48`** (2 nodes): `utils.ts`, `cn()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 49`** (2 nodes): `useTheme.ts`, `useTheme()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 50`** (2 nodes): `FuturisticAgriLogin()`, `login.jsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 51`** (2 nodes): `theme-provider.tsx`, `ThemeProvider()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 52`** (2 nodes): `AgricultureAISignup()`, `register.jsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 53`** (1 nodes): `eslint.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 54`** (1 nodes): `vite.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 55`** (1 nodes): `postcss.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 56`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 57`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 58`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 59`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 60`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 61`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 62`** (1 nodes): `Des mots agricoles fondamentaux doivent apparaître dans les keywords FR.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 63`** (1 nodes): `Les classes variétales doivent être mappées au tag 'varieties'.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 64`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 65`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 66`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 67`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 68`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 69`** (1 nodes): `urls.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 70`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 71`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 72`** (1 nodes): `tests.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 73`** (1 nodes): `admin.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 74`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 75`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 76`** (1 nodes): `__init__.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 77`** (1 nodes): `main.jsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 78`** (1 nodes): `MarkdownMessage.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 79`** (1 nodes): `UserMessage.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 80`** (1 nodes): `PrevisionPage.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 81`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 82`** (1 nodes): `prompt-suggestion.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 83`** (1 nodes): `collapsible.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 84`** (1 nodes): `tooltip.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 85`** (1 nodes): `avatar.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 86`** (1 nodes): `thinking-bar.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 87`** (1 nodes): `Accordion.jsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 88`** (1 nodes): `madagascarGraphData.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 89`** (1 nodes): `madagascarGeoJSON.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+
+## Suggested Questions
+_Questions this graph is uniquely positioned to answer:_
+
+- **Why does `retrieve()` connect `Community 3` to `Community 0`, `Community 4`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `chat()` connect `Community 4` to `Community 0`, `Community 3`, `Community 10`, `Community 11`, `Community 12`?**
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Why does `predict()` connect `Community 1` to `Community 0`, `Community 8`, `Community 11`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Are the 12 inferred relationships involving `retrieve()` (e.g. with `chat()` and `.test_returns_empty_for_invalid_domain()`) actually correct?**
+  _`retrieve()` has 12 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 16 inferred relationships involving `Crop` (e.g. with `PredictionViewSet` and `POST /api/predictions/predict/     Lance une prédiction de rendement pour une cu`) actually correct?**
+  _`Crop` has 16 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 14 inferred relationships involving `Farm` (e.g. with `MLModelVersion` and `Meta`) actually correct?**
+  _`Farm` has 14 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 8 inferred relationships involving `Meta` (e.g. with `Prediction` and `MLModelVersion`) actually correct?**
+  _`Meta` has 8 INFERRED edges - model-reasoned connections that need verification._
