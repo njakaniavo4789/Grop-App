@@ -90,7 +90,7 @@ export default function Login() {
                   overflow: 'hidden'
                 }}>
                   <img
-                    src="/ispm-logo.png"
+                    src="/images.jpeg"
                     alt="ISPM"
                     style={{ width: 100, height: 100, objectFit: 'contain' }}
                   />
